@@ -1,213 +1,124 @@
-@extends('layouts.client')
-@section('title', 'My Portal')
+@extends('layouts.public')
+@section('title', 'My Account')
 
 @section('content')
 
-{{-- Hero Section --}}
-<section class="bg-gradient-to-br from-stone-900 to-amber-900 text-white">
-    <div class="max-w-6xl mx-auto px-6 py-16 flex flex-col md:flex-row items-center justify-between gap-10">
-        <div>
-            <p class="text-amber-400 text-sm font-medium mb-2 uppercase tracking-widest">Welcome back</p>
-            <h1 class="text-4xl font-bold leading-tight mb-3">Hello, Juan! 👋</h1>
-            <p class="text-stone-300 text-lg mb-6">Here's an overview of your reservation at <span class="text-amber-400 font-semibold">Palm Residences</span>.</p>
-            <div class="flex flex-wrap gap-3">
-                <a href="{{ route('client.reservation') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">
-                    View My Reservation
-                </a>
-                <a href="{{ route('client.chat') }}" class="bg-white/10 hover:bg-white/20 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition">
-                    Ask AI Assistant
-                </a>
+{{-- Hero --}}
+<div class="bg-gradient-to-r from-stone-900 to-amber-900 text-white">
+    <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div class="flex items-center gap-5">
+            <div class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0">J</div>
+            <div>
+                <p class="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-1">Welcome back</p>
+                <h1 class="text-2xl font-bold">Juan dela Cruz</h1>
+                <p class="text-stone-300 text-sm mt-0.5">juan@email.com · Client since January 2025</p>
             </div>
         </div>
-        <div class="bg-white/10 rounded-2xl p-6 min-w-64 backdrop-blur-sm border border-white/10">
-            <p class="text-amber-300 text-xs uppercase tracking-widest mb-3">Reservation Summary</p>
-            <div class="space-y-3">
-                @foreach([
-                    ['Property','Palm Residences'],
-                    ['Lot','12-B, Block 1'],
-                    ['Area','120 sqm'],
-                    ['Status','Active'],
-                ] as $d)
-                <div class="flex justify-between text-sm">
-                    <span class="text-stone-400">{{ $d[0] }}</span>
-                    <span class="text-white font-medium">{{ $d[1] }}</span>
-                </div>
-                @endforeach
-            </div>
-        </div>
+        <a href="{{ route('client.account.profile') }}" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            Edit Profile
+        </a>
     </div>
-</section>
+</div>
 
 {{-- Status Cards --}}
-<section class="max-w-6xl mx-auto px-6 -mt-6">
+<div class="max-w-6xl mx-auto px-6 -mt-5">
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
         @foreach([
-            ['Total Paid','₱300,000','text-green-600','bg-green-50 border-green-100'],
-            ['Remaining Balance','₱900,000','text-red-500','bg-red-50 border-red-100'],
-            ['Next Due','Jul 15, 2025','text-amber-600','bg-amber-50 border-amber-100'],
-            ['Documents','4 of 6','text-blue-600','bg-blue-50 border-blue-100'],
+            ['Total Paid','₱300,000','bg-green-50 border-green-100','text-green-600'],
+            ['Remaining','₱900,000','bg-red-50 border-red-100','text-red-500'],
+            ['Next Due','Jul 15','bg-amber-50 border-amber-100','text-amber-600'],
+            ['Documents','4/6','bg-blue-50 border-blue-100','text-blue-600'],
         ] as $s)
-        <div class="bg-white rounded-xl border {{ $s[3] }} p-4 shadow-sm">
+        <div class="bg-white rounded-2xl border {{ $s[2] }} p-4 shadow-sm">
             <p class="text-xs text-stone-500 mb-1">{{ $s[0] }}</p>
-            <p class="text-lg font-bold {{ $s[2] }}">{{ $s[1] }}</p>
+            <p class="text-xl font-bold {{ $s[3] }}">{{ $s[1] }}</p>
         </div>
         @endforeach
     </div>
-</section>
+</div>
 
-{{-- Main Content --}}
-<section class="max-w-6xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-    {{-- Left: Upcoming Payment + Recent Notifications --}}
-    <div class="lg:col-span-2 space-y-8">
-
-        {{-- Upcoming Payment --}}
-        <div>
-            <h2 class="text-lg font-bold text-stone-800 mb-4">Upcoming Payment</h2>
-            <div class="bg-white rounded-2xl border border-stone-200 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center">
-                        <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="font-semibold text-stone-800 text-lg">₱50,000</p>
-                        <p class="text-sm text-stone-500">Monthly Installment — July 2025</p>
-                        <p class="text-xs text-amber-600 font-medium mt-1">Due: July 15, 2025</p>
-                    </div>
-                </div>
-                <a href="{{ route('client.payments') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl text-sm font-medium transition whitespace-nowrap">
-                    Pay Now
-                </a>
+{{-- Quick Nav Cards --}}
+<div class="max-w-6xl mx-auto px-6 py-8">
+    <h2 class="font-semibold text-stone-800 mb-4">Quick Access</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+        @foreach([
+            ['My Reservation','client.account.reservation','M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z','amber'],
+            ['My Payments','client.account.payments','M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z','green'],
+            ['My Documents','client.account.documents','M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z','blue'],
+            ['Notifications','client.account.notifications','M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9','red'],
+            ['Feedback','client.account.feedback','M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z','purple'],
+        ] as $nav)
+        <a href="{{ route($nav[1]) }}" class="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col items-center gap-3 hover:shadow-md hover:border-amber-200 transition group text-center">
+            <div class="w-12 h-12 bg-stone-100 group-hover:bg-amber-100 rounded-xl flex items-center justify-center transition">
+                <svg class="w-6 h-6 text-stone-500 group-hover:text-amber-600 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $nav[2] }}"/></svg>
             </div>
-        </div>
-
-        {{-- Payment History Preview --}}
-        <div>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-stone-800">Recent Payments</h2>
-                <a href="{{ route('client.payments') }}" class="text-sm text-amber-600 hover:underline">View all</a>
-            </div>
-            <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-                @foreach([
-                    ['June 2025','₱50,000','Jun 10, 2025','Paid'],
-                    ['May 2025','₱50,000','May 12, 2025','Paid'],
-                    ['April 2025','₱50,000','Apr 8, 2025','Paid'],
-                ] as $p)
-                <div class="flex items-center justify-between px-6 py-4 border-b border-stone-100 last:border-0 hover:bg-stone-50 transition">
-                    <div>
-                        <p class="text-sm font-medium text-stone-700">{{ $p[0] }}</p>
-                        <p class="text-xs text-stone-400">{{ $p[2] }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-stone-700">{{ $p[1] }}</p>
-                        <span class="text-xs text-green-600 font-medium">{{ $p[3] }}</span>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Document Status --}}
-        <div>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-stone-800">Document Requirements</h2>
-                <a href="{{ route('client.documents') }}" class="text-sm text-amber-600 hover:underline">Upload</a>
-            </div>
-            <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
-                @foreach([
-                    ['Valid ID','Approved','green'],
-                    ['Proof of Income','Approved','green'],
-                    ['Birth Certificate','Approved','green'],
-                    ['TIN Certificate','Missing — Upload required','red'],
-                    ['Marriage Certificate','Approved','green'],
-                    ['Bank Statement','Pending Review','yellow'],
-                ] as $d)
-                <div class="flex items-center justify-between px-6 py-3.5 border-b border-stone-100 last:border-0 hover:bg-stone-50 transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-2 h-2 rounded-full shrink-0
-                            {{ $d[2]==='green' ? 'bg-green-500' : '' }}
-                            {{ $d[2]==='yellow' ? 'bg-yellow-500' : '' }}
-                            {{ $d[2]==='red' ? 'bg-red-500' : '' }}">
-                        </div>
-                        <p class="text-sm text-stone-700">{{ $d[0] }}</p>
-                    </div>
-                    <span class="text-xs font-medium
-                        {{ $d[2]==='green' ? 'text-green-600' : '' }}
-                        {{ $d[2]==='yellow' ? 'text-yellow-600' : '' }}
-                        {{ $d[2]==='red' ? 'text-red-500' : '' }}">
-                        {{ $d[1] }}
-                    </span>
-                </div>
-                @endforeach
-            </div>
-        </div>
-
+            <p class="text-sm font-semibold text-stone-700 group-hover:text-amber-700 transition">{{ $nav[0] }}</p>
+        </a>
+        @endforeach
     </div>
 
-    {{-- Right: Notifications + AI Chat CTA --}}
-    <div class="space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {{-- Notifications --}}
-        <div>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-stone-800">Notifications</h2>
-                <a href="{{ route('client.notifications') }}" class="text-sm text-amber-600 hover:underline">See all</a>
+        {{-- Reservation Summary --}}
+        <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
+                <h2 class="font-semibold text-stone-800">My Reservation</h2>
+                <a href="{{ route('client.account.reservation') }}" class="text-xs text-amber-600 hover:underline">View details →</a>
             </div>
-            <div class="space-y-3">
+            <div class="p-5">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <p class="font-bold text-stone-800">Palm Residences</p>
+                        <p class="text-sm text-stone-400 flex items-center gap-1 mt-0.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                            Quezon City · Lot 12-B, Block 1
+                        </p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">Active</span>
+                </div>
+                <div class="mb-3">
+                    <div class="flex justify-between text-xs text-stone-500 mb-1">
+                        <span>Payment Progress</span><span class="font-semibold text-amber-600">25%</span>
+                    </div>
+                    <div class="w-full bg-stone-100 rounded-full h-2 overflow-hidden">
+                        <div class="bg-amber-500 h-2 rounded-full" style="width:25%"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-xs text-stone-500">
+                    <span>₱300,000 paid</span><span>₱900,000 remaining</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Recent Notifications --}}
+        <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
+                <h2 class="font-semibold text-stone-800">Recent Notifications</h2>
+                <a href="{{ route('client.account.notifications') }}" class="text-xs text-amber-600 hover:underline">See all →</a>
+            </div>
+            <div class="divide-y divide-stone-100">
                 @foreach([
-                    ['Payment Reminder','July installment due on Jul 15.','yellow','2h ago',true],
-                    ['Missing Document','TIN Certificate not yet uploaded.','red','5h ago',true],
-                    ['Payment Confirmed','June payment received. ✓','green','Jun 10',false],
+                    ['Payment Reminder','July installment due Jul 15.','yellow','2h ago',true],
+                    ['Missing Document','TIN Certificate not uploaded.','red','5h ago',true],
+                    ['Payment Confirmed','June payment received ✓','green','Jun 10',false],
                 ] as $n)
-                <div class="bg-white rounded-xl border border-stone-200 p-4 {{ $n[4] ? 'border-l-4 border-l-amber-400' : '' }}">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="flex items-start gap-2">
-                            <div class="w-2 h-2 rounded-full mt-1.5 shrink-0
-                                {{ $n[2]==='yellow' ? 'bg-yellow-500' : '' }}
-                                {{ $n[2]==='red' ? 'bg-red-500' : '' }}
-                                {{ $n[2]==='green' ? 'bg-green-500' : '' }}">
-                            </div>
-                            <div>
-                                <p class="text-sm font-medium text-stone-700">{{ $n[0] }}</p>
-                                <p class="text-xs text-stone-400 mt-0.5">{{ $n[1] }}</p>
-                            </div>
-                        </div>
-                        <span class="text-xs text-stone-400 shrink-0">{{ $n[3] }}</span>
+                <div class="flex items-start gap-3 px-5 py-3.5 {{ $n[4] ? 'bg-amber-50/50' : '' }}">
+                    <div class="w-2 h-2 rounded-full mt-1.5 shrink-0
+                        {{ $n[2]==='yellow' ? 'bg-yellow-500' : '' }}
+                        {{ $n[2]==='red' ? 'bg-red-500' : '' }}
+                        {{ $n[2]==='green' ? 'bg-green-500' : '' }}"></div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-stone-700">{{ $n[0] }}</p>
+                        <p class="text-xs text-stone-400">{{ $n[1] }}</p>
                     </div>
+                    <span class="text-xs text-stone-400 shrink-0">{{ $n[3] }}</span>
                 </div>
                 @endforeach
             </div>
         </div>
 
-        {{-- AI Chat CTA --}}
-        <div class="bg-gradient-to-br from-stone-800 to-amber-900 rounded-2xl p-6 text-white">
-            <div class="w-12 h-12 bg-amber-600 rounded-xl flex items-center justify-center mb-4">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-            </div>
-            <h3 class="font-bold text-lg mb-2">Have a question?</h3>
-            <p class="text-stone-300 text-sm mb-4">Our AI Assistant is available 24/7 to answer your inquiries about payments, documents, and your reservation.</p>
-            <a href="{{ route('client.chat') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl text-sm font-medium transition">
-                Chat with AI Now
-            </a>
-        </div>
-
-        {{-- Broker Contact --}}
-        <div class="bg-white rounded-2xl border border-stone-200 p-5">
-            <h3 class="font-semibold text-stone-800 mb-3">Your Broker</h3>
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-11 h-11 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold">B</div>
-                <div>
-                    <p class="font-medium text-stone-800 text-sm">Broker Name</p>
-                    <p class="text-xs text-stone-400">Licensed Real Estate Broker</p>
-                </div>
-            </div>
-            <a href="{{ route('client.chat') }}" class="block w-full text-center border border-amber-600 text-amber-600 hover:bg-amber-50 py-2 rounded-xl text-sm font-medium transition">
-                Send a Message
-            </a>
-        </div>
-
     </div>
-
-</section>
+</div>
 
 @endsection

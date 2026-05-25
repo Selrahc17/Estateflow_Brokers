@@ -74,6 +74,11 @@
                     class="flex-1 py-2 rounded-lg text-sm font-medium transition">
                     Client
                 </button>
+                <button @click="role = 'admin'"
+                    :class="role === 'admin' ? 'bg-white text-red-700 shadow-sm' : 'text-stone-500'"
+                    class="flex-1 py-2 rounded-lg text-sm font-medium transition">
+                    Admin
+                </button>
             </div>
 
             {{-- Form --}}
@@ -111,6 +116,14 @@
                         Sign In as Client
                     </a>
                 </div>
+                {{-- Admin Login --}}
+                <div x-show="role === 'admin'">
+                    <a href="{{ route('admin.dashboard') }}"
+                        class="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-3 rounded-xl font-medium transition">
+                        Sign In as Admin
+                    </a>
+                </div>
+
             </form>
 
             <p class="text-center text-sm text-stone-400 mt-6">

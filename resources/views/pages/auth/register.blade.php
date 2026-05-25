@@ -77,6 +77,9 @@
                 Create Account
             </button>
 
+            {{-- After register redirect to verify --}}
+            <p class="text-center text-xs text-stone-400">After registering, check your email to verify your account.</p>
+
         </form>
 
         <p class="text-center text-sm text-stone-400 mt-5">

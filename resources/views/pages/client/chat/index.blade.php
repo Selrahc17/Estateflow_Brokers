@@ -131,9 +131,11 @@
             <div class="px-5 py-3 border-t border-stone-100 bg-white">
                 <p class="text-xs text-stone-400 mb-2">Suggested questions:</p>
                 <div class="flex flex-wrap gap-2">
-                    @foreach(['What documents am I missing?','How much is my balance?','Show my lot details','How to pay online?','Contact my broker']) as $q)
-                    <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition border border-transparent hover:border-amber-200">{{ $q }}</button>
-                    @endforeach
+                    <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition border border-transparent hover:border-amber-200">What documents am I missing?</button>
+                    <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition border border-transparent hover:border-amber-200">How much is my balance?</button>
+                    <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition border border-transparent hover:border-amber-200">Show my lot details</button>
+                    <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition border border-transparent hover:border-amber-200">How to pay online?</button>
+                    <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition border border-transparent hover:border-amber-200">Contact my broker</button>
                 </div>
             </div>
 

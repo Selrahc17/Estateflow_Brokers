@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Http\Controllers\Broker;
+
+use App\Http\Controllers\Controller;
+use App\Models\Lot;
+use App\Models\Property;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class LotController extends Controller
+{
+    public function index(): View
+    {
+        $lots = Lot::whereHas('property', fn($q) => $q->where('broker_id', auth()->id()))
+            ->with('property')
+            ->latest()
+            ->paginate(15);
+
+        return view('pages.lots.index', compact('lots'));
+    }
+
+    public function create(): View
+    {
+        $properties = Property::where('broker_id', auth()->id())->pluck('name', 'id');
+        return view('pages.lots.create', compact('properties'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'property_id'  => 'required|exists:properties,id',
+            'lot_number'   => 'required|string|max:50',
+            'price'        => 'nullable|numeric|min:0',
+            'square_meters' => 'nullable|numeric|min:0',
+            'status'       => 'required|in:available,reserved,sold',
+            'description'  => 'nullable|string',
+            'title'        => 'nullable|string|max:255',
+        ]);
+
+        Lot::create($data);
+
+        return redirect()->route('broker.lots.index')->with('success', 'Lot created successfully.');
+    }
+
+    public function edit(Lot $lot): View
+    {
+        $properties = Property::where('broker_id', auth()->id())->pluck('name', 'id');
+        return view('pages.lots.edit', compact('lot', 'properties'));
+    }
+
+    public function update(Request $request, Lot $lot): RedirectResponse
+    {
+        $data = $request->validate([
+            'property_id'  => 'required|exists:properties,id',
+            'lot_number'   => 'required|string|max:50',
+            'price'        => 'nullable|numeric|min:0',
+            'square_meters' => 'nullable|numeric|min:0',
+            'status'       => 'required|in:available,reserved,sold',
+            'description'  => 'nullable|string',
+            'title'        => 'nullable|string|max:255',
+        ]);
+
+        $lot->update($data);
+
+        return redirect()->route('broker.lots.index')->with('success', 'Lot updated successfully.');
+    }
+
+    public function destroy(Lot $lot): RedirectResponse
+    {
+        $lot->delete();
+        return redirect()->route('broker.lots.index')->with('success', 'Lot deleted successfully.');
+    }
+}

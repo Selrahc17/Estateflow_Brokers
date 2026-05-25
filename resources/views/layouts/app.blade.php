@@ -87,10 +87,10 @@
         {{-- Profile --}}
         <div class="border-t border-stone-700 p-3">
             <a href="{{ route('settings.index') }}" class="flex items-center gap-3 px-2 py-2 rounded-lg text-stone-300 hover:bg-stone-800 transition">
-                <div class="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-white">B</div>
+                <div class="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-white">{{ substr(auth()->user()->name ?? 'B', 0, 1) }}</div>
                 <div x-show="sidebarOpen">
-                    <p class="text-sm font-medium text-white">Broker Name</p>
-                    <p class="text-xs text-stone-400">broker@estateflow.com</p>
+                    <p class="text-sm font-medium text-white">{{ auth()->user()->name ?? 'Broker' }}</p>
+                    <p class="text-xs text-stone-400">{{ auth()->user()->email ?? '' }}</p>
                 </div>
             </a>
         </div>
@@ -118,6 +118,20 @@
                 <div class="w-9 h-9 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold text-sm">B</div>
             </div>
         </header>
+
+        {{-- Flash Messages --}}
+        @if(session('success'))
+            <div class="mx-6 mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ session('error') }}
+            </div>
+        @endif
 
         {{-- Page Content --}}
         <main class="flex-1 p-6">

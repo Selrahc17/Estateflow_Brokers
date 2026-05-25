@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Client;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -10,16 +11,39 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Admin
+        User::create([
+            'name'     => 'Super Admin',
+            'email'    => 'admin@estateflow.com',
+            'password' => 'admin123',
+            'role'     => 'admin',
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Broker
+        User::create([
+            'name'     => 'Broker Name',
+            'email'    => 'broker@estateflow.com',
+            'password' => 'broker123',
+            'role'     => 'broker',
+        ]);
+
+        // Test Client (User + Client profile)
+        $clientUser = User::create([
+            'name'     => 'Juan dela Cruz',
+            'email'    => 'client@estateflow.com',
+            'password' => 'client123',
+            'role'     => 'client',
+        ]);
+
+        Client::create([
+            'user_id'    => $clientUser->id,
+            'first_name' => 'Juan',
+            'last_name'  => 'dela Cruz',
+            'email'      => 'client@estateflow.com',
+            'password'   => 'client123',
+            'status'     => 'active',
         ]);
     }
 }

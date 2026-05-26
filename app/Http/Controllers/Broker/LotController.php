@@ -8,17 +8,23 @@ use App\Models\Property;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class LotController extends Controller
 {
     public function index(): View
     {
+        $properties = Property::where('broker_id', auth()->id())->get();
+
         $lots = Lot::whereHas('property', fn($q) => $q->where('broker_id', auth()->id()))
+            ->when(request('property_id'), fn($q) => $q->where('property_id', request('property_id')))
+            ->when(request('status'), fn($q) => $q->where('status', request('status')))
             ->with('property')
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('pages.lots.index', compact('lots'));
+        return view('pages.lots.index', compact('lots', 'properties'));
     }
 
     public function create(): View
@@ -30,7 +36,7 @@ class LotController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'property_id'  => 'required|exists:properties,id',
+            'property_id'  => ['required', Rule::exists('properties', 'id')->where('broker_id', auth()->id())],
             'lot_number'   => 'required|string|max:50',
             'price'        => 'nullable|numeric|min:0',
             'square_meters' => 'nullable|numeric|min:0',
@@ -53,7 +59,7 @@ class LotController extends Controller
     public function update(Request $request, Lot $lot): RedirectResponse
     {
         $data = $request->validate([
-            'property_id'  => 'required|exists:properties,id',
+            'property_id'  => ['required', Rule::exists('properties', 'id')->where('broker_id', auth()->id())],
             'lot_number'   => 'required|string|max:50',
             'price'        => 'nullable|numeric|min:0',
             'square_meters' => 'nullable|numeric|min:0',

@@ -8,9 +8,15 @@
 {{-- Header Actions --}}
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
-        <form method="GET" class="flex gap-2">
+        <form method="GET" class="flex flex-col gap-2 sm:flex-row sm:items-center">
             <input type="text" name="search" placeholder="Search properties..." value="{{ request('search') }}"
-                   class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 w-64">
+                   class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 w-full sm:w-64">
+            <select name="type" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
+                <option value="">All Types</option>
+                @foreach(['House and Lot','Lot Only','Condominium','Commercial','Apartment'] as $type)
+                <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
+                @endforeach
+            </select>
             <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
                 <option value="">All Status</option>
                 <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
@@ -46,14 +52,15 @@
             <div class="flex items-start justify-between mb-2">
                 <div>
                     <h3 class="font-semibold text-stone-800">{{ $property->name }}</h3>
-                    <p class="text-xs text-stone-400 flex items-center gap-1 mt-0.5">
+                    <p class="text-xs text-stone-400 flex flex-wrap items-center gap-1 mt-0.5">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                         {{ $property->city ?? $property->province ?? 'N/A' }}
                     </p>
+                    <p class="text-xs text-stone-500 mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-full bg-stone-100 text-stone-700">{{ $property->type }}</p>
                 </div>
             </div>
             <div class="flex items-center justify-between text-xs text-stone-500 mt-3 pt-3 border-t border-stone-100">
-                <span>{{ $property->lots_count }} lots</span>
+                <span>{{ $property->available_lots_count }} available / {{ $property->lots_count }} total units</span>
                 @if($property->price)
                     <span class="text-green-600 font-medium">₱{{ number_format($property->price, 2) }}</span>
                 @endif
@@ -61,6 +68,10 @@
             <div class="flex gap-2 mt-3">
                 <a href="{{ route('broker.properties.show', $property) }}" class="flex-1 text-center text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 py-1.5 rounded-lg transition font-medium">View Lots</a>
                 <a href="{{ route('broker.properties.edit', $property) }}" class="flex-1 text-center text-xs bg-stone-50 hover:bg-stone-100 text-stone-600 py-1.5 rounded-lg transition font-medium">Edit</a>
+                <form method="POST" action="{{ route('broker.properties.destroy', $property) }}" onsubmit="return confirm('Delete this property?')" class="w-24">
+                    @csrf @method('DELETE')
+                    <button type="submit" class="w-full text-center text-xs bg-red-50 hover:bg-red-100 text-red-600 py-1.5 rounded-lg transition font-medium">Delete</button>
+                </form>
             </div>
         </div>
     </div>

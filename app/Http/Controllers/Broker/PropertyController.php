@@ -14,9 +14,14 @@ class PropertyController extends Controller
     public function index(): View
     {
         $properties = Property::where('broker_id', auth()->id())
+            ->when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%'))
+            ->when(request('status'), fn($q) => $q->where('status', request('status')))
+            ->when(request('type'), fn($q) => $q->where('type', request('type')))
             ->withCount('lots')
+            ->withCount(['lots as available_lots_count' => fn($q) => $q->where('status', 'available')])
             ->latest()
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
         return view('pages.properties.index', compact('properties'));
     }
@@ -34,6 +39,7 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
+            'type'        => 'required|in:House and Lot,Lot Only,Condominium,Commercial,Apartment',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
@@ -73,6 +79,7 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
+            'type'        => 'required|in:House and Lot,Lot Only,Condominium,Commercial,Apartment',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',

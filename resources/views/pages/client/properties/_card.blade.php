@@ -15,9 +15,12 @@
             <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500 text-white">Available</span>
         </div>
         @if($property->lots_count > 0)
-        <div class="absolute top-3 right-3">
-            <span class="px-2.5 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-medium text-stone-700">
+        <div class="absolute top-3 right-3 space-y-1 text-right">
+            <span class="px-2.5 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-medium text-stone-700 block">
                 {{ $property->lots_count }} lot{{ $property->lots_count > 1 ? 's' : '' }} available
+            </span>
+            <span class="px-2.5 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-medium text-stone-700 block">
+                {{ $property->type ?? 'Property' }}
             </span>
         </div>
         @endif

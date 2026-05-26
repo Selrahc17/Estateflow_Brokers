@@ -8,7 +8,7 @@
     <form method="GET" class="flex gap-2">
         <select name="property_id" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
             <option value="">All Properties</option>
-            @foreach(\App\Models\Property::where('broker_id', auth()->id())->get() as $p)
+            @foreach($properties as $p)
                 <option value="{{ $p->id }}" {{ request('property_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
             @endforeach
         </select>

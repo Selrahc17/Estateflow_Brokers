@@ -13,6 +13,7 @@ class PropertyController extends Controller
     {
         $properties = Property::where('status', 'available')
             ->when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%')->orWhere('description', 'like', '%'.request('search').'%'))
+            ->when(request('type'), fn($q) => $q->where('type', request('type')))
             ->when(request('location'), fn($q) => $q->where(fn($q2) => $q2->where('city', 'like', '%'.request('location').'%')->orWhere('province', 'like', '%'.request('location').'%')->orWhere('address', 'like', '%'.request('location').'%')))
             ->withCount(['lots' => fn($q) => $q->where('status', 'available')])
             ->latest()

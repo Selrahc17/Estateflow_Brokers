@@ -250,10 +250,7 @@ function mapPicker(initLat, initLng) {
             if (q.length < 2) { this.results = []; return; }
             this.searching = true;
             try {
-                const res = await fetch(
-                    `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(q)}&limit=6&countrycodes=ph`,
-                    { headers: { 'Accept-Language': 'en' } }
-                );
+                const res = await fetch(`/api/geocode/search?q=${encodeURIComponent(q)}`);
                 this.results = await res.json();
             } finally { this.searching = false; }
         },
@@ -267,10 +264,7 @@ function mapPicker(initLat, initLng) {
 
         async reverseGeocode(lat, lng) {
             try {
-                const res = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=${lat}&lon=${lng}`,
-                    { headers: { 'Accept-Language': 'en' } }
-                );
+                const res = await fetch(`/api/geocode/reverse?lat=${lat}&lon=${lng}`);
                 const data = await res.json();
                 if (data?.address) this.fillAddress(data.address, data.display_name);
             } catch(e) {}

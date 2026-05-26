@@ -31,6 +31,7 @@ use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
 use App\Http\Controllers\Client\ProfileController as ClientProfileController;
 use App\Http\Controllers\Client\PropertyController as ClientPropertyController;
 use App\Http\Controllers\Client\ReservationController as ClientReservationController;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 // ===================== AUTH ROUTES =====================
@@ -98,6 +99,29 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');
 });
+
+// ===================== NOMINATIM PROXY =====================
+Route::get('/api/geocode/search', function () {
+    $q = request('q');
+    if (!$q || strlen($q) < 2) return response()->json([]);
+    $res = Http::withoutVerifying()->withHeaders(['User-Agent' => 'EstateFlowBrokers/1.0'])
+        ->get('https://nominatim.openstreetmap.org/search', [
+            'format' => 'json', 'addressdetails' => 1,
+            'q' => $q, 'limit' => 6, 'countrycodes' => 'ph',
+        ]);
+    return response()->json($res->json());
+})->middleware('auth');
+
+Route::get('/api/geocode/reverse', function () {
+    $lat = request('lat'); $lon = request('lon');
+    if (!$lat || !$lon) return response()->json([]);
+    $res = Http::withoutVerifying()->withHeaders(['User-Agent' => 'EstateFlowBrokers/1.0'])
+        ->get('https://nominatim.openstreetmap.org/reverse', [
+            'format' => 'json', 'addressdetails' => 1,
+            'lat' => $lat, 'lon' => $lon,
+        ]);
+    return response()->json($res->json());
+})->middleware('auth');
 
 // ===================== BROKER ROUTES =====================
 Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->group(function () {

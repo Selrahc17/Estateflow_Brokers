@@ -34,16 +34,18 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
+            'latitude'    => 'nullable|numeric|between:-90,90',
+            'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
             'status'      => 'required|in:available,sold,coming_soon',
-            'featured_image' => 'nullable|image|max:2048',
             'amenities'   => 'nullable|array',
         ]);
 
-        $data['slug'] = Str::slug($data['name']) . '-' . uniqid();
+        $data['slug']      = Str::slug($data['name']) . '-' . uniqid();
         $data['broker_id'] = auth()->id();
 
         if ($request->hasFile('featured_image')) {
+            $request->validate(['featured_image' => 'image|max:4096']);
             $data['featured_image'] = $request->file('featured_image')->store('properties', 'public');
         }
 
@@ -71,13 +73,19 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
+            'latitude'    => 'nullable|numeric|between:-90,90',
+            'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
             'status'      => 'required|in:available,sold,coming_soon',
-            'featured_image' => 'nullable|image|max:2048',
             'amenities'   => 'nullable|array',
         ]);
 
         if ($request->hasFile('featured_image')) {
+            $request->validate(['featured_image' => 'image|max:4096']);
+            // Delete old image
+            if ($property->featured_image) {
+                \Storage::disk('public')->delete($property->featured_image);
+            }
             $data['featured_image'] = $request->file('featured_image')->store('properties', 'public');
         }
 

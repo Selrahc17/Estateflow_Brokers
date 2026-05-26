@@ -24,10 +24,14 @@ class ReportController extends Controller
                 ->selectRaw("status, COUNT(*) as count")
                 ->groupBy('status')
                 ->pluck('count', 'status'),
+            'reservations_by_status' => Reservation::where('broker_id', $brokerId)
+                ->selectRaw("status, COUNT(*) as count")
+                ->groupBy('status')
+                ->pluck('count', 'status'),
             'monthly_payments'   => Payment::where('broker_id', $brokerId)
                 ->where('status', 'verified')
-                ->selectRaw("EXTRACT(MONTH FROM created_at) as month, SUM(amount) as total")
-                ->groupByRaw("EXTRACT(MONTH FROM created_at)")
+                ->selectRaw("CAST(strftime('%m', created_at) AS INTEGER) as month, SUM(amount) as total")
+                ->groupByRaw("strftime('%m', created_at)")
                 ->pluck('total', 'month'),
         ];
 

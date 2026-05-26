@@ -13,6 +13,7 @@ class BrokerController extends Controller
     public function index(): View
     {
         $brokers = User::where('role', 'broker')
+            ->when(request('search'), fn($q) => $q->where('name','like','%'.request('search').'%')->orWhere('email','like','%'.request('search').'%'))
             ->withCount('clients')
             ->latest()
             ->paginate(15);

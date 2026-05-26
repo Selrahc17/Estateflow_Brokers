@@ -47,6 +47,11 @@ class PaymentController extends Controller
         $data['payment_code'] = 'PAY-' . strtoupper(Str::random(8));
         $data['status'] = 'pending';
 
+        $reservation = \App\Models\Reservation::find($data['reservation_id']);
+        if ($reservation) {
+            $data['broker_id'] = $reservation->broker_id;
+        }
+
         Payment::create($data);
 
         return redirect()->route('client.account.payments')->with('success', 'Payment submitted. Awaiting verification.');

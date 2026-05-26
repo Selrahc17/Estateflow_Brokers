@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
-@section('page-subtitle', 'Welcome back, Broker! Here is your overview.')
+@section('page-subtitle', 'Welcome back, {{ auth()->user()->name }}!')
 
 @section('content')
 
@@ -14,8 +14,7 @@
         </div>
         <div>
             <p class="text-sm text-stone-500">Total Properties</p>
-            <p class="text-2xl font-bold text-stone-800">24</p>
-            <p class="text-xs text-green-500">+2 this month</p>
+            <p class="text-2xl font-bold text-stone-800">{{ $stats['total_properties'] }}</p>
         </div>
     </div>
 
@@ -25,8 +24,7 @@
         </div>
         <div>
             <p class="text-sm text-stone-500">Active Reservations</p>
-            <p class="text-2xl font-bold text-stone-800">18</p>
-            <p class="text-xs text-green-500">+5 this week</p>
+            <p class="text-2xl font-bold text-stone-800">{{ $stats['active_reservations'] }}</p>
         </div>
     </div>
 
@@ -36,8 +34,7 @@
         </div>
         <div>
             <p class="text-sm text-stone-500">Total Clients</p>
-            <p class="text-2xl font-bold text-stone-800">142</p>
-            <p class="text-xs text-green-500">+12 this month</p>
+            <p class="text-2xl font-bold text-stone-800">{{ $stats['total_clients'] }}</p>
         </div>
     </div>
 
@@ -47,8 +44,7 @@
         </div>
         <div>
             <p class="text-sm text-stone-500">Pending Payments</p>
-            <p class="text-2xl font-bold text-stone-800">7</p>
-            <p class="text-xs text-red-500">Needs follow-up</p>
+            <p class="text-2xl font-bold text-stone-800">{{ $stats['pending_payments'] }}</p>
         </div>
     </div>
 
@@ -61,7 +57,7 @@
     <div class="xl:col-span-2 bg-white rounded-xl border border-stone-200 p-5">
         <div class="flex items-center justify-between mb-4">
             <h2 class="font-semibold text-stone-800">Recent Reservations</h2>
-            <a href="{{ route('reservations.index') }}" class="text-xs text-amber-600 hover:underline">View all</a>
+        <a href="{{ route('broker.reservations.index') }}" class="text-xs text-amber-600 hover:underline">View all</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -75,28 +71,25 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-50">
-                    @foreach([
-                        ['Juan dela Cruz', 'Palm Residences', 'Lot 12-B', 'Active', 'Jul 1, 2025', 'green'],
-                        ['Maria Santos', 'Greenfield Villas', 'Lot 5-A', 'Pending', 'Jun 28, 2025', 'yellow'],
-                        ['Pedro Reyes', 'Sunrise Homes', 'Lot 3-C', 'Active', 'Jun 25, 2025', 'green'],
-                        ['Ana Lim', 'Palm Residences', 'Lot 8-D', 'Overdue', 'Jun 20, 2025', 'red'],
-                        ['Carlos Tan', 'Greenfield Villas', 'Lot 2-A', 'Active', 'Jun 18, 2025', 'green'],
-                    ] as $row)
+                    @forelse($recentReservations as $res)
                     <tr class="hover:bg-stone-50 transition">
-                        <td class="py-3 font-medium text-stone-700">{{ $row[0] }}</td>
-                        <td class="py-3 text-stone-500">{{ $row[1] }}</td>
-                        <td class="py-3 text-stone-500">{{ $row[2] }}</td>
+                        <td class="py-3 font-medium text-stone-700">{{ $res->client?->full_name ?? '—' }}</td>
+                        <td class="py-3 text-stone-500">{{ $res->lot?->property?->name ?? '—' }}</td>
+                        <td class="py-3 text-stone-500">{{ $res->lot?->lot_number ?? '—' }}</td>
                         <td class="py-3">
                             <span class="px-2 py-1 rounded-full text-xs font-medium
-                                {{ $row[5] === 'green' ? 'bg-green-100 text-green-700' : '' }}
-                                {{ $row[5] === 'yellow' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                                {{ $row[5] === 'red' ? 'bg-red-100 text-red-700' : '' }}">
-                                {{ $row[3] }}
+                                {{ $res->status === 'confirmed' ? 'bg-green-100 text-green-700' : '' }}
+                                {{ $res->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                                {{ $res->status === 'cancelled' ? 'bg-red-100 text-red-700' : '' }}
+                                {{ $res->status === 'completed' ? 'bg-blue-100 text-blue-700' : '' }}">
+                                {{ ucfirst($res->status) }}
                             </span>
                         </td>
-                        <td class="py-3 text-stone-400 text-xs">{{ $row[4] }}</td>
+                        <td class="py-3 text-stone-400 text-xs">{{ $res->reserved_at?->format('M d, Y') ?? $res->created_at->format('M d, Y') }}</td>
                     </tr>
-                    @endforeach
+                    @empty
+                    <tr><td colspan="5" class="py-6 text-center text-stone-400 text-sm">No reservations yet.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -109,15 +102,15 @@
         <div class="bg-white rounded-xl border border-stone-200 p-5">
             <h2 class="font-semibold text-stone-800 mb-4">Quick Actions</h2>
             <div class="space-y-2">
-                <a href="{{ route('reservations.index') }}" class="flex items-center gap-3 p-3 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition text-sm font-medium">
+                <a href="{{ route('broker.reservations.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     New Reservation
                 </a>
-                <a href="{{ route('clients.index') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
+                <a href="{{ route('broker.clients.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                     Add Client
                 </a>
-                <a href="{{ route('properties.index') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
+                <a href="{{ route('broker.properties.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Add Property
                 </a>
@@ -158,27 +151,25 @@
 {{-- Lot Availability Summary --}}
 <div class="bg-white rounded-xl border border-stone-200 p-5">
     <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-stone-800">Lot Availability Overview</h2>
-        <a href="{{ route('lots.index') }}" class="text-xs text-amber-600 hover:underline">View map</a>
+        <h2 class="font-semibold text-stone-800">Recent Payments</h2>
+        <a href="{{ route('broker.lots.index') }}" class="text-xs text-amber-600 hover:underline">View all</a>
     </div>
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        @foreach([
-            ['Palm Residences', 24, 18, 6],
-            ['Greenfield Villas', 36, 20, 16],
-            ['Sunrise Homes', 48, 35, 13],
-            ['Hillside Estates', 20, 8, 12],
-        ] as $prop)
+        @forelse($recentPayments as $payment)
         <div class="p-4 rounded-xl bg-stone-50 border border-stone-100">
-            <p class="text-sm font-semibold text-stone-700 mb-2">{{ $prop[0] }}</p>
-            <div class="flex justify-between text-xs text-stone-500 mb-1">
-                <span>Reserved</span><span class="font-medium text-stone-700">{{ $prop[2] }}/{{ $prop[1] }}</span>
-            </div>
-            <div class="w-full bg-stone-200 rounded-full h-2">
-                <div class="bg-amber-500 h-2 rounded-full" style="width: {{ round($prop[2]/$prop[1]*100) }}%"></div>
-            </div>
-            <p class="text-xs text-green-600 mt-1">{{ $prop[3] }} lots available</p>
+            <p class="text-sm font-semibold text-stone-700 mb-1">{{ $payment->client?->full_name ?? '—' }}</p>
+            <p class="text-xs text-stone-500 mb-2">{{ $payment->payment_code }}</p>
+            <p class="text-sm font-bold text-amber-600">₱{{ number_format($payment->amount, 2) }}</p>
+            <span class="text-xs px-2 py-0.5 rounded-full mt-1 inline-block
+                {{ $payment->status === 'verified' ? 'bg-green-100 text-green-700' : '' }}
+                {{ $payment->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                {{ $payment->status === 'failed' ? 'bg-red-100 text-red-700' : '' }}">
+                {{ ucfirst($payment->status) }}
+            </span>
         </div>
-        @endforeach
+        @empty
+        <div class="col-span-4 py-6 text-center text-stone-400 text-sm">No payments yet.</div>
+        @endforelse
     </div>
 </div>
 

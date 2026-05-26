@@ -135,6 +135,7 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->g
     Route::get('/notifications', [BrokerNotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [BrokerNotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [BrokerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::post('/notifications/send', [BrokerNotificationController::class, 'send'])->name('notifications.send');
     Route::get('/chat', [BrokerChatController::class, 'index'])->name('chat.index');
     Route::post('/chat', [BrokerChatController::class, 'store'])->name('chat.store');
     Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');

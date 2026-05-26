@@ -12,7 +12,10 @@ class UserController extends Controller
 {
     public function index(): View
     {
-        $users = User::latest()->paginate(15);
+        $users = User::when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%')->orWhere('email', 'like', '%'.request('search').'%'))
+            ->when(request('role'), fn($q) => $q->where('role', request('role')))
+            ->latest()
+            ->paginate(15);
         return view('pages.admin.users.index', compact('users'));
     }
 

@@ -34,4 +34,22 @@ class NotificationController extends Controller
 
         return back()->with('success', 'All notifications marked as read.');
     }
+
+    public function send(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'title'   => 'required|string|max:255',
+            'message' => 'nullable|string',
+        ]);
+
+        AppNotification::create([
+            'user_id' => $data['user_id'],
+            'type'    => 'system',
+            'title'   => $data['title'],
+            'message' => $data['message'] ?? null,
+        ]);
+
+        return back()->with('success', 'Notification sent.');
+    }
 }

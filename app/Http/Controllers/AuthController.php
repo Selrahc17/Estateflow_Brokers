@@ -28,26 +28,30 @@ class AuthController extends Controller
     public function register(Request $request): RedirectResponse
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-            'role'     => 'required|in:client,broker,admin',
+            'first_name' => 'required|string|max:100',
+            'last_name'  => 'required|string|max:100',
+            'email'      => 'required|email|unique:users,email',
+            'phone'      => 'nullable|string|max:20',
+            'password'   => 'required|string|min:8|confirmed',
+            'role'       => 'required|in:client,broker',
         ]);
 
+        $fullName = $request->first_name . ' ' . $request->last_name;
+
         $user = User::create([
-            'name'     => $request->name,
+            'name'     => $fullName,
             'email'    => $request->email,
             'password' => $request->password,
             'role'     => $request->role,
         ]);
 
-        // If registering as client, create client profile
         if ($request->role === 'client') {
             Client::create([
-                'user_id' => $user->id,
-                'first_name' => explode(' ', $request->name)[0],
-                'last_name'  => explode(' ', $request->name)[1] ?? '',
+                'user_id'    => $user->id,
+                'first_name' => $request->first_name,
+                'last_name'  => $request->last_name,
                 'email'      => $request->email,
+                'phone'      => $request->phone,
                 'password'   => $request->password,
                 'status'     => 'active',
             ]);
@@ -90,8 +94,8 @@ class AuthController extends Controller
     {
         return match ($user->role) {
             'admin'  => route('admin.dashboard'),
-            'broker' => route('dashboard'),
-            default  => route('client.account.home'),
+            'broker' => route('broker.dashboard'),
+            default  => route('client.properties'),
         };
     }
 }

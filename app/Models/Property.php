@@ -12,8 +12,8 @@ class Property extends Model
 
     protected $fillable = [
         'broker_id', 'name', 'slug', 'description', 'address',
-        'city', 'province', 'price', 'status', 'featured_image',
-        'images', 'amenities',
+        'city', 'province', 'latitude', 'longitude', 'price', 'status',
+        'featured_image', 'images', 'amenities',
     ];
 
     protected function casts(): array

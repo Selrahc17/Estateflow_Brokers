@@ -32,7 +32,7 @@
             @foreach([
                 ['Property Listings','Manage all your lots and properties'],
                 ['Client Management','Track clients and reservations'],
-                ['AI Assistant','Smart inquiry handling 24/7'],
+                ['Payment Tracking','Monitor payments and documents'],
             ] as $f)
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 bg-amber-600/20 rounded-lg flex items-center justify-center">
@@ -48,7 +48,7 @@
     </div>
 
     {{-- Right Panel --}}
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-8" x-data="{ role: 'broker' }">
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div class="w-full max-w-md">
 
             {{-- Mobile Logo --}}
@@ -62,74 +62,53 @@
             <h2 class="text-2xl font-bold text-stone-800 mb-1">Welcome back</h2>
             <p class="text-stone-400 text-sm mb-6">Sign in to your account to continue</p>
 
-            {{-- Role Toggle --}}
-            <div class="flex bg-stone-200 rounded-xl p-1 mb-6">
-                <button @click="role = 'broker'"
-                    :class="role === 'broker' ? 'bg-white text-amber-700 shadow-sm' : 'text-stone-500'"
-                    class="flex-1 py-2 rounded-lg text-sm font-medium transition">
-                    Broker / Agent
-                </button>
-                <button @click="role = 'client'"
-                    :class="role === 'client' ? 'bg-white text-amber-700 shadow-sm' : 'text-stone-500'"
-                    class="flex-1 py-2 rounded-lg text-sm font-medium transition">
-                    Client
-                </button>
-                <button @click="role = 'admin'"
-                    :class="role === 'admin' ? 'bg-white text-red-700 shadow-sm' : 'text-stone-500'"
-                    class="flex-1 py-2 rounded-lg text-sm font-medium transition">
-                    Admin
-                </button>
+            {{-- Error --}}
+            @if($errors->any())
+            <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+                {{ $errors->first() }}
             </div>
+            @endif
 
             {{-- Form --}}
-            <form class="space-y-4">
+            <form action="{{ route('auth.login.post') }}" method="POST" class="space-y-4">
+                @csrf
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">Email Address</label>
-                    <input type="email" placeholder="you@example.com"
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required
                         class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
                 </div>
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">Password</label>
-                    <input type="password" placeholder="••••••••"
+                    <input type="password" name="password" placeholder="••••••••" required
                         class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
                 </div>
                 <div class="flex items-center justify-between">
                     <label class="flex items-center gap-2 text-sm text-stone-500 cursor-pointer">
-                        <input type="checkbox" class="rounded border-stone-300 text-amber-600">
+                        <input type="checkbox" name="remember" class="rounded border-stone-300 text-amber-600">
                         Remember me
                     </label>
-                    <a href="{{ route('auth.forgot') }}" class="text-sm text-amber-600 hover:underline">Forgot password?</a>
                 </div>
 
-                {{-- Broker Login --}}
-                <div x-show="role === 'broker'">
-                    <a href="{{ route('dashboard') }}"
-                        class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-center py-3 rounded-xl font-medium transition">
-                        Sign In as Broker
-                    </a>
-                </div>
-
-                {{-- Client Login --}}
-                <div x-show="role === 'client'">
-                    <a href="{{ route('client.account.home') }}"
-                        class="block w-full bg-stone-800 hover:bg-stone-900 text-white text-center py-3 rounded-xl font-medium transition">
-                        Sign In as Client
-                    </a>
-                </div>
-                {{-- Admin Login --}}
-                <div x-show="role === 'admin'">
-                    <a href="{{ route('admin.dashboard') }}"
-                        class="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-3 rounded-xl font-medium transition">
-                        Sign In as Admin
-                    </a>
-                </div>
-
+                <button type="submit"
+                    class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-center py-3 rounded-xl font-medium transition">
+                    Sign In
+                </button>
             </form>
 
             <p class="text-center text-sm text-stone-400 mt-6">
                 Don't have an account?
                 <a href="{{ route('auth.register') }}" class="text-amber-600 hover:underline font-medium">Register here</a>
             </p>
+
+            {{-- Test Accounts --}}
+            <div class="mt-8 p-4 bg-stone-50 border border-stone-200 rounded-xl">
+                <p class="text-xs font-semibold text-stone-500 mb-2">Test Accounts</p>
+                <div class="space-y-1 text-xs text-stone-500">
+                    <p><span class="font-medium text-red-600">Admin:</span> admin@estateflow.com / admin123</p>
+                    <p><span class="font-medium text-amber-600">Broker:</span> broker@estateflow.com / broker123</p>
+                    <p><span class="font-medium text-blue-600">Client:</span> client@estateflow.com / client123</p>
+                </div>
+            </div>
 
         </div>
     </div>

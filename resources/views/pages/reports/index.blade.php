@@ -5,102 +5,116 @@
 
 @section('content')
 
-{{-- Summary Cards --}}
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-    @foreach([
-        ['Total Revenue','₱12.4M','↑ 18% vs last month','green'],
-        ['Lots Sold','42','↑ 5 this month','green'],
-        ['Active Clients','142','↑ 12 new','blue'],
-        ['Pending Reservations','5','Needs action','yellow'],
-    ] as $s)
     <div class="bg-white rounded-xl border border-stone-200 p-4">
-        <p class="text-xs text-stone-500 mb-1">{{ $s[0] }}</p>
-        <p class="text-xl font-bold text-stone-800">{{ $s[1] }}</p>
-        <p class="text-xs mt-1 {{ $s[3]==='green' ? 'text-green-500' : ($s[3]==='blue' ? 'text-blue-500' : 'text-yellow-500') }}">{{ $s[2] }}</p>
+        <p class="text-xs text-stone-500 mb-1">Total Revenue</p>
+        <p class="text-xl font-bold text-green-600">₱{{ number_format($data['total_revenue'], 2) }}</p>
     </div>
-    @endforeach
+    <div class="bg-white rounded-xl border border-stone-200 p-4">
+        <p class="text-xs text-stone-500 mb-1">Total Properties</p>
+        <p class="text-xl font-bold text-stone-800">{{ $data['total_properties'] }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 p-4">
+        <p class="text-xs text-stone-500 mb-1">Total Clients</p>
+        <p class="text-xl font-bold text-blue-600">{{ $data['total_clients'] }}</p>
+    </div>
+    <div class="bg-white rounded-xl border border-stone-200 p-4">
+        <p class="text-xs text-stone-500 mb-1">Total Reservations</p>
+        <p class="text-xl font-bold text-amber-600">{{ $data['total_reservations'] }}</p>
+    </div>
 </div>
 
 <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
 
-    {{-- Monthly Sales Chart (Static Visual) --}}
+    {{-- Reservations by Status --}}
     <div class="bg-white rounded-xl border border-stone-200 p-5">
-        <h2 class="font-semibold text-stone-800 mb-4">Monthly Reservations</h2>
-        <div class="flex items-end gap-2 h-40">
-            @foreach([['Jan',4],['Feb',6],['Mar',5],['Apr',8],['May',7],['Jun',10],['Jul',9]] as $m)
-            <div class="flex-1 flex flex-col items-center gap-1">
-                <span class="text-xs text-stone-500">{{ $m[1] }}</span>
-                <div class="w-full bg-amber-400 rounded-t-md" style="height: {{ $m[1] * 14 }}px"></div>
-                <span class="text-xs text-stone-400">{{ $m[0] }}</span>
-            </div>
-            @endforeach
-        </div>
-    </div>
-
-    {{-- Property Performance --}}
-    <div class="bg-white rounded-xl border border-stone-200 p-5">
-        <h2 class="font-semibold text-stone-800 mb-4">Property Performance</h2>
-        <div class="space-y-4">
-            @foreach([
-                ['Palm Residences',75,'₱3.2M'],
-                ['Greenfield Villas',55,'₱2.8M'],
-                ['Sunrise Homes',72,'₱4.1M'],
-                ['Hillside Estates',40,'₱1.5M'],
-            ] as $p)
+        <h2 class="font-semibold text-stone-800 mb-4">Reservations by Status</h2>
+        @if($data['total_reservations'] > 0)
+        <div class="space-y-3">
+            @foreach(['pending'=>'yellow','confirmed'=>'green','cancelled'=>'red','completed'=>'blue'] as $status => $color)
+            @php $count = $data['reservations_by_status'][$status] ?? 0; $pct = $data['total_reservations'] > 0 ? round($count/$data['total_reservations']*100) : 0; @endphp
             <div>
                 <div class="flex justify-between text-sm mb-1">
-                    <span class="text-stone-700 font-medium">{{ $p[0] }}</span>
-                    <span class="text-stone-500">{{ $p[2] }}</span>
+                    <span class="text-stone-700 font-medium">{{ ucfirst($status) }}</span>
+                    <span class="text-stone-500">{{ $count }}</span>
                 </div>
                 <div class="w-full bg-stone-100 rounded-full h-2">
-                    <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $p[1] }}%"></div>
+                    <div class="bg-{{ $color }}-500 h-2 rounded-full" style="width: {{ $pct }}%"></div>
                 </div>
-                <p class="text-xs text-stone-400 mt-0.5">{{ $p[1] }}% lots sold</p>
             </div>
             @endforeach
         </div>
+        @else
+        <p class="text-stone-400 text-sm text-center py-6">No reservations yet.</p>
+        @endif
+    </div>
+
+    {{-- Properties by Status --}}
+    <div class="bg-white rounded-xl border border-stone-200 p-5">
+        <h2 class="font-semibold text-stone-800 mb-4">Properties by Status</h2>
+        @if($data['total_properties'] > 0)
+        <div class="space-y-3">
+            @foreach($data['properties_by_status'] as $status => $count)
+            @php $pct = $data['total_properties'] > 0 ? round($count/$data['total_properties']*100) : 0; @endphp
+            <div>
+                <div class="flex justify-between text-sm mb-1">
+                    <span class="text-stone-700 font-medium">{{ ucfirst(str_replace('_',' ',$status)) }}</span>
+                    <span class="text-stone-500">{{ $count }}</span>
+                </div>
+                <div class="w-full bg-stone-100 rounded-full h-2">
+                    <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $pct }}%"></div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <p class="text-stone-400 text-sm text-center py-6">No properties yet.</p>
+        @endif
+    </div>
+
+    {{-- Monthly Revenue --}}
+    <div class="bg-white rounded-xl border border-stone-200 p-5">
+        <h2 class="font-semibold text-stone-800 mb-4">Monthly Revenue (Verified Payments)</h2>
+        @if($data['monthly_payments']->isNotEmpty())
+        <div class="flex items-end gap-2 h-40">
+            @foreach(range(1,12) as $month)
+            @php $amount = $data['monthly_payments'][$month] ?? 0; $max = $data['monthly_payments']->max() ?: 1; $h = round($amount/$max*120); @endphp
+            <div class="flex-1 flex flex-col items-center gap-1">
+                @if($amount > 0)<span class="text-xs text-stone-500">{{ number_format($amount/1000,0) }}K</span>@else<span class="text-xs text-stone-300">—</span>@endif
+                <div class="w-full {{ $amount > 0 ? 'bg-amber-400 hover:bg-amber-500' : 'bg-stone-100' }} rounded-t-md transition" style="height: {{ max($h,4) }}px"></div>
+                <span class="text-xs text-stone-400">{{ date('M', mktime(0,0,0,$month,1)) }}</span>
+            </div>
+            @endforeach
+        </div>
+        @else
+        <p class="text-stone-400 text-sm text-center py-6">No payment data yet.</p>
+        @endif
     </div>
 
     {{-- Top Clients --}}
     <div class="bg-white rounded-xl border border-stone-200 p-5">
         <h2 class="font-semibold text-stone-800 mb-4">Top Clients by Payment</h2>
-        <div class="space-y-3">
-            @foreach([
-                ['Juan dela Cruz','Palm Residences','₱600,000'],
-                ['Pedro Reyes','Sunrise Homes','₱540,000'],
-                ['Carlos Tan','Greenfield Villas','₱480,000'],
-                ['Rosa Garcia','Hillside Estates','₱420,000'],
-            ] as $c)
-            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-sm">{{ strtoupper(substr($c[0],0,1)) }}</div>
-                    <div>
-                        <p class="text-sm font-medium text-stone-700">{{ $c[0] }}</p>
-                        <p class="text-xs text-stone-400">{{ $c[1] }}</p>
-                    </div>
-                </div>
-                <span class="text-sm font-semibold text-stone-700">{{ $c[2] }}</span>
+        @php
+            $topClients = \App\Models\Payment::where('broker_id', auth()->id())
+                ->where('status','verified')
+                ->selectRaw('client_id, SUM(amount) as total')
+                ->groupBy('client_id')
+                ->orderByDesc('total')
+                ->take(5)
+                ->with('client')
+                ->get();
+        @endphp
+        @forelse($topClients as $tp)
+        <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg mb-2">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-sm">{{ strtoupper(substr($tp->client?->first_name ?? '?', 0, 1)) }}</div>
+                <p class="text-sm font-medium text-stone-700">{{ $tp->client?->full_name ?? '—' }}</p>
             </div>
-            @endforeach
+            <span class="text-sm font-semibold text-stone-700">₱{{ number_format($tp->total, 2) }}</span>
         </div>
-    </div>
-
-    {{-- Document Status --}}
-    <div class="bg-white rounded-xl border border-stone-200 p-5">
-        <h2 class="font-semibold text-stone-800 mb-4">Document Compliance</h2>
-        <div class="space-y-3">
-            @foreach([['Approved',18,'green'],['Pending',7,'yellow'],['Missing',4,'red']] as $d)
-            <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg">
-                <span class="text-sm text-stone-700">{{ $d[0] }}</span>
-                <div class="flex items-center gap-3">
-                    <div class="w-24 bg-stone-200 rounded-full h-2">
-                        <div class="h-2 rounded-full {{ $d[2]==='green' ? 'bg-green-500' : ($d[2]==='yellow' ? 'bg-yellow-500' : 'bg-red-500') }}" style="width: {{ $d[1]/29*100 }}%"></div>
-                    </div>
-                    <span class="text-sm font-bold text-stone-700 w-6 text-right">{{ $d[1] }}</span>
-                </div>
-            </div>
-            @endforeach
-        </div>
+        @empty
+        <p class="text-stone-400 text-sm text-center py-6">No verified payments yet.</p>
+        @endforelse
     </div>
 
 </div>

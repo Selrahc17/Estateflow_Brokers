@@ -2,15 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Client extends Model
+class Client extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\ClientFactory> */
-    use HasFactory, Notifiable, SoftDeletes;
+    use Notifiable, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -31,30 +29,50 @@ class Client extends Model
 
     protected $hidden = [
         'password',
+        'remember_token',
         'email_verification_token',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'date_of_birth' => 'date',
-            'email_verified' => 'boolean',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'email_verified' => 'boolean',
+    ];
 
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
     }
 
-    // A client belongs to a user account
-    public function user()
+    public function reservations()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasMany(Reservation::class);
     }
 
-    // A client belongs to a broker
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function broker()
     {
         return $this->belongsTo(User::class, 'broker_id');

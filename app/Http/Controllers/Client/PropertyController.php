@@ -12,9 +12,11 @@ class PropertyController extends Controller
     public function index(): View
     {
         $properties = Property::where('status', 'available')
+            ->when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%')->orWhere('description', 'like', '%'.request('search').'%'))
+            ->when(request('location'), fn($q) => $q->where(fn($q2) => $q2->where('city', 'like', '%'.request('location').'%')->orWhere('province', 'like', '%'.request('location').'%')->orWhere('address', 'like', '%'.request('location').'%')))
             ->withCount(['lots' => fn($q) => $q->where('status', 'available')])
             ->latest()
-            ->paginate(9);
+            ->paginate(12);
 
         return view('pages.client.properties.index', compact('properties'));
     }

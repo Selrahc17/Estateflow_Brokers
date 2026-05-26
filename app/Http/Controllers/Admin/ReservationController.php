@@ -13,6 +13,7 @@ class ReservationController extends Controller
     public function index(): View
     {
         $reservations = Reservation::with(['client', 'broker', 'lot.property'])
+            ->when(request('status'), fn($q) => $q->where('status', request('status')))
             ->latest()
             ->paginate(15);
 

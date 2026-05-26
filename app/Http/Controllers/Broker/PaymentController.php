@@ -14,6 +14,7 @@ class PaymentController extends Controller
     public function index(): View
     {
         $payments = Payment::where('broker_id', auth()->id())
+            ->when(request('status'), fn($q) => $q->where('status', request('status')))
             ->with(['client', 'reservation'])
             ->latest()
             ->paginate(15);

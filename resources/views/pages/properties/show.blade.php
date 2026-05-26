@@ -41,6 +41,17 @@
                     <p class="text-sm text-stone-600">{{ $property->description }}</p>
                 </div>
             @endif
+
+            @if($property->latitude && $property->longitude)
+            <div class="mt-4 pt-4 border-t border-stone-100">
+                <p class="text-sm font-medium text-stone-700 mb-2 flex items-center gap-1">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Map Location
+                </p>
+                <div id="show-map" class="w-full rounded-lg border border-stone-200 overflow-hidden" style="height:220px"></div>
+                <p class="text-xs text-stone-400 mt-1 font-mono">{{ $property->latitude }}, {{ $property->longitude }}</p>
+            </div>
+            @endif
         </div>
 
         {{-- Lots Table --}}
@@ -97,4 +108,20 @@
         </div>
     </div>
 </div>
+
+@if($property->latitude && $property->longitude)
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var map = L.map('show-map', { zoomControl: true, scrollWheelZoom: false })
+        .setView([{{ $property->latitude }}, {{ $property->longitude }}], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
+    L.marker([{{ $property->latitude }}, {{ $property->longitude }}])
+        .addTo(map)
+        .bindPopup('<strong>{{ addslashes($property->name) }}</strong><br>{{ addslashes(implode(', ', array_filter([$property->city, $property->province]))) }}')
+        .openPopup();
+});
+</script>
+@endif
 @endsection

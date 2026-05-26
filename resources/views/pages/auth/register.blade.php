@@ -21,7 +21,8 @@
         <h2 class="text-2xl font-bold text-stone-800 mb-1">Create an Account</h2>
         <p class="text-stone-400 text-sm mb-6">Fill in your details to get started</p>
 
-        <form class="space-y-4" x-data="{ role: 'client' }">
+        <form class="space-y-4" x-data="{ role: 'client' }" action="{{ route('auth.register.post') }}" method="POST">
+            @csrf
 
             {{-- Role --}}
             <div>
@@ -34,44 +35,54 @@
                         :class="role === 'broker' ? 'bg-white text-amber-700 shadow-sm' : 'text-stone-500'"
                         class="flex-1 py-2 rounded-lg text-sm font-medium transition">Broker / Agent</button>
                 </div>
+                <input type="hidden" name="role" :value="role">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">First Name</label>
-                    <input type="text" placeholder="Juan" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="text" name="first_name" placeholder="Juan" value="{{ old('first_name') }}" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                 </div>
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">Last Name</label>
-                    <input type="text" placeholder="dela Cruz" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="text" name="last_name" placeholder="dela Cruz" value="{{ old('last_name') }}" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                 </div>
             </div>
 
             <div>
                 <label class="text-sm text-stone-600 font-medium mb-1 block">Email Address</label>
-                <input type="email" placeholder="you@example.com" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <input type="email" name="email" placeholder="you@example.com" value="{{ old('email') }}" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
 
             <div>
                 <label class="text-sm text-stone-600 font-medium mb-1 block">Phone Number</label>
-                <input type="text" placeholder="+63 912 345 6789" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <input type="text" name="phone" placeholder="+63 912 345 6789" value="{{ old('phone') }}" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
 
             {{-- Broker-only field --}}
             <div x-show="role === 'broker'">
                 <label class="text-sm text-stone-600 font-medium mb-1 block">PRC License Number</label>
-                <input type="text" placeholder="PRC-2024-00000" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <input type="text" name="prc_license" placeholder="PRC-2024-00000" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
 
             <div>
                 <label class="text-sm text-stone-600 font-medium mb-1 block">Password</label>
-                <input type="password" placeholder="••••••••" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <input type="password" name="password" placeholder="••••••••" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
 
             <div>
                 <label class="text-sm text-stone-600 font-medium mb-1 block">Confirm Password</label>
-                <input type="password" placeholder="••••••••" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <input type="password" name="password_confirmation" placeholder="••••••••" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
+
+            {{-- Validation Errors --}}
+            @if($errors->any())
+            <div class="bg-red-50 border border-red-200 rounded-xl p-3">
+                @foreach($errors->all() as $error)
+                <p class="text-xs text-red-600">• {{ $error }}</p>
+                @endforeach
+            </div>
+            @endif
 
             <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl font-medium transition">
                 Create Account

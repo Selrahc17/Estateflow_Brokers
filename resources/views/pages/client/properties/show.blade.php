@@ -208,41 +208,66 @@
                 <h3 class="font-semibold text-stone-800 mb-1">Interested in this property?</h3>
                 <p class="text-xs text-stone-400 mb-4">Send an inquiry or reserve a lot today.</p>
 
-                <div class="space-y-3">
+                @auth
+                <form action="{{ route('client.account.inquiries.store', $property->id) }}" method="POST" class="space-y-3">
+                    @csrf
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Full Name</label>
-                        <input type="text" placeholder="Juan dela Cruz" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="text" value="{{ auth()->user()->name }}" disabled class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm bg-stone-50">
                     </div>
                     <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Email</label>
-                        <input type="email" placeholder="juan@email.com" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <label class="text-xs text-stone-500 mb-1 block">Email *</label>
+                        <input type="email" name="email" placeholder="juan@email.com" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 @error('email') ring-2 ring-red-400 @enderror">
+                        @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Phone</label>
-                        <input type="text" placeholder="+63 912 345 6789" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <label class="text-xs text-stone-500 mb-1 block">Phone *</label>
+                        <input type="text" name="phone" placeholder="+63 912 345 6789" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 @error('phone') ring-2 ring-red-400 @enderror">
+                        @error('phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Message</label>
-                        <textarea rows="3" placeholder="I'm interested in this property..." class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
+                        <label class="text-xs text-stone-500 mb-1 block">Message *</label>
+                        <textarea name="message" rows="3" placeholder="I'm interested in this property..." required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none @error('message') ring-2 ring-red-400 @enderror"></textarea>
+                        @error('message') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    <a href="{{ route('client.inquiry.success') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl text-sm font-semibold transition">
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl text-sm font-semibold transition">
                         Send Inquiry
+                    </button>
+                    <div class="flex gap-2">
+                        @php
+                            $isFavorited = auth()->check() && auth()->user()->favorites()->where('property_id', $property->id)->exists();
+                        @endphp
+                        <form action="{{ route('client.account.favorites.toggle', $property->id) }}" method="POST" class="flex-1">
+                            @csrf
+                            <button type="submit" class="w-full border {{ $isFavorited ? 'border-amber-600 bg-amber-50' : 'border-stone-200 hover:bg-stone-50' }} {{ $isFavorited ? 'text-amber-600' : 'text-stone-600' }} py-2 rounded-xl text-sm font-medium transition">
+                                {{ $isFavorited ? '❤️ Saved' : '🤍 Save' }}
+                            </button>
+                        </form>
+                    </div>
+                </form>
+                @else
+                <div class="space-y-3">
+                    <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                        <p class="text-xs text-amber-800">Please log in to send an inquiry</p>
+                    </div>
+                    <a href="{{ route('auth.login') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl text-sm font-semibold transition">
+                        Login to Inquire
                     </a>
-                    <a href="{{ route('auth.login') }}" class="block w-full text-center border border-amber-600 text-amber-600 hover:bg-amber-50 py-3 rounded-xl text-sm font-semibold transition">
-                        Reserve a Lot
+                    <a href="{{ route('auth.register') }}" class="block w-full text-center border border-amber-600 text-amber-600 hover:bg-amber-50 py-3 rounded-xl text-sm font-semibold transition">
+                        Create Account
                     </a>
                 </div>
+                @endauth
             </div>
 
             {{-- Broker Info --}}
             <div class="bg-white rounded-2xl border border-stone-200 p-5">
                 <h3 class="font-semibold text-stone-800 mb-3">Listed by</h3>
                 <div class="flex items-center gap-3 mb-3">
-                    <div class="w-11 h-11 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold">B</div>
+                    <div class="w-11 h-11 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold">{{ substr($property->broker->name, 0, 1) }}</div>
                     <div>
-                        <p class="font-medium text-stone-800 text-sm">Broker Name</p>
+                        <p class="font-medium text-stone-800 text-sm">{{ $property->broker->name }}</p>
                         <p class="text-xs text-stone-400">Licensed Real Estate Broker</p>
-                        <p class="text-xs text-stone-400">PRC-2024-00123</p>
                     </div>
                 </div>
                 <a href="{{ route('client.account.chat') }}" class="block w-full text-center border border-stone-200 text-stone-600 hover:bg-stone-50 py-2 rounded-xl text-sm font-medium transition">

@@ -71,9 +71,7 @@
                     <p class="text-sm text-stone-500 leading-relaxed">{{ $n[1] }}</p>
                     @if(!$n[4])
                     <div class="flex gap-2 mt-3">
-                        @if($n[5]==='payment')
-                        <a href="{{ route('client.account.payments') }}" class="text-xs bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg font-medium transition">Pay Now</a>
-                        @elseif($n[5]==='document')
+                        @if($n[5]==='document')
                         <a href="{{ route('client.account.documents') }}" class="text-xs bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg font-medium transition">Upload Now</a>
                         @endif
                         <button class="text-xs text-stone-400 hover:text-stone-600 px-3 py-1.5 rounded-lg border border-stone-200 hover:bg-stone-50 transition">Dismiss</button>

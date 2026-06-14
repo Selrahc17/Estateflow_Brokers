@@ -12,7 +12,7 @@ class ReservationController extends Controller
     {
         $client = auth()->user()->clientProfile;
         $reservations = $client
-            ? Reservation::where('client_id', $client->id)->with('lot.property', 'payments')->latest()->paginate(10)
+            ? Reservation::where('client_id', $client->id)->with('lot.property')->latest()->paginate(10)
             : collect();
 
         return view('pages.client.reservation.index', compact('reservations'));

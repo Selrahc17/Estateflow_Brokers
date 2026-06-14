@@ -51,4 +51,22 @@ class User extends Authenticatable
     {
         return $this->hasOne(Client::class, 'user_id');
     }
+
+    // A client can have many favorite properties
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    // A client can have many inquiries
+    public function inquiries()
+    {
+        return $this->hasMany(Inquiry::class);
+    }
+
+    // A broker receives many inquiries
+    public function receivedInquiries()
+    {
+        return $this->hasMany(Inquiry::class, 'broker_id');
+    }
 }

@@ -22,7 +22,7 @@ class ReservationController extends Controller
 
     public function show(Reservation $reservation): View
     {
-        $reservation->load(['client', 'broker', 'lot.property', 'payments']);
+        $reservation->load(['client', 'broker', 'lot.property']);
         return view('pages.admin.reservations.show', compact('reservation'));
     }
 

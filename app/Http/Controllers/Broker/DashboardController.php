@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Broker;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
-use App\Models\Payment;
+use App\Models\Inquiry;
 use App\Models\Property;
 use App\Models\Reservation;
 
@@ -18,7 +18,7 @@ class DashboardController extends Controller
             'total_properties'  => Property::where('broker_id', $brokerId)->count(),
             'total_clients'     => Client::where('broker_id', $brokerId)->count(),
             'active_reservations' => Reservation::where('broker_id', $brokerId)->where('status', 'confirmed')->count(),
-            'pending_payments'  => Payment::where('broker_id', $brokerId)->where('status', 'pending')->count(),
+            'pending_inquiries' => Inquiry::where('broker_id', $brokerId)->where('status', 'new')->count(),
         ];
 
         $recentReservations = Reservation::where('broker_id', $brokerId)
@@ -27,12 +27,6 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $recentPayments = Payment::where('broker_id', $brokerId)
-            ->with(['client', 'reservation'])
-            ->latest()
-            ->take(5)
-            ->get();
-
-        return view('pages.dashboard.index', compact('stats', 'recentReservations', 'recentPayments'));
+        return view('pages.dashboard.index', compact('stats', 'recentReservations'));
     }
 }

@@ -41,18 +41,4 @@ class Reservation extends Model
     {
         return $this->belongsTo(User::class, 'broker_id');
     }
-
-    public function payments()
-    {
-        return $this->hasMany(Payment::class);
-    }
-
-    public function getMonthlyPaymentAttribute(): ?float
-    {
-        if ($this->total_price && $this->payment_terms_months > 0) {
-            $balance = $this->total_price - ($this->down_payment ?? 0);
-            return round($balance / $this->payment_terms_months, 2);
-        }
-        return null;
-    }
 }

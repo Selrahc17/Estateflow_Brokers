@@ -115,10 +115,6 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     My Reservation
                                 </a>
-                                <a href="{{ route('client.account.payments') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-amber-700 transition {{ request()->routeIs('client.account.payments') ? 'bg-amber-50 text-amber-700' : '' }}">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                    My Payments
-                                </a>
                                 <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-amber-700 transition {{ request()->routeIs('client.account.documents') ? 'bg-amber-50 text-amber-700' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     My Documents
@@ -179,7 +175,6 @@
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2">
                 <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-2">My Account</p>
                 <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">My Reservation</a>
-                <a href="{{ route('client.account.payments') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">My Payments</a>
                 <a href="{{ route('client.account.documents') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">My Documents</a>
                 <a href="{{ route('client.account.notifications') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">Notifications</a>
                 <a href="{{ route('client.account.feedback') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">Feedback & Ratings</a>
@@ -235,7 +230,6 @@
                     <a href="{{ route('auth.login') }}" class="block hover:text-white transition">Sign In</a>
                     <a href="{{ route('auth.register') }}" class="block hover:text-white transition">Register</a>
                     <a href="{{ route('client.account.home') }}" class="block hover:text-white transition">My Reservation</a>
-                    <a href="{{ route('client.account.payments') }}" class="block hover:text-white transition">My Payments</a>
                 </div>
             </div>
             <div>

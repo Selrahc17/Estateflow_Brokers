@@ -39,12 +39,12 @@
     </div>
 
     <div class="bg-white rounded-xl p-5 border border-stone-200 flex items-center gap-4">
-        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div>
-            <p class="text-sm text-stone-500">Pending Payments</p>
-            <p class="text-2xl font-bold text-stone-800">{{ $stats['pending_payments'] }}</p>
+            <p class="text-sm text-stone-500">Pending Inquiries</p>
+            <p class="text-2xl font-bold text-stone-800">{{ $stats['pending_inquiries'] ?? 0 }}</p>
         </div>
     </div>
 

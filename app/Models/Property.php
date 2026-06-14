@@ -34,4 +34,16 @@ class Property extends Model
     {
         return $this->hasMany(Lot::class);
     }
+
+    // A property can have many favorites
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    // A property can have many inquiries
+    public function inquiries()
+    {
+        return $this->hasMany(Inquiry::class);
+    }
 }

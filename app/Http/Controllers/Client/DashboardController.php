@@ -15,7 +15,6 @@ class DashboardController extends Controller
 
         $stats = [
             'active_reservation' => $client ? Reservation::where('client_id', $client->id)->where('status', 'confirmed')->count() : 0,
-            'pending_payments'   => $client ? $client->reservations()->withCount(['payments as pending_payments' => fn($q) => $q->where('status', 'pending')])->get()->sum('pending_payments') : 0,
         ];
 
         $recentReservations = $client ? Reservation::where('client_id', $client->id)->with('lot.property')->latest()->take(3)->get() : collect();

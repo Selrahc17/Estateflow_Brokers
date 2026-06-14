@@ -23,7 +23,7 @@ class ClientController extends Controller
 
     public function show(Client $client): View
     {
-        $client->load(['reservations' => fn($q) => $q->with('lot.property', 'payments')]);
+        $client->load(['reservations' => fn($q) => $q->with('lot.property')]);
         return view('pages.clients.show', compact('client'));
     }
 

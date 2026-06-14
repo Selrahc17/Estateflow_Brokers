@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\AuditController as AdminAuditController;
 use App\Http\Controllers\Admin\FeedbackController as AdminFeedbackController;
-use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
@@ -15,9 +14,9 @@ use App\Http\Controllers\Broker\ChatController as BrokerChatController;
 use App\Http\Controllers\Broker\ClientController as BrokerClientController;
 use App\Http\Controllers\Broker\DashboardController as BrokerDashboardController;
 use App\Http\Controllers\Broker\DocumentController as BrokerDocumentController;
+use App\Http\Controllers\Broker\InquiryController as BrokerInquiryController;
 use App\Http\Controllers\Broker\LotController;
 use App\Http\Controllers\Broker\NotificationController as BrokerNotificationController;
-use App\Http\Controllers\Broker\PaymentController as BrokerPaymentController;
 use App\Http\Controllers\Broker\PropertyController;
 use App\Http\Controllers\Broker\ReportController as BrokerReportController;
 use App\Http\Controllers\Broker\ReservationController as BrokerReservationController;
@@ -25,9 +24,10 @@ use App\Http\Controllers\Broker\SettingController as BrokerSettingController;
 use App\Http\Controllers\Client\ChatController as ClientChatController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 use App\Http\Controllers\Client\DocumentController as ClientDocumentController;
+use App\Http\Controllers\Client\FavoriteController as ClientFavoriteController;
 use App\Http\Controllers\Client\FeedbackController as ClientFeedbackController;
+use App\Http\Controllers\Client\InquiryController as ClientInquiryController;
 use App\Http\Controllers\Client\NotificationController as ClientNotificationController;
-use App\Http\Controllers\Client\PaymentController as ClientPaymentController;
 use App\Http\Controllers\Client\ProfileController as ClientProfileController;
 use App\Http\Controllers\Client\PropertyController as ClientPropertyController;
 use App\Http\Controllers\Client\ReservationController as ClientReservationController;
@@ -46,6 +46,7 @@ Route::redirect('/', '/properties');
 
 Route::get('/properties', [ClientPropertyController::class, 'index'])->name('client.properties');
 Route::get('/properties/{slug}', [ClientPropertyController::class, 'show'])->name('client.property.show');
+Route::post('/properties/{property}/inquire', [ClientInquiryController::class, 'store'])->name('client.property.inquire');
 Route::view('/about', 'pages.client.about.index')->name('client.about');
 Route::view('/contact', 'pages.client.contact.index')->name('client.contact');
 Route::view('/privacy-policy', 'pages.client.legal.privacy')->name('client.legal.privacy');
@@ -56,10 +57,6 @@ Route::view('/inquiry/success', 'pages.client.inquiry.success')->name('client.in
 Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client'])->group(function () {
     Route::get('/', [ClientDashboardController::class, 'index'])->name('home');
     Route::get('/reservation', [ClientReservationController::class, 'index'])->name('reservation');
-    Route::get('/payments', [ClientPaymentController::class, 'index'])->name('payments');
-    Route::get('/payments/pay', [ClientPaymentController::class, 'pay'])->name('payments.pay');
-    Route::post('/payments', [ClientPaymentController::class, 'store'])->name('payments.store');
-    Route::get('/payments/success', fn() => view('pages.client.pay.success'))->name('payments.success');
     Route::get('/documents', [ClientDocumentController::class, 'index'])->name('documents');
     Route::post('/documents', [ClientDocumentController::class, 'store'])->name('documents.store');
     Route::get('/notifications', [ClientNotificationController::class, 'index'])->name('notifications');
@@ -71,6 +68,13 @@ Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client']
     Route::get('/profile', [ClientProfileController::class, 'index'])->name('profile');
     Route::post('/profile', [ClientProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [ClientProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::get('/favorites', [ClientFavoriteController::class, 'index'])->name('favorites');
+    Route::post('/favorites/{property}', [ClientFavoriteController::class, 'store'])->name('favorites.store');
+    Route::delete('/favorites/{property}', [ClientFavoriteController::class, 'destroy'])->name('favorites.destroy');
+    Route::post('/favorites/{property}/toggle', [ClientFavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::get('/inquiries', [ClientInquiryController::class, 'index'])->name('inquiries');
+    Route::post('/inquiries/{property}', [ClientInquiryController::class, 'store'])->name('inquiries.store');
+    Route::get('/inquiries/{inquiry}', [ClientInquiryController::class, 'show'])->name('inquiries.show');
 });
 
 // ===================== ADMIN ROUTES =====================
@@ -92,7 +96,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/documents', [AdminDocumentController::class, 'index'])->name('documents');
     Route::post('/documents/{document}/verify', [AdminDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [AdminDocumentController::class, 'reject'])->name('documents.reject');
-    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments');
     Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback');
     Route::post('/feedback/{feedback}/resolve', [AdminFeedbackController::class, 'resolve'])->name('feedback.resolve');
     Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit');
@@ -139,6 +142,9 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->g
     Route::get('/lots/{lot}/edit', [LotController::class, 'edit'])->name('lots.edit');
     Route::put('/lots/{lot}', [LotController::class, 'update'])->name('lots.update');
     Route::delete('/lots/{lot}', [LotController::class, 'destroy'])->name('lots.destroy');
+    Route::get('/inquiries', [BrokerInquiryController::class, 'index'])->name('inquiries.index');
+    Route::get('/inquiries/{inquiry}', [BrokerInquiryController::class, 'show'])->name('inquiries.show');
+    Route::patch('/inquiries/{inquiry}/status', [BrokerInquiryController::class, 'updateStatus'])->name('inquiries.status');
     Route::get('/reservations', [BrokerReservationController::class, 'index'])->name('reservations.index');
     Route::get('/reservations/create', [BrokerReservationController::class, 'create'])->name('reservations.create');
     Route::post('/reservations', [BrokerReservationController::class, 'store'])->name('reservations.store');
@@ -150,9 +156,6 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->g
     Route::get('/clients/{client}', [BrokerClientController::class, 'show'])->name('clients.show');
     Route::get('/clients/{client}/edit', [BrokerClientController::class, 'edit'])->name('clients.edit');
     Route::put('/clients/{client}', [BrokerClientController::class, 'update'])->name('clients.update');
-    Route::get('/payments', [BrokerPaymentController::class, 'index'])->name('payments.index');
-    Route::post('/payments/{payment}/verify', [BrokerPaymentController::class, 'verify'])->name('payments.verify');
-    Route::post('/payments/{payment}/reject', [BrokerPaymentController::class, 'reject'])->name('payments.reject');
     Route::get('/documents', [BrokerDocumentController::class, 'index'])->name('documents.index');
     Route::post('/documents/{document}/verify', [BrokerDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [BrokerDocumentController::class, 'reject'])->name('documents.reject');

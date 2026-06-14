@@ -28,7 +28,6 @@
                 <a href="{{ route('client.properties') }}" class="{{ request()->routeIs('client.properties') ? 'text-amber-600' : 'text-stone-500 hover:text-stone-800' }} transition">Browse</a>
                 <a href="{{ route('client.account.home') }}" class="{{ request()->routeIs('client.account.home') ? 'text-amber-600' : 'text-stone-500 hover:text-stone-800' }} transition">Dashboard</a>
                 <a href="{{ route('client.account.reservation') }}" class="{{ request()->routeIs('client.account.reservation') ? 'text-amber-600' : 'text-stone-500 hover:text-stone-800' }} transition">My Reservation</a>
-                <a href="{{ route('client.account.payments') }}" class="{{ request()->routeIs('client.account.payments') ? 'text-amber-600' : 'text-stone-500 hover:text-stone-800' }} transition">Payments</a>
                 <a href="{{ route('client.account.documents') }}" class="{{ request()->routeIs('client.account.documents') ? 'text-amber-600' : 'text-stone-500 hover:text-stone-800' }} transition">Documents</a>
             </div>
 
@@ -67,7 +66,6 @@
             <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 hover:text-amber-600">Browse Properties</a>
             <a href="{{ route('client.account.home') }}" class="block text-sm text-stone-600 hover:text-amber-600">Dashboard</a>
             <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 hover:text-amber-600">My Reservation</a>
-            <a href="{{ route('client.account.payments') }}" class="block text-sm text-stone-600 hover:text-amber-600">Payments</a>
             <a href="{{ route('client.account.documents') }}" class="block text-sm text-stone-600 hover:text-amber-600">Documents</a>
             <a href="{{ route('client.account.notifications') }}" class="block text-sm text-stone-600 hover:text-amber-600">Notifications</a>
             <form action="{{ route('auth.logout') }}" method="POST">

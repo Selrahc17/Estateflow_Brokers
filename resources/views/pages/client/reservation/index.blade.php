@@ -63,9 +63,7 @@
         </div>
         @endif
 
-        <div class="px-6 pb-5 flex gap-3">
-            <a href="{{ route('client.account.payments.pay') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-sm font-semibold transition">Pay Now</a>
-            <a href="{{ route('client.account.payments') }}" class="border border-stone-200 text-stone-600 hover:bg-stone-50 px-5 py-2 rounded-xl text-sm font-medium transition">View Payments</a>
+        <div class="px-6 pb-5">
         </div>
     </div>
     @empty

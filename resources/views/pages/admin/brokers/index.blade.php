@@ -30,15 +30,32 @@
             <div>
                 <p class="font-semibold text-stone-800">{{ $broker->name }}</p>
                 <p class="text-xs text-stone-400">{{ $broker->email }}</p>
+                <span class="mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-medium {{ $broker->is_approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                    {{ $broker->is_approved ? 'Approved' : 'Pending Approval' }}
+                </span>
             </div>
         </div>
         <div class="flex justify-between text-xs text-stone-500 pt-3 border-t border-stone-100 mb-3">
             <span>{{ $broker->clients_count }} client(s)</span>
             <span class="text-stone-400">Since {{ $broker->created_at->format('M Y') }}</span>
         </div>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
             <a href="{{ route('admin.brokers.show', $broker) }}" class="flex-1 text-center border border-stone-200 hover:bg-stone-50 text-stone-600 py-2 rounded-lg text-xs font-medium transition">View Profile</a>
             <a href="{{ route('admin.users.edit', $broker) }}" class="flex-1 text-center border border-amber-200 hover:bg-amber-50 text-amber-600 py-2 rounded-lg text-xs font-medium transition">Edit</a>
+            @if(!$broker->is_approved)
+            <form action="{{ route('admin.brokers.approve', $broker) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-medium transition">Approve</button>
+            </form>
+            @endif
+            @if($broker->is_approved)
+            <form action="{{ route('admin.brokers.reject', $broker) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="flex-1 text-center bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-xs font-medium transition">Reject</button>
+            </form>
+            @endif
         </div>
     </div>
     @empty

@@ -27,4 +27,10 @@ class DocumentController extends Controller
         $document->update(['status' => 'rejected', 'notes' => $request->notes, 'uploaded_by' => auth()->id()]);
         return back()->with('success', 'Document rejected.');
     }
+
+    public function requestMore(Request $request, Document $document): RedirectResponse
+    {
+        $document->update(['status' => 'needs_more', 'notes' => $request->notes, 'uploaded_by' => auth()->id()]);
+        return back()->with('success', 'Requested additional documents.');
+    }
 }

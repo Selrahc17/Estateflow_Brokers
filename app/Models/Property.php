@@ -13,7 +13,7 @@ class Property extends Model
     protected $fillable = [
         'broker_id', 'name', 'slug', 'description', 'address',
         'city', 'province', 'type', 'latitude', 'longitude', 'price', 'status',
-        'featured_image', 'images', 'amenities',
+        'featured_image', 'images', 'amenities', 'view_count',
     ];
 
     protected function casts(): array
@@ -45,5 +45,11 @@ class Property extends Model
     public function inquiries()
     {
         return $this->hasMany(Inquiry::class);
+    }
+
+    // A property can have many site visits
+    public function siteVisits()
+    {
+        return $this->hasMany(SiteVisit::class);
     }
 }

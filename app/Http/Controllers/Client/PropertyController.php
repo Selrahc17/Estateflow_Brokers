@@ -40,6 +40,8 @@ class PropertyController extends Controller
             ->with(['lots' => fn($q) => $q->where('status', 'available'), 'broker'])
             ->firstOrFail();
 
+        $property->increment('view_count');
+
         return view('pages.client.properties.show', compact('property'));
     }
 }

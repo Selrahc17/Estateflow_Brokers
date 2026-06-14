@@ -69,4 +69,13 @@ class UserController extends Controller
         $user->delete();
         return redirect()->route('admin.users')->with('success', 'User deleted successfully.');
     }
+
+    public function toggleStatus(User $user): RedirectResponse
+    {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot suspend your own account.');
+        }
+        $user->update(['is_active' => !$user->is_active]);
+        return redirect()->route('admin.users')->with('success', "User {$user->name} has been " . ($user->is_active ? 'reactivated' : 'suspended') . ".");
+    }
 }

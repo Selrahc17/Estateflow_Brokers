@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Inquiry;
 use App\Models\Property;
 use App\Models\Reservation;
+use App\Models\SiteVisit;
 
 class DashboardController extends Controller
 {
@@ -19,6 +20,7 @@ class DashboardController extends Controller
             'total_clients'     => Client::where('broker_id', $brokerId)->count(),
             'active_reservations' => Reservation::where('broker_id', $brokerId)->where('status', 'confirmed')->count(),
             'pending_inquiries' => Inquiry::where('broker_id', $brokerId)->where('status', 'new')->count(),
+            'pending_site_visits' => SiteVisit::where('broker_id', $brokerId)->where('status', 'pending')->count(),
         ];
 
         $recentReservations = Reservation::where('broker_id', $brokerId)
@@ -27,6 +29,12 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        return view('pages.dashboard.index', compact('stats', 'recentReservations'));
+        $recentSiteVisits = SiteVisit::where('broker_id', $brokerId)
+            ->with(['client', 'property'])
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('pages.dashboard.index', compact('stats', 'recentReservations', 'recentSiteVisits'));
     }
 }

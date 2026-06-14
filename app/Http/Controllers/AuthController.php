@@ -37,12 +37,15 @@ class AuthController extends Controller
         ]);
 
         $fullName = $request->first_name . ' ' . $request->last_name;
+        $hashedPassword = Hash::make($request->password);
 
         $user = User::create([
             'name'     => $fullName,
             'email'    => $request->email,
-            'password' => $request->password,
+            'password' => $hashedPassword,
             'role'     => $request->role,
+            'is_approved' => $request->role === 'broker' ? false : true,
+            'is_active' => true,
         ]);
 
         if ($request->role === 'client') {
@@ -52,7 +55,7 @@ class AuthController extends Controller
                 'last_name'  => $request->last_name,
                 'email'      => $request->email,
                 'phone'      => $request->phone,
-                'password'   => $request->password,
+                'password'   => $hashedPassword,
                 'status'     => 'active',
             ]);
         }
@@ -71,8 +74,26 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $user = Auth::user();
+            
+            // Check if user is active
+            if (!$user->is_active) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your account has been suspended.',
+                ])->onlyInput('email');
+            }
+
+            // Check if broker is approved
+            if ($user->role === 'broker' && !$user->is_approved) {
+                Auth::logout();
+                return back()->withErrors([
+                    'email' => 'Your broker account is pending approval.',
+                ])->onlyInput('email');
+            }
+
             $request->session()->regenerate();
-            return redirect()->intended($this->redirectForRole(Auth::user()));
+            return redirect()->intended($this->redirectForRole($user));
         }
 
         return back()->withErrors([

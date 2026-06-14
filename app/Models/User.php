@@ -3,18 +3,22 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'name', 'email', 'password', 'role', 'is_active', 'is_approved'
+    ];
+
+    protected $hidden = [
+        'password', 'remember_token'
+    ];
 
     protected function casts(): array
     {
@@ -68,5 +72,17 @@ class User extends Authenticatable
     public function receivedInquiries()
     {
         return $this->hasMany(Inquiry::class, 'broker_id');
+    }
+
+    // A broker has many properties
+    public function properties()
+    {
+        return $this->hasMany(Property::class, 'broker_id');
+    }
+
+    // A broker has many site visits
+    public function siteVisits()
+    {
+        return $this->hasMany(SiteVisit::class, 'broker_id');
     }
 }

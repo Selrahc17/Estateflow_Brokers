@@ -77,4 +77,9 @@ class Client extends Authenticatable
     {
         return $this->belongsTo(User::class, 'broker_id');
     }
+
+    public function siteVisits()
+    {
+        return $this->hasMany(SiteVisit::class);
+    }
 }

@@ -19,11 +19,25 @@ class DashboardController extends Controller
             'total_clients'     => Client::count(),
             'total_properties'  => Property::count(),
             'total_reservations' => Reservation::count(),
+            'total_revenue'     => 0, // Placeholder, since no payment handling per scope
         ];
 
         $recentUsers = User::latest()->take(5)->get();
         $recentReservations = Reservation::with(['client', 'broker'])->latest()->take(5)->get();
+        
+        // Most active brokers (by number of properties)
+        $mostActiveBrokers = User::where('role', 'broker')
+            ->withCount('properties')
+            ->orderBy('properties_count', 'desc')
+            ->take(5)
+            ->get();
+            
+        // Most viewed properties
+        $mostViewedProperties = Property::with('broker')
+            ->orderBy('view_count', 'desc')
+            ->take(5)
+            ->get();
 
-        return view('pages.admin.dashboard.index', compact('stats', 'recentUsers', 'recentReservations'));
+        return view('pages.admin.dashboard.index', compact('stats', 'recentUsers', 'recentReservations', 'mostActiveBrokers', 'mostViewedProperties'));
     }
 }

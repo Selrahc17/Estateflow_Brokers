@@ -117,60 +117,30 @@
             </div>
         </div>
 
-        {{-- Alerts --}}
+        {{-- Recent Notifications --}}
         <div class="bg-white rounded-xl border border-stone-200 p-5">
-            <h2 class="font-semibold text-stone-800 mb-4">Alerts</h2>
+            <h2 class="font-semibold text-stone-800 mb-4">Recent Notifications</h2>
             <div class="space-y-3">
-                <div class="flex items-start gap-3 p-3 bg-red-50 rounded-lg">
-                    <div class="w-2 h-2 bg-red-500 rounded-full mt-1.5 shrink-0"></div>
-                    <div>
-                        <p class="text-sm font-medium text-red-700">Payment Overdue</p>
-                        <p class="text-xs text-red-500">Ana Lim — Lot 8-D</p>
+                @php
+                    $recentNotifs = \App\Models\AppNotification::where('user_id', auth()->id())->latest()->take(5)->get();
+                @endphp
+                @forelse($recentNotifs as $notif)
+                <div class="flex items-start gap-3 p-3 {{ !$notif->is_read ? 'bg-amber-50' : 'bg-stone-50' }} rounded-lg">
+                    <div class="w-2 h-2 {{ !$notif->is_read ? 'bg-amber-500' : 'bg-stone-500' }} rounded-full mt-1.5 shrink-0"></div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-stone-700">{{ $notif->title }}</p>
+                        <p class="text-xs text-stone-500">{{ $notif->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
-                <div class="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg">
-                    <div class="w-2 h-2 bg-yellow-500 rounded-full mt-1.5 shrink-0"></div>
-                    <div>
-                        <p class="text-sm font-medium text-yellow-700">Missing Documents</p>
-                        <p class="text-xs text-yellow-600">Maria Santos — 2 docs pending</p>
-                    </div>
-                </div>
-                <div class="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-1.5 shrink-0"></div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">New Inquiry</p>
-                        <p class="text-xs text-blue-500">3 new messages via AI Chat</p>
-                    </div>
-                </div>
+                @empty
+                <p class="text-sm text-stone-400 text-center py-4">No notifications yet.</p>
+                @endforelse
             </div>
         </div>
 
     </div>
 </div>
 
-{{-- Lot Availability Summary --}}
-<div class="bg-white rounded-xl border border-stone-200 p-5">
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="font-semibold text-stone-800">Recent Payments</h2>
-        <a href="{{ route('broker.lots.index') }}" class="text-xs text-amber-600 hover:underline">View all</a>
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        @forelse($recentPayments as $payment)
-        <div class="p-4 rounded-xl bg-stone-50 border border-stone-100">
-            <p class="text-sm font-semibold text-stone-700 mb-1">{{ $payment->client?->full_name ?? '—' }}</p>
-            <p class="text-xs text-stone-500 mb-2">{{ $payment->payment_code }}</p>
-            <p class="text-sm font-bold text-amber-600">₱{{ number_format($payment->amount, 2) }}</p>
-            <span class="text-xs px-2 py-0.5 rounded-full mt-1 inline-block
-                {{ $payment->status === 'verified' ? 'bg-green-100 text-green-700' : '' }}
-                {{ $payment->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                {{ $payment->status === 'failed' ? 'bg-red-100 text-red-700' : '' }}">
-                {{ ucfirst($payment->status) }}
-            </span>
-        </div>
-        @empty
-        <div class="col-span-4 py-6 text-center text-stone-400 text-sm">No payments yet.</div>
-        @endforelse
-    </div>
-</div>
+
 
 @endsection

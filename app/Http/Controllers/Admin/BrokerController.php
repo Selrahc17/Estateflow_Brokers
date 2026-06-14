@@ -14,6 +14,7 @@ class BrokerController extends Controller
     {
         $brokers = User::where('role', 'broker')
             ->when(request('search'), fn($q) => $q->where('name','like','%'.request('search').'%')->orWhere('email','like','%'.request('search').'%'))
+            ->when(request('approval_status'), fn($q) => $q->where('is_approved', request('approval_status') === 'approved'))
             ->withCount('clients')
             ->latest()
             ->paginate(15);
@@ -35,9 +36,10 @@ class BrokerController extends Controller
         ]);
 
         $data['role'] = 'broker';
+        $data['is_approved'] = false; // New brokers need approval
         User::create($data);
 
-        return redirect()->route('admin.brokers')->with('success', 'Broker created successfully.');
+        return redirect()->route('admin.brokers')->with('success', 'Broker created successfully. Pending approval.');
     }
 
     public function show(User $user): View
@@ -46,9 +48,15 @@ class BrokerController extends Controller
         return view('pages.admin.brokers.show', compact('user'));
     }
 
-    public function toggleStatus(User $user): RedirectResponse
+    public function approve(User $user): RedirectResponse
     {
-        // You could add an is_active column, but for now just redirect back
-        return back()->with('success', 'Broker status toggled.');
+        $user->update(['is_approved' => true]);
+        return back()->with('success', "Broker {$user->name} has been approved!");
+    }
+
+    public function reject(User $user): RedirectResponse
+    {
+        $user->update(['is_approved' => false]);
+        return back()->with('success', "Broker {$user->name} has been rejected.");
     }
 }

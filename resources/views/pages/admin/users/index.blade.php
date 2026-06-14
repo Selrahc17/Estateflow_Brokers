@@ -48,7 +48,19 @@
                         <div class="w-8 h-8 {{ $user->role === 'broker' ? 'bg-amber-100 text-amber-700' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} rounded-full flex items-center justify-center text-xs font-bold shrink-0">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
-                        <span class="font-medium text-stone-700">{{ $user->name }}</span>
+                        <div>
+                            <span class="font-medium text-stone-700">{{ $user->name }}</span>
+                            <div class="flex gap-2 mt-1">
+                                <span class="px-1.5 py-0.5 rounded text-xs font-medium {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                                    {{ $user->is_active ? 'Active' : 'Suspended' }}
+                                </span>
+                                @if($user->role === 'broker')
+                                <span class="px-1.5 py-0.5 rounded text-xs font-medium {{ $user->is_approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                                    {{ $user->is_approved ? 'Approved' : 'Pending Approval' }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </td>
                 <td class="px-5 py-3">
@@ -59,9 +71,16 @@
                 <td class="px-5 py-3 text-stone-500 text-xs">{{ $user->email }}</td>
                 <td class="px-5 py-3 text-stone-400 text-xs">{{ $user->created_at->format('M d, Y') }}</td>
                 <td class="px-5 py-3">
-                    <div class="flex gap-3">
+                    <div class="flex gap-3 flex-wrap">
                         <a href="{{ route('admin.users.edit', $user) }}" class="text-xs text-amber-600 hover:underline">Edit</a>
                         @if($user->id !== auth()->id())
+                        <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="text-xs {{ $user->is_active ? 'text-orange-600' : 'text-green-600' }} hover:underline">
+                                {{ $user->is_active ? 'Suspend' : 'Reactivate' }}
+                            </button>
+                        </form>
                         <form action="{{ route('admin.users.destroy', $user) }}" method="POST" onsubmit="return confirm('Delete this user?')">
                             @csrf @method('DELETE')
                             <button type="submit" class="text-xs text-red-500 hover:underline">Delete</button>

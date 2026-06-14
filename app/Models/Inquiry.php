@@ -30,4 +30,9 @@ class Inquiry extends Model
     {
         return $this->belongsTo(Lot::class);
     }
+
+    public function siteVisit()
+    {
+        return $this->hasOne(SiteVisit::class);
+    }
 }

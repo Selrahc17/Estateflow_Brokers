@@ -8,6 +8,23 @@
     <form method="POST" action="{{ route('broker.properties.store') }}" enctype="multipart/form-data">
         @csrf
 
+        @if(session('duplicate_property'))
+            <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-5">
+                <h4 class="font-semibold text-yellow-800 text-sm flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Potential Duplicate Found!
+                </h4>
+                <div class="bg-white rounded-lg p-3 border border-yellow-300 mb-3">
+                    <p class="font-medium text-stone-700 text-sm">{{ session('duplicate_property')->name }}</p>
+                    <p class="text-xs text-stone-500 mt-1">{{ implode(', ', array_filter([session('duplicate_property')->address, session('duplicate_property')->city, session('duplicate_property')->province])) }}</p>
+                </div>
+                <label class="flex items-center gap-2 text-sm text-yellow-800 cursor-pointer">
+                    <input type="checkbox" name="confirm_duplicate" class="rounded">
+                    I confirm this is not a duplicate and want to proceed
+                </label>
+            </div>
+        @endif
+
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">Property Name</label>

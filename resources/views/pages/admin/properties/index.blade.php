@@ -4,6 +4,41 @@
 @section('page-subtitle', 'Review and moderate property listings')
 
 @section('content')
+@if(count($duplicateGroups) > 0)
+<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-5">
+    <h3 class="font-semibold text-yellow-800 mb-3 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        Potential Duplicates Found ({{ count($duplicateGroups) }})
+    </h3>
+    @foreach($duplicateGroups as $group)
+        @php
+            $groupProperties = Property::whereIn('id', $group)->get();
+        @endphp
+        <form method="POST" action="{{ route('admin.properties.delete-multiple') }}" class="border border-yellow-300 rounded-lg p-4 bg-yellow-100 mb-3">
+            @csrf
+            @method('DELETE')
+            <div class="flex items-start gap-4">
+                <div class="flex-1">
+                    <p class="font-medium text-yellow-800 text-sm mb-2">Group {{ $loop->iteration }}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                        @foreach($groupProperties as $prop)
+                        <label class="flex items-center gap-2 bg-white p-2 rounded border border-yellow-200 text-sm cursor-pointer">
+                            <input type="checkbox" name="ids[]" value="{{ $prop->id }}" class="rounded">
+                            <div class="flex-1">
+                                <p class="font-medium text-stone-700">{{ $prop->name }}</p>
+                                <p class="text-xs text-stone-400">{{ $prop->broker?->name ?? '—' }} • {{ $prop->created_at->format('M d') }}</p>
+                            </div>
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg">Delete Selected</button>
+            </div>
+        </form>
+    @endforeach
+</div>
+@endif
+
 <div class="bg-white rounded-xl border border-stone-200">
     <div class="flex items-center justify-between px-5 py-4 border-b border-stone-100">
         <h2 class="font-semibold text-stone-800">All Properties</h2>

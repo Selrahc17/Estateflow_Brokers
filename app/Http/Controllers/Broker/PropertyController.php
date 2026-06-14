@@ -45,7 +45,25 @@ class PropertyController extends Controller
             'price'       => 'nullable|numeric|min:0',
             'status'      => 'required|in:available,sold,coming_soon',
             'amenities'   => 'nullable|array',
+            'confirm_duplicate' => 'nullable|boolean',
         ]);
+
+        // Check for potential duplicates
+        $existingDuplicate = Property::where('broker_id', '!=', auth()->id())
+            ->where(function ($q) use ($data) {
+                $q->where('name', $data['name'])
+                  ->where('city', $data['city'] ?? '')
+                  ->where('province', $data['province'] ?? '');
+                if (!empty($data['latitude']) && !empty($data['longitude'])) {
+                    $q->orWhere('latitude', $data['latitude'])->where('longitude', $data['longitude']);
+                }
+            })->first();
+
+        if ($existingDuplicate && !$request->has('confirm_duplicate')) {
+            return back()->withErrors([
+                'duplicate_warning' => 'A similar property already exists in the system. Please review or confirm to proceed.',
+            ])->withInput()->with('duplicate_property', $existingDuplicate);
+        }
 
         $data['slug']      = Str::slug($data['name']) . '-' . uniqid();
         $data['broker_id'] = auth()->id();

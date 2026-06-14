@@ -18,13 +18,49 @@ class PropertyController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('pages.admin.properties.index', compact('properties'));
+        // Find potential duplicates
+        $potentialDuplicates = Property::select('name', 'city', 'province', 'latitude', 'longitude')
+            ->selectRaw('COUNT(*) as count, GROUP_CONCAT(id) as ids')
+            ->groupBy('name', 'city', 'province')
+            ->havingRaw('COUNT(*) > 1')
+            ->orWhere(function ($q) {
+                $q->whereNotNull('latitude')->whereNotNull('longitude')
+                  ->groupBy('latitude', 'longitude')
+                  ->havingRaw('COUNT(*) > 1');
+            })
+            ->get();
+
+        // Flatten potential duplicates into a list of property ID groups
+        $duplicateGroups = [];
+        foreach ($potentialDuplicates as $dup) {
+            if ($dup->ids) {
+                $ids = explode(',', $dup->ids);
+                if (count($ids) > 1) {
+                    $duplicateGroups[] = $ids;
+                }
+            }
+        }
+
+        return view('pages.admin.properties.index', compact('properties', 'duplicateGroups'));
     }
 
     public function show(Property $property): View
     {
         $property->load(['broker', 'lots']);
-        return view('pages.admin.properties.show', compact('property'));
+        // Find potential duplicates for this specific property
+        $potentialDuplicates = Property::where('id', '!=', $property->id)
+            ->where(function ($q) use ($property) {
+                $q->where([
+                    'name' => $property->name,
+                    'city' => $property->city,
+                    'province' => $property->province
+                ]);
+                if ($property->latitude && $property->longitude) {
+                    $q->orWhere('latitude', $property->latitude)->where('longitude', $property->longitude);
+                }
+            })
+            ->get();
+        return view('pages.admin.properties.show', compact('property', 'potentialDuplicates'));
     }
 
     public function updateStatus(Request $request, Property $property): RedirectResponse
@@ -33,5 +69,12 @@ class PropertyController extends Controller
         $property->update(['status' => $request->status]);
 
         return redirect()->route('admin.properties')->with('success', 'Property status updated.');
+    }
+
+    public function deleteMultiple(Request $request): RedirectResponse
+    {
+        $request->validate(['ids' => 'required|array|min:2']);
+        Property::whereIn('id', $request->ids)->delete();
+        return back()->with('success', 'Selected duplicate properties deleted.');
     }
 }

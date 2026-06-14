@@ -93,6 +93,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/properties', [AdminPropertyController::class, 'index'])->name('properties');
     Route::get('/properties/{property}', [AdminPropertyController::class, 'show'])->name('properties.show');
     Route::patch('/properties/{property}/status', [AdminPropertyController::class, 'updateStatus'])->name('properties.status');
+    Route::delete('/properties/delete-multiple', [AdminPropertyController::class, 'deleteMultiple'])->name('properties.delete-multiple');
     Route::get('/brokers', [AdminBrokerController::class, 'index'])->name('brokers');
     Route::get('/brokers/create', [AdminBrokerController::class, 'create'])->name('brokers.create');
     Route::post('/brokers', [AdminBrokerController::class, 'store'])->name('brokers.store');

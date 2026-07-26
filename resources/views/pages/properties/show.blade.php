@@ -20,7 +20,7 @@
             </div>
 
             @if($property->featured_image)
-                <img src="{{ Storage::url($property->featured_image) }}" class="w-full h-48 object-cover rounded-lg mb-4">
+                <img src="{{ $property->featured_image }}" class="w-full h-48 object-cover rounded-lg mb-4">
             @endif
 
             <dl class="grid grid-cols-2 gap-4 text-sm">

@@ -26,7 +26,7 @@
                 <div>
                     <label class="block text-sm font-medium text-stone-700 mb-1">Property Type</label>
                     <select name="type" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 @error('type') border-red-400 @enderror">
-                        @foreach(['House and Lot','Lot Only','Condominium','Commercial','Apartment'] as $type)
+                        @foreach(['House and Lot','Condominium','Townhouse','Lot Only','Office Space','Warehouse','Farm','Villa','Apartment'] as $type)
                         <option value="{{ $type }}" {{ old('type', $property->type) === $type ? 'selected' : '' }}>{{ $type }}</option>
                         @endforeach
                     </select>
@@ -165,10 +165,24 @@
             <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">Featured Image</label>
                 @if($property->featured_image)
-                    <div class="mb-2"><img src="{{ Storage::url($property->featured_image) }}" class="h-24 rounded-lg object-cover"></div>
+                    <div class="mb-2"><img src="{{ $property->featured_image }}" class="h-24 rounded-lg object-cover"></div>
                 @endif
                 <input type="file" name="featured_image" accept="image/*"
                        class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-stone-700 mb-1">Additional Images <span class="text-stone-400 font-normal text-xs">(up to 10 photos)</span></label>
+                @if(!empty($property->images))
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        @foreach($property->images as $img)
+                            <img src="{{ $img }}" class="h-20 w-28 rounded-lg object-cover border border-stone-200">
+                        @endforeach
+                    </div>
+                @endif
+                <input type="file" name="images[]" accept="image/*" multiple
+                       class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                <p class="text-xs text-stone-400 mt-1">Uploading new images will replace the existing ones.</p>
             </div>
         </div>
 

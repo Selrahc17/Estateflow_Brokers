@@ -4,7 +4,7 @@
     {{-- Image --}}
     <div class="relative overflow-hidden h-48 bg-stone-100 dark:bg-stone-800">
         @if($property->featured_image)
-        <img src="{{ asset('storage/' . $property->featured_image) }}" alt="{{ $property->name }}"
+        <img src="{{ $property->featured_image }}" alt="{{ $property->name }}"
              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
         @else
         <div class="w-full h-full flex items-center justify-center">

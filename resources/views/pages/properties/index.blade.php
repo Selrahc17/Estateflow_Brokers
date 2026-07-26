@@ -13,7 +13,7 @@
                    class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 w-full sm:w-64">
             <select name="type" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
                 <option value="">All Types</option>
-                @foreach(['House and Lot','Lot Only','Condominium','Commercial','Apartment'] as $type)
+                @foreach(['House and Lot','Condominium','Townhouse','Lot Only','Office Space','Warehouse','Farm','Villa','Apartment'] as $type)
                 <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
                 @endforeach
             </select>
@@ -37,7 +37,7 @@
     <div class="bg-white rounded-xl border border-stone-200 overflow-hidden hover:shadow-md transition">
         <div class="h-36 bg-gradient-to-br from-amber-100 to-stone-200 flex items-center justify-center relative">
             @if($property->featured_image)
-                <img src="{{ Storage::url($property->featured_image) }}" class="w-full h-full object-cover" alt="{{ $property->name }}">
+                <img src="{{ $property->featured_image }}" class="w-full h-full object-cover" alt="{{ $property->name }}">
             @else
                 <svg class="w-16 h-16 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             @endif

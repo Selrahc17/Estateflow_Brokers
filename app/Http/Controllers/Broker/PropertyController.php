@@ -39,7 +39,7 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
-            'type'        => 'required|in:House and Lot,Lot Only,Condominium,Commercial,Apartment',
+            'type'        => 'required|in:House and Lot,Condominium,Townhouse,Lot Only,Office Space,Warehouse,Farm,Villa,Apartment',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
@@ -70,7 +70,21 @@ class PropertyController extends Controller
 
         if ($request->hasFile('featured_image')) {
             $request->validate(['featured_image' => 'image|max:4096']);
-            $data['featured_image'] = $request->file('featured_image')->store('properties', 'public');
+            $file = $request->file('featured_image');
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+            \Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
+            $data['featured_image'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+        }
+
+        if ($request->hasFile('images')) {
+            $request->validate(['images.*' => 'image|max:4096']);
+            $urls = [];
+            foreach ($request->file('images') as $img) {
+                $filename = uniqid() . '.' . $img->getClientOriginalExtension();
+                \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
+                $urls[] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+            }
+            $data['images'] = $urls;
         }
 
         Property::create($data);
@@ -97,7 +111,7 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
-            'type'        => 'required|in:House and Lot,Lot Only,Condominium,Commercial,Apartment',
+            'type'        => 'required|in:House and Lot,Condominium,Townhouse,Lot Only,Office Space,Warehouse,Farm,Villa,Apartment',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
@@ -107,11 +121,21 @@ class PropertyController extends Controller
 
         if ($request->hasFile('featured_image')) {
             $request->validate(['featured_image' => 'image|max:4096']);
-            // Delete old image
-            if ($property->featured_image) {
-                \Storage::disk('public')->delete($property->featured_image);
+            $file = $request->file('featured_image');
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+            \Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
+            $data['featured_image'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+        }
+
+        if ($request->hasFile('images')) {
+            $request->validate(['images.*' => 'image|max:4096']);
+            $urls = [];
+            foreach ($request->file('images') as $img) {
+                $filename = uniqid() . '.' . $img->getClientOriginalExtension();
+                \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
+                $urls[] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
             }
-            $data['featured_image'] = $request->file('featured_image')->store('properties', 'public');
+            $data['images'] = $urls;
         }
 
         $property->update($data);

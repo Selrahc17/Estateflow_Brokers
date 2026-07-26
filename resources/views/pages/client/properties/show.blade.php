@@ -22,14 +22,12 @@
                 <div class="relative h-72 sm:h-96 bg-stone-100">
                     @php
                         $imgs = [];
-                        if ($property->featured_image) {
-                            $imgs[] = asset('storage/' . $property->featured_image);
+                        if ($property->featured_image) { $imgs[] = $property->featured_image; }
+                        if (!empty($property->images)) {
+                            foreach ($property->images as $img) { $imgs[] = $img; }
                         }
-                        // Fallback to unsplash images if no property images
                         if (empty($imgs)) {
-                            $imgs = [
-                                'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=500&fit=crop',
-                            ];
+                            $imgs = ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=500&fit=crop'];
                         }
                     @endphp
                     @foreach($imgs as $i => $img)
@@ -47,7 +45,7 @@
                 </div>
                 {{-- Thumbnails --}}
                 @if(count($imgs) > 1)
-                <div class="flex gap-2 mt-2">
+                <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
                     @foreach($imgs as $i => $img)
                     <button @click="activeImg = {{ $i }}"
                             :class="activeImg === {{ $i }} ? 'ring-2 ring-amber-500' : 'opacity-60 hover:opacity-100'"
@@ -247,56 +245,31 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         @if($property->latitude && $property->longitude)
-        // Property coordinates
         var lat = {{ $property->latitude }};
         var lng = {{ $property->longitude }};
 
-        var map = L.map('property-map', {
-            center: [lat, lng],
-            zoom: 15,
-            scrollWheelZoom: false
-        });
+        var map = L.map('property-map', { center: [lat, lng], zoom: 15, scrollWheelZoom: false });
 
-        // OpenStreetMap tile layer (free, no API key needed)
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             maxZoom: 19
         }).addTo(map);
 
-        // Custom amber marker icon
         var icon = L.divIcon({
             className: '',
-            html: `<div style="
-                width: 36px; height: 36px;
-                background: #d97706;
-                border: 3px solid white;
-                border-radius: 50% 50% 50% 0;
-                transform: rotate(-45deg);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            "></div>`,
-            iconSize: [36, 36],
-            iconAnchor: [18, 36],
-            popupAnchor: [0, -40]
+            html: `<div style="width:36px;height:36px;background:#d97706;border:3px solid white;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>`,
+            iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -40]
         });
 
-        // Add marker
         var marker = L.marker([lat, lng], { icon: icon }).addTo(map);
-
         marker.bindPopup(`
-            <div style="font-family: Inter, sans-serif; min-width: 180px; padding: 4px;">
-                <p style="font-weight: 700; font-size: 14px; color: #1c1917; margin: 0 0 4px;">{{ $property->name }}</p>
-                <p style="font-size: 12px; color: #78716c; margin: 0 0 6px;">{{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? '') }}</p>
+            <div style="font-family:Inter,sans-serif;min-width:180px;padding:4px;">
+                <p style="font-weight:700;font-size:14px;color:#1c1917;margin:0 0 4px;">{{ $property->name }}</p>
+                <p style="font-size:12px;color:#78716c;margin:0 0 6px;">{{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? '') }}</p>
             </div>
         `).openPopup();
 
-        // Draw a circle radius around property
-        L.circle([lat, lng], {
-            color: '#d97706',
-            fillColor: '#fef3c7',
-            fillOpacity: 0.15,
-            weight: 1.5,
-            radius: 500
-        }).addTo(map);
+        L.circle([lat, lng], { color: '#d97706', fillColor: '#fef3c7', fillOpacity: 0.15, weight: 1.5, radius: 500 }).addTo(map);
         @endif
     });
 </script>

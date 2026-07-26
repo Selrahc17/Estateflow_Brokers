@@ -100,16 +100,6 @@
                 <a href="{{ route('auth.register') }}" class="text-amber-600 hover:underline font-medium">Register here</a>
             </p>
 
-            {{-- Test Accounts --}}
-            <div class="mt-8 p-4 bg-stone-50 border border-stone-200 rounded-xl">
-                <p class="text-xs font-semibold text-stone-500 mb-2">Test Accounts</p>
-                <div class="space-y-1 text-xs text-stone-500">
-                    <p><span class="font-medium text-red-600">Admin:</span> admin@estateflow.com / admin123</p>
-                    <p><span class="font-medium text-amber-600">Broker:</span> broker@estateflow.com / broker123</p>
-                    <p><span class="font-medium text-blue-600">Client:</span> client@estateflow.com / client123</p>
-                </div>
-            </div>
-
         </div>
     </div>
 

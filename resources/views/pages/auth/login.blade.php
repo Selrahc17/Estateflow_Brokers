@@ -7,14 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-stone-100 font-sans min-h-screen flex">
+<body class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),_transparent_28%),linear-gradient(135deg,_#f8fafc_0%,_#f5f5f4_100%)] font-sans flex">
 
     {{-- Left Panel --}}
     <div class="hidden lg:flex lg:w-1/2 bg-stone-900 flex-col justify-between p-12 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-amber-900/40 to-stone-900"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.25),_transparent_30%),linear-gradient(135deg,_rgba(120,53,15,0.7),_rgba(28,25,23,0.95))]"></div>
         <div class="relative z-10">
             <div class="flex items-center gap-3 mb-16">
-                <div class="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center">
+                <div class="w-11 h-11 bg-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                     </svg>
@@ -24,7 +24,7 @@
             <h1 class="text-4xl font-bold text-white leading-tight mb-4">
                 Your Real Estate<br>Management Hub
             </h1>
-            <p class="text-stone-400 text-lg leading-relaxed">
+            <p class="text-stone-300 text-lg leading-relaxed max-w-lg">
                 Manage properties, reservations, clients, and payments — all in one place.
             </p>
         </div>
@@ -34,13 +34,13 @@
                 ['Client Management','Track clients and reservations'],
                 ['Payment Tracking','Monitor payments and documents'],
             ] as $f)
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-amber-600/20 rounded-lg flex items-center justify-center">
+            <div class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm">
+                <div class="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
                     <div class="w-2 h-2 bg-amber-400 rounded-full"></div>
                 </div>
                 <div>
                     <p class="text-white text-sm font-medium">{{ $f[0] }}</p>
-                    <p class="text-stone-500 text-xs">{{ $f[1] }}</p>
+                    <p class="text-stone-400 text-xs">{{ $f[1] }}</p>
                 </div>
             </div>
             @endforeach
@@ -48,23 +48,35 @@
     </div>
 
     {{-- Right Panel --}}
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div class="w-full max-w-md">
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12">
+        <div class="w-full max-w-md rounded-3xl border border-stone-200/80 bg-white/80 p-8 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] backdrop-blur">
 
             {{-- Mobile Logo --}}
-            <div class="flex items-center gap-2 mb-8 lg:hidden">
-                <div class="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <div class="flex items-center justify-between gap-2 mb-8 lg:hidden">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    </div>
+                    <span class="text-xl font-bold text-amber-600">EstateFlow</span>
                 </div>
-                <span class="text-xl font-bold text-amber-600">EstateFlow</span>
+                <a href="{{ url('/') }}" class="text-sm font-medium text-stone-500 hover:text-amber-600 transition">
+                    ← Back to Home
+                </a>
             </div>
 
-            <h2 class="text-2xl font-bold text-stone-800 mb-1">Welcome back</h2>
-            <p class="text-stone-400 text-sm mb-6">Sign in to your account to continue</p>
+            <div class="mb-8">
+                <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-amber-600 transition mb-4">
+                    <span>←</span>
+                    <span>Back to Home</span>
+                </a>
+                <p class="text-sm font-semibold uppercase tracking-[0.25em] text-amber-600 mb-2">Welcome back</p>
+                <h2 class="text-3xl font-bold text-stone-800">Sign in to your account</h2>
+                <p class="text-stone-500 text-sm mt-2">Access your dashboard and manage your real estate work.</p>
+            </div>
 
             {{-- Error --}}
             @if($errors->any())
-            <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+            <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
                 {{ $errors->first() }}
             </div>
             @endif
@@ -75,22 +87,22 @@
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">Email Address</label>
                     <input type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required
-                        class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+                        class="w-full border border-stone-200 rounded-2xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 bg-white shadow-sm">
                 </div>
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">Password</label>
                     <input type="password" name="password" placeholder="••••••••" required
-                        class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+                        class="w-full border border-stone-200 rounded-2xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 bg-white shadow-sm">
                 </div>
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between pt-1">
                     <label class="flex items-center gap-2 text-sm text-stone-500 cursor-pointer">
-                        <input type="checkbox" name="remember" class="rounded border-stone-300 text-amber-600">
+                        <input type="checkbox" name="remember" class="rounded border-stone-300 text-amber-600 focus:ring-amber-400">
                         Remember me
                     </label>
                 </div>
 
                 <button type="submit"
-                    class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-center py-3 rounded-xl font-medium transition">
+                    class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-center py-3 rounded-2xl font-semibold transition shadow-lg shadow-amber-600/20">
                     Sign In
                 </button>
             </form>

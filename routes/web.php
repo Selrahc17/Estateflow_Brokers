@@ -55,6 +55,7 @@ Route::view('/contact', 'pages.client.contact.index')->name('client.contact');
 Route::view('/privacy-policy', 'pages.client.legal.privacy')->name('client.legal.privacy');
 Route::view('/terms-of-use', 'pages.client.legal.terms')->name('client.legal.terms');
 Route::view('/inquiry/success', 'pages.client.inquiry.success')->name('client.inquiry.success');
+Route::view('/offline', 'offline')->name('offline');
 
 // ===================== AUTHENTICATED CLIENT ROUTES =====================
 Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client'])->group(function () {

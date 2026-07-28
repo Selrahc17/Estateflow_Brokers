@@ -13,6 +13,7 @@ class Property extends Model
     protected $fillable = [
         'broker_id', 'name', 'slug', 'description', 'address',
         'city', 'province', 'type', 'latitude', 'longitude', 'price', 'status',
+        'bedrooms', 'bathrooms', 'floor_area', 'lot_area', 'frontage', 'stories', 'parking_slots',
         'featured_image', 'images', 'amenities', 'view_count',
     ];
 

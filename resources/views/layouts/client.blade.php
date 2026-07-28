@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-stone-50 font-sans" x-data="{ mobileMenu: false }">
+<body class="bg-stone-50 font-sans" x-data="{ mobileMenu: false }" @resize.window="mobileMenu = false">
 
     {{-- Top Navigation --}}
     <nav class="bg-white border-b border-stone-200 sticky top-0 z-50">

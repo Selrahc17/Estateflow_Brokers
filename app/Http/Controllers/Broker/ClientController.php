@@ -13,7 +13,39 @@ class ClientController extends Controller
 {
     public function index(): View
     {
-        $clients = Client::where('broker_id', auth()->id())
+        $brokerId = auth()->id();
+
+        $clientIds = collect();
+
+        $clientIds = $clientIds->merge(
+            \App\Models\Inquiry::where('broker_id', $brokerId)
+                ->select('email')
+                ->distinct()
+                ->pluck('email')
+                ->filter()
+                ->map(fn ($email) => Client::where('email', $email)->where('broker_id', $brokerId)->value('id'))
+                ->filter()
+        );
+
+        $clientIds = $clientIds->merge(
+            \App\Models\Reservation::where('broker_id', $brokerId)->pluck('client_id')
+        );
+
+        $clientIds = $clientIds->merge(
+            \App\Models\SiteVisit::where('broker_id', $brokerId)->pluck('client_id')
+        );
+
+        $clientIds = $clientIds->merge(
+            \App\Models\Payment::where('broker_id', $brokerId)->pluck('client_id')
+        );
+
+        $clientIds = $clientIds->merge(
+            \App\Models\Feedback::where('user_id', $brokerId)->pluck('client_id')
+        );
+
+        $clientIds = $clientIds->unique()->filter();
+
+        $clients = Client::whereIn('id', $clientIds)
             ->withCount('reservations')
             ->latest()
             ->paginate(15);

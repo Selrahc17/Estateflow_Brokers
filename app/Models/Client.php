@@ -82,4 +82,14 @@ class Client extends Authenticatable
     {
         return $this->hasMany(SiteVisit::class);
     }
+
+    public function inquiries()
+    {
+        return $this->hasMany(Inquiry::class, 'email', 'email');
+    }
+
+    public function interactions()
+    {
+        return $this->hasMany(Inquiry::class, 'email', 'email');
+    }
 }

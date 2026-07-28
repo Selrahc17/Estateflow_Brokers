@@ -44,6 +44,13 @@ class PropertyController extends Controller
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
             'status'      => 'required|in:available,sold,coming_soon',
+            'bedrooms'    => 'nullable|integer|min:0',
+            'bathrooms'   => 'nullable|integer|min:0',
+            'floor_area'  => 'nullable|numeric|min:0',
+            'lot_area'    => 'nullable|numeric|min:0',
+            'frontage'    => 'nullable|numeric|min:0',
+            'stories'     => 'nullable|integer|min:0',
+            'parking_slots' => 'nullable|integer|min:0',
             'amenities'   => 'nullable|array',
             'confirm_duplicate' => 'nullable|boolean',
         ]);
@@ -116,6 +123,13 @@ class PropertyController extends Controller
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
             'status'      => 'required|in:available,sold,coming_soon',
+            'bedrooms'    => 'nullable|integer|min:0',
+            'bathrooms'   => 'nullable|integer|min:0',
+            'floor_area'  => 'nullable|numeric|min:0',
+            'lot_area'    => 'nullable|numeric|min:0',
+            'frontage'    => 'nullable|numeric|min:0',
+            'stories'     => 'nullable|integer|min:0',
+            'parking_slots' => 'nullable|integer|min:0',
             'amenities'   => 'nullable|array',
         ]);
 

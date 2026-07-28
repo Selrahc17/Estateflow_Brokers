@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Client;
 use App\Models\Inquiry;
 use App\Models\Property;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class InquiryController extends Controller
@@ -29,6 +32,25 @@ class InquiryController extends Controller
             'email' => 'required|email',
         ]);
 
+        $client = Client::where('email', $validated['email'])->first();
+
+        if (! $client) {
+            $client = new Client();
+        }
+
+        $client->fill([
+            'user_id' => auth()->id() ?? $client->user_id,
+            'broker_id' => $property->broker_id,
+            'first_name' => $client->first_name ?: $this->extractFirstName($validated['email']),
+            'last_name' => $client->last_name ?: $this->extractLastName($validated['email']),
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'status' => 'active',
+            'password' => $client->password ?: Hash::make(Str::random(24)),
+        ]);
+
+        $client->save();
+
         Inquiry::create([
             'user_id' => auth()->id(),
             'property_id' => $property->id,
@@ -48,5 +70,22 @@ class InquiryController extends Controller
         abort_if($inquiry->user_id !== auth()->id(), 403);
 
         return view('pages.client.inquiries.show', compact('inquiry'));
+    }
+
+    private function extractFirstName(string $email): string
+    {
+        $localPart = explode('@', $email)[0] ?? 'client';
+        $localPart = str_replace(['.', '_', '-'], ' ', $localPart);
+
+        return ucfirst(trim(explode(' ', $localPart)[0] ?? 'Client'));
+    }
+
+    private function extractLastName(string $email): string
+    {
+        $localPart = explode('@', $email)[0] ?? 'client';
+        $localPart = str_replace(['.', '_', '-'], ' ', $localPart);
+        $parts = preg_split('/\s+/', trim($localPart)) ?: [''];
+
+        return ucfirst($parts[1] ?? '');
     }
 }

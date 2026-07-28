@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#d97706">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="EstateFlow">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <title>EstateFlow — @yield('title', 'Find Your Dream Property')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -12,7 +18,7 @@
         .dark .dark\:bg-stone-950 { background-color: #0c0a09; }
     </style>
 </head>
-<body class="bg-white dark:bg-stone-950 font-sans transition-colors duration-300" x-data="{ mobileMenu: false, mobileSearch: false }">
+<body class="bg-white dark:bg-stone-950 font-sans transition-colors duration-300" x-data="{ mobileMenu: false, mobileSearch: false }" @resize.window="mobileMenu = false; mobileSearch = false">
 
     {{-- Sticky Navbar --}}
     <header class="sticky top-0 z-50 bg-white/95 dark:bg-stone-900/95 backdrop-blur border-b border-stone-200 dark:border-stone-800" x-data="{ scrolled: false }" @scroll.window="scrolled = window.scrollY > 50">
@@ -51,14 +57,9 @@
                             <select name="type" class="text-sm text-stone-400 bg-transparent border-0 outline-none w-full mt-0.5 cursor-pointer dark:bg-stone-800">
                                 <option value="">Any type</option>
                                 <option value="House and Lot" {{ request('type') == 'House and Lot' ? 'selected' : '' }}>House and Lot</option>
-                                <option value="Condominium" {{ request('type') == 'Condominium' ? 'selected' : '' }}>Condominium</option>
-                                <option value="Townhouse" {{ request('type') == 'Townhouse' ? 'selected' : '' }}>Townhouse</option>
                                 <option value="Lot Only" {{ request('type') == 'Lot Only' ? 'selected' : '' }}>Lot Only</option>
-                                <option value="Office Space" {{ request('type') == 'Office Space' ? 'selected' : '' }}>Office Space</option>
-                                <option value="Warehouse" {{ request('type') == 'Warehouse' ? 'selected' : '' }}>Warehouse</option>
-                                <option value="Farm" {{ request('type') == 'Farm' ? 'selected' : '' }}>Farm</option>
-                                <option value="Villa" {{ request('type') == 'Villa' ? 'selected' : '' }}>Villa</option>
-                                <option value="Apartment" {{ request('type') == 'Apartment' ? 'selected' : '' }}>Apartment</option>
+                                <option value="Condominium" {{ request('type') == 'Condominium' ? 'selected' : '' }}>Condominium</option>
+                                <option value="Commercial" {{ request('type') == 'Commercial' ? 'selected' : '' }}>Commercial</option>
                             </select>
                         </div>
                     </div>
@@ -180,14 +181,8 @@
             <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-1">Browse</p>
             <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1 font-medium">All Properties</a>
             <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">House and Lot</a>
-            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Condominium</a>
-            <a href="{{ route('client.properties') }}?type=Townhouse" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Townhouse</a>
             <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Lot Only</a>
-            <a href="{{ route('client.properties') }}?type=Office+Space" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Office Space</a>
-            <a href="{{ route('client.properties') }}?type=Warehouse" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Warehouse</a>
-            <a href="{{ route('client.properties') }}?type=Farm" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Farm</a>
-            <a href="{{ route('client.properties') }}?type=Villa" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Villa</a>
-            <a href="{{ route('client.properties') }}?type=Apartment" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Apartment</a>
+            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Condominium</a>
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2">
                 <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-2">My Account</p>
                 <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">My Reservation</a>
@@ -208,14 +203,8 @@
             <a href="{{ route('client.properties') }}?status=Pre-Selling" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'Pre-Selling' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Pre-Selling</a>
             <a href="{{ route('client.properties') }}?status=RFO" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'RFO' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Ready for Occupancy</a>
             <a href="{{ route('client.properties') }}?type=House+and+Lot" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'House and Lot' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">House & Lot</a>
-            <a href="{{ route('client.properties') }}?type=Condominium" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Condominium' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Condominium</a>
-            <a href="{{ route('client.properties') }}?type=Townhouse" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Townhouse' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Townhouse</a>
             <a href="{{ route('client.properties') }}?type=Lot+Only" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Lot Only' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Lot Only</a>
-            <a href="{{ route('client.properties') }}?type=Office+Space" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Office Space' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Office Space</a>
-            <a href="{{ route('client.properties') }}?type=Warehouse" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Warehouse' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Warehouse</a>
-            <a href="{{ route('client.properties') }}?type=Farm" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Farm' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Farm</a>
-            <a href="{{ route('client.properties') }}?type=Villa" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Villa' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Villa</a>
-            <a href="{{ route('client.properties') }}?type=Apartment" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Apartment' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Apartment</a>
+            <a href="{{ route('client.properties') }}?type=Condominium" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Condominium' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Condominium</a>
             <a href="{{ route('client.properties') }}?type=Commercial" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Commercial' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Commercial</a>
         </div>
     </header>
@@ -362,5 +351,12 @@
     </div>
 
     @stack('scripts')
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+    </script>
 </body>
 </html>

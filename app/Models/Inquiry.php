@@ -9,6 +9,16 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable(['user_id', 'property_id', 'broker_id', 'lot_id', 'message', 'status', 'phone', 'email'])]
 class Inquiry extends Model
 {
+    protected $fillable = [
+        'user_id',
+        'property_id',
+        'broker_id',
+        'lot_id',
+        'message',
+        'status',
+        'phone',
+        'email',
+    ];
     use HasFactory;
 
     public function user()

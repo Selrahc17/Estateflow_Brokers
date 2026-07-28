@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: true }">
+<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: true }" @resize.window="sidebarOpen = window.innerWidth >= 1024">
 
     {{-- Sidebar --}}
     <aside :class="sidebarOpen ? 'w-64' : 'w-16'"

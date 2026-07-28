@@ -42,6 +42,30 @@ class PropertyController extends Controller
 
         $property->increment('view_count');
 
-        return view('pages.client.properties.show', compact('property'));
+        $relatedProperties = Property::where('status', 'available')
+            ->where('id', '!=', $property->id)
+            ->where(function ($query) use ($property) {
+                $query->where('type', $property->type)
+                    ->orWhere('city', $property->city)
+                    ->orWhere('province', $property->province);
+            })
+            ->withCount(['lots' => fn($q) => $q->where('status', 'available')])
+            ->latest()
+            ->take(4)
+            ->get();
+
+        if ($relatedProperties->count() < 4) {
+            $additionalProperties = Property::where('status', 'available')
+                ->where('id', '!=', $property->id)
+                ->whereNotIn('id', $relatedProperties->pluck('id'))
+                ->withCount(['lots' => fn($q) => $q->where('status', 'available')])
+                ->latest()
+                ->take(4 - $relatedProperties->count())
+                ->get();
+
+            $relatedProperties = $relatedProperties->concat($additionalProperties);
+        }
+
+        return view('pages.client.properties.show', compact('property', 'relatedProperties'));
     }
 }

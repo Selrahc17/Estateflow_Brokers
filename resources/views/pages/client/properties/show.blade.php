@@ -115,6 +115,23 @@
                 @endif
             </div>
 
+            <div class="bg-white rounded-2xl border border-stone-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-stone-800">More Properties</h3>
+                    <a href="{{ route('client.properties') }}" class="text-sm text-amber-600 hover:underline">Browse all</a>
+                </div>
+
+                @if($relatedProperties->isNotEmpty())
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    @foreach($relatedProperties as $relatedProperty)
+                        @include('pages.client.properties._card', ['property' => $relatedProperty])
+                    @endforeach
+                </div>
+                @else
+                <p class="text-sm text-stone-500">No other properties are available right now. Please check back soon.</p>
+                @endif
+            </div>
+
             {{-- Lot Availability Map --}}
             @if($property->lots->count())
             <div class="bg-white rounded-2xl border border-stone-200 p-6">

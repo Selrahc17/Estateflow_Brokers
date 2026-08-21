@@ -80,6 +80,92 @@
                         {{ $property->description ?: 'No description available yet.' }}
                     </p>
                 </div>
+
+                {{-- Specs Grid --}}
+                @if($property->bedrooms || $property->bathrooms || $property->floor_area || $property->lot_area || $property->stories || $property->parking_slots || $property->frontage)
+                <div class="border-t border-stone-100 pt-4 mt-4">
+                    <h3 class="font-semibold text-stone-800 mb-3">Property Details</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        @if($property->bedrooms)
+                        <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400">Bedrooms</p>
+                                <p class="font-semibold text-stone-800">{{ $property->bedrooms }}</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($property->bathrooms)
+                        <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m0 4a2 2 0 100 4m0-4a2 2 0 110 4m-6 4h16M4 15v4a1 1 0 001 1h14a1 1 0 001-1v-4"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400">Bathrooms</p>
+                                <p class="font-semibold text-stone-800">{{ $property->bathrooms }}</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($property->floor_area)
+                        <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400">Floor Area</p>
+                                <p class="font-semibold text-stone-800">{{ $property->floor_area }} m²</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($property->lot_area)
+                        <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400">Lot Area</p>
+                                <p class="font-semibold text-stone-800">{{ $property->lot_area }} m²</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($property->stories)
+                        <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400">Stories</p>
+                                <p class="font-semibold text-stone-800">{{ $property->stories }}</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($property->parking_slots)
+                        <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3m0 0h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-5a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400">Parking</p>
+                                <p class="font-semibold text-stone-800">{{ $property->parking_slots }} slot{{ $property->parking_slots > 1 ? 's' : '' }}</p>
+                            </div>
+                        </div>
+                        @endif
+                        @if($property->frontage)
+                        <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
+                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs text-stone-400">Frontage</p>
+                                <p class="font-semibold text-stone-800">{{ $property->frontage }} m</p>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
 
             {{-- Location Map --}}
@@ -224,17 +310,69 @@
 
             {{-- Broker Info --}}
             <div class="bg-white rounded-2xl border border-stone-200 p-5">
-                <h3 class="font-semibold text-stone-800 mb-3">Listed by</h3>
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-11 h-11 bg-amber-600 rounded-full flex items-center justify-center text-white font-bold">{{ substr($property->broker->name, 0, 1) }}</div>
+                <h3 class="font-semibold text-stone-800 mb-4">Listed by</h3>
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-14 h-14 rounded-full overflow-hidden bg-amber-600 flex items-center justify-center shrink-0">
+                        @if($property->broker->avatar)
+                            <img src="{{ $property->broker->avatar }}" class="w-full h-full object-cover">
+                        @else
+                            <span class="text-white text-xl font-bold">{{ strtoupper(substr($property->broker->name, 0, 1)) }}</span>
+                        @endif
+                    </div>
                     <div>
-                        <p class="font-medium text-stone-800 text-sm">{{ $property->broker->name }}</p>
-                        <p class="text-xs text-stone-400">Licensed Real Estate Broker</p>
+                        <p class="font-semibold text-stone-800">{{ $property->broker->name }}</p>
+                        <p class="text-xs text-amber-600 font-medium">Licensed Real Estate Broker</p>
                     </div>
                 </div>
-                <a href="{{ route('client.account.chat') }}" class="block w-full text-center border border-stone-200 text-stone-600 hover:bg-stone-50 py-2 rounded-xl text-sm font-medium transition">
+                @auth
+                <div class="space-y-2 mb-4">
+                    <a href="mailto:{{ $property->broker->email }}" class="flex items-center gap-2.5 text-sm text-stone-600 hover:text-amber-600 transition">
+                        <span class="w-7 h-7 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </span>
+                        <span class="truncate">{{ $property->broker->email }}</span>
+                    </a>
+                    @if($property->broker->phone)
+                    <a href="tel:{{ $property->broker->phone }}" class="flex items-center gap-2.5 text-sm text-stone-600 hover:text-amber-600 transition">
+                        <span class="w-7 h-7 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        </span>
+                        {{ $property->broker->phone }}
+                    </a>
+                    @endif
+                </div>
+                <a href="mailto:{{ $property->broker->email }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl text-sm font-medium transition">
                     Contact Broker
                 </a>
+                @else
+                {{-- Faded contact for guests --}}
+                @php
+                    $emailPreview = substr($property->broker->email, 0, 5);
+                    $phonePreview = $property->broker->phone ? substr($property->broker->phone, 0, 4) : null;
+                @endphp
+                <div class="space-y-2 mb-4">
+                    <div class="flex items-center gap-2.5 text-sm text-stone-600">
+                        <span class="w-7 h-7 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </span>
+                        <span>{{ $emailPreview }}<span style="filter:blur(4px);user-select:none;">xxxxxxxxxxxxxxxx</span></span>
+                    </div>
+                    @if($phonePreview)
+                    <div class="flex items-center gap-2.5 text-sm text-stone-600">
+                        <span class="w-7 h-7 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
+                            <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        </span>
+                        <span>{{ $phonePreview }}<span style="filter:blur(4px);user-select:none;">xxxxxxxxx</span></span>
+                    </div>
+                    @endif
+                </div>
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl mb-3">
+                    <p class="text-xs text-amber-800 text-center">🔒 Log in to see full contact details</p>
+                </div>
+                <a href="{{ route('auth.login') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl text-sm font-medium transition">
+                    Login to Contact Broker
+                </a>
+                @endauth
             </div>
 
             {{-- AI Assistant CTA --}}

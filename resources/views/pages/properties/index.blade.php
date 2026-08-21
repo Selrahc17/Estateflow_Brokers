@@ -35,11 +35,13 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
     @forelse($properties as $property)
     <div class="bg-white rounded-xl border border-stone-200 overflow-hidden hover:shadow-md transition">
-        <div class="h-36 bg-gradient-to-br from-amber-100 to-stone-200 flex items-center justify-center relative">
+        <div class="h-36 bg-gradient-to-br from-amber-100 to-stone-200 relative overflow-hidden">
             @if($property->featured_image)
-                <img src="{{ $property->featured_image }}" class="w-full h-full object-cover" alt="{{ $property->name }}">
+                <img src="{{ $property->featured_image }}" class="w-full h-full object-cover absolute inset-0" alt="{{ $property->name }}">
             @else
-                <svg class="w-16 h-16 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                <div class="w-full h-full flex items-center justify-center">
+                    <svg class="w-16 h-16 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                </div>
             @endif
             <span class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium
                 @if($property->status == 'available') bg-green-100 text-green-700

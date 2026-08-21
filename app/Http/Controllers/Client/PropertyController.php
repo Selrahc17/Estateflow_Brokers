@@ -14,6 +14,8 @@ class PropertyController extends Controller
         $properties = Property::where('status', 'available')
             ->when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%')->orWhere('description', 'like', '%'.request('search').'%'))
             ->when(request('type'), fn($q) => $q->where('type', request('type')))
+            ->when(request('city'), fn($q) => $q->where('city', request('city')))
+            ->when(request('province'), fn($q) => $q->where('province', request('province')))
             ->when(request('location'), fn($q) => $q->where(fn($q2) => $q2->where('city', 'like', '%'.request('location').'%')->orWhere('province', 'like', '%'.request('location').'%')->orWhere('address', 'like', '%'.request('location').'%')))
             ->when(request('min_price'), fn($q) => $q->where('price', '>=', request('min_price')))
             ->when(request('max_price'), fn($q) => $q->where('price', '<=', request('max_price')))
@@ -29,9 +31,11 @@ class PropertyController extends Controller
             }, fn($q) => $q->latest())
             ->paginate(12);
 
-        $types = Property::distinct()->pluck('type');
+        $types = Property::where('status', 'available')->distinct()->orderBy('type')->pluck('type');
+        $cities = Property::where('status', 'available')->whereNotNull('city')->where('city', '!=', '')->distinct()->orderBy('city')->pluck('city');
+        $provinces = Property::where('status', 'available')->whereNotNull('province')->where('province', '!=', '')->distinct()->orderBy('province')->pluck('province');
 
-        return view('pages.client.properties.index', compact('properties', 'types'));
+        return view('pages.client.properties.index', compact('properties', 'types', 'cities', 'provinces'));
     }
 
     public function show(string $slug): View

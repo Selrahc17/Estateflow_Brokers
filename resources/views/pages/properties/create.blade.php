@@ -64,60 +64,36 @@
                 </div>
             </div>
 
-            <div class="border border-stone-200 rounded-xl p-4 bg-stone-50" x-show="selectedType === 'House and Lot' || selectedType === 'Condominium' || selectedType === 'Townhouse' || selectedType === 'Villa' || selectedType === 'Apartment'">
-                <p class="text-sm font-semibold text-stone-700 mb-3">Residential Details</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="border border-stone-200 rounded-xl p-4 bg-stone-50">
+                <p class="text-sm font-semibold text-stone-700 mb-3">Property Specifications</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Bedrooms</label>
-                        <input type="number" name="bedrooms" min="0" value="{{ old('bedrooms') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="number" name="bedrooms" min="0" value="{{ old('bedrooms') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Bathrooms</label>
-                        <input type="number" name="bathrooms" min="0" value="{{ old('bathrooms') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="number" name="bathrooms" min="0" value="{{ old('bathrooms') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-stone-500 mb-1">Stories / Floors</label>
+                        <input type="number" name="stories" min="0" value="{{ old('stories') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Floor Area (sqm)</label>
-                        <input type="number" step="0.01" name="floor_area" min="0" value="{{ old('floor_area') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="number" step="0.01" name="floor_area" min="0" value="{{ old('floor_area') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Lot Area (sqm)</label>
-                        <input type="number" step="0.01" name="lot_area" min="0" value="{{ old('lot_area') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Stories</label>
-                        <input type="number" name="stories" min="0" value="{{ old('stories') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Parking Slots</label>
-                        <input type="number" name="parking_slots" min="0" value="{{ old('parking_slots') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    </div>
-                </div>
-            </div>
-
-            <div class="border border-stone-200 rounded-xl p-4 bg-stone-50" x-show="selectedType === 'Lot Only' || selectedType === 'Farm'">
-                <p class="text-sm font-semibold text-stone-700 mb-3">Land Details</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Lot Area (sqm)</label>
-                        <input type="number" step="0.01" name="lot_area" min="0" value="{{ old('lot_area') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="number" step="0.01" name="lot_area" min="0" value="{{ old('lot_area') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Frontage (m)</label>
-                        <input type="number" step="0.01" name="frontage" min="0" value="{{ old('frontage') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    </div>
-                </div>
-            </div>
-
-            <div class="border border-stone-200 rounded-xl p-4 bg-stone-50" x-show="selectedType === 'Office Space' || selectedType === 'Warehouse'">
-                <p class="text-sm font-semibold text-stone-700 mb-3">Commercial Details</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Floor Area (sqm)</label>
-                        <input type="number" step="0.01" name="floor_area" min="0" value="{{ old('floor_area') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="number" step="0.01" name="frontage" min="0" value="{{ old('frontage') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Parking Slots</label>
-                        <input type="number" name="parking_slots" min="0" value="{{ old('parking_slots') }}" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="number" name="parking_slots" min="0" value="{{ old('parking_slots') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                 </div>
             </div>

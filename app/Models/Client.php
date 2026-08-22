@@ -60,7 +60,7 @@ class Client extends Authenticatable
 
     public function notifications()
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasManyThrough(AppNotification::class, User::class, 'id', 'user_id', 'user_id', 'id');
     }
 
     public function feedbacks()

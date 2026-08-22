@@ -168,5 +168,6 @@
             window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
         }
     </script>
+    @stack('scripts')
 </body>
 </html>

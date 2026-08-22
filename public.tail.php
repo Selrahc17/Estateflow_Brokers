@@ -1,4 +1,0 @@
-﻿
-    @stack('scripts')
-</body>
-</html>

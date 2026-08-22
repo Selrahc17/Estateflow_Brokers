@@ -8,7 +8,9 @@ use App\Models\Lot;
 use App\Models\Reservation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ReservationController extends Controller
@@ -37,8 +39,14 @@ class ReservationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'client_id'          => 'required|exists:clients,id',
-            'lot_id'             => 'required|exists:lots,id',
+            'client_id'          => ['required', Rule::exists('clients', 'id')->where('broker_id', auth()->id())],
+            'lot_id'             => [
+                'required',
+                Rule::exists('lots', 'id')->whereIn(
+                    'property_id',
+                    \App\Models\Property::where('broker_id', auth()->id())->select('id')
+                ),
+            ],
             'total_price'        => 'required|numeric|min:0',
             'down_payment'       => 'nullable|numeric|min:0',
             'payment_schedule'   => 'required|in:monthly,quarterly,annual',
@@ -52,10 +60,27 @@ class ReservationController extends Controller
         $data['reserved_at'] = now();
         $data['expires_at'] = now()->addDays(30);
 
-        $reservation = Reservation::create($data);
+        $reservation = DB::transaction(function () use ($data) {
+            $lot = Lot::whereKey($data['lot_id'])
+                ->where('status', 'available')
+                ->lockForUpdate()
+                ->first();
 
-        // Update lot status
-        $reservation->lot->update(['status' => 'reserved']);
+            if (!$lot) {
+                return null;
+            }
+
+            $reservation = Reservation::create($data);
+            $lot->update(['status' => 'reserved']);
+
+            return $reservation;
+        });
+
+        if (!$reservation) {
+            return back()->withErrors([
+                'lot_id' => 'This lot is no longer available for reservation.',
+            ])->withInput();
+        }
 
         return redirect()->route('broker.reservations.index')
             ->with('success', "Reservation {$reservation->reservation_code} created successfully.");
@@ -63,12 +88,14 @@ class ReservationController extends Controller
 
     public function show(Reservation $reservation): View
     {
+        $this->ensureOwnership($reservation);
         $reservation->load(['client', 'lot.property']);
         return view('pages.reservations.show', compact('reservation'));
     }
 
     public function updateStatus(Request $request, Reservation $reservation): RedirectResponse
     {
+        $this->ensureOwnership($reservation);
         $data = $request->validate([
             'status' => 'required|in:pending,confirmed,cancelled,completed',
         ]);
@@ -87,5 +114,10 @@ class ReservationController extends Controller
 
         return redirect()->route('broker.reservations.show', $reservation)
             ->with('success', 'Reservation status updated successfully.');
+    }
+
+    private function ensureOwnership(Reservation $reservation): void
+    {
+        abort_unless((int) $reservation->broker_id === (int) auth()->id(), 403);
     }
 }

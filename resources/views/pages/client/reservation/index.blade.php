@@ -27,41 +27,12 @@
                 {{ ucfirst($res->status) }}
             </span>
         </div>
-        <div class="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="p-6">
             <div class="p-4 bg-stone-50 rounded-xl">
                 <p class="text-xs text-stone-400 mb-1">Total Price</p>
                 <p class="text-sm font-bold text-green-600">₱{{ number_format($res->total_price, 2) }}</p>
             </div>
-            <div class="p-4 bg-stone-50 rounded-xl">
-                <p class="text-xs text-stone-400 mb-1">Down Payment</p>
-                <p class="text-sm font-bold text-stone-700">₱{{ number_format($res->down_payment, 2) }}</p>
-            </div>
-            <div class="p-4 bg-stone-50 rounded-xl">
-                <p class="text-xs text-stone-400 mb-1">Monthly Payment</p>
-                <p class="text-sm font-bold text-amber-600">₱{{ number_format($res->monthly_payment, 2) }}</p>
-            </div>
-            <div class="p-4 bg-stone-50 rounded-xl">
-                <p class="text-xs text-stone-400 mb-1">Terms</p>
-                <p class="text-sm font-bold text-stone-700">{{ $res->payment_terms_months }} months</p>
-            </div>
         </div>
-
-        @if($res->payments->isNotEmpty())
-        @php $paid = $res->payments->where('status','verified')->sum('amount'); $pct = $res->total_price > 0 ? min(100, round($paid/$res->total_price*100)) : 0; @endphp
-        <div class="px-6 pb-6">
-            <div class="flex justify-between text-xs text-stone-500 mb-1">
-                <span>Payment Progress</span>
-                <span class="font-semibold text-amber-600">{{ $pct }}%</span>
-            </div>
-            <div class="w-full bg-stone-100 rounded-full h-2 overflow-hidden">
-                <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $pct }}%"></div>
-            </div>
-            <div class="flex justify-between text-xs text-stone-400 mt-1">
-                <span>₱{{ number_format($paid, 0) }} paid</span>
-                <span>₱{{ number_format($res->total_price - $paid, 0) }} remaining</span>
-            </div>
-        </div>
-        @endif
 
         <div class="px-6 pb-5">
         </div>

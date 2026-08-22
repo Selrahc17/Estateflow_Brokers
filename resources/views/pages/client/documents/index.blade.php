@@ -98,7 +98,7 @@
                                 {{ $doc->status==='rejected' ? 'bg-red-100 text-red-600' : '' }}">
                                 {{ ucfirst($doc->status) }}
                             </span>
-                            <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank" class="text-xs text-amber-600 hover:underline">View</a>
+                            <a href="{{ route('client.account.documents.download', $doc) }}" class="text-xs text-amber-600 hover:underline">Download</a>
                         </div>
                     </div>
                     @empty

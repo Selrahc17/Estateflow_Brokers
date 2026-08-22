@@ -14,7 +14,10 @@ class PropertyController extends Controller
     {
         $properties = Property::with(['broker', 'lots'])
             ->when(request('status'), fn($q) => $q->where('status', request('status')))
-            ->when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%')->orWhere('address', 'like', '%'.request('search').'%'))
+            ->when(request('search'), fn($q) => $q->where(function ($query) {
+                $query->where('name', 'like', '%'.request('search').'%')
+                    ->orWhere('address', 'like', '%'.request('search').'%');
+            }))
             ->latest()
             ->paginate(15);
 

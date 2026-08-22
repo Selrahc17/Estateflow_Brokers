@@ -50,6 +50,7 @@
                 {{ ucfirst($client->status) }}
             </span>
             <div class="flex gap-3">
+                <button type="button" data-lead-score="{{ $client->id }}" class="text-xs text-blue-600 hover:underline">Score Lead</button>
                 <a href="{{ route('broker.clients.show', $client) }}" class="text-xs text-amber-600 hover:underline">View</a>
                 <a href="{{ route('broker.clients.edit', $client) }}" class="text-xs text-stone-400 hover:underline">Edit</a>
             </div>
@@ -59,6 +60,29 @@
     <div class="col-span-3 py-12 text-center text-stone-400">No clients found.</div>
     @endforelse
 </div>
+
+@push('scripts')
+<script>
+document.querySelectorAll('[data-lead-score]').forEach((button) => {
+    button.addEventListener('click', async () => {
+        button.disabled = true;
+        button.textContent = 'Scoring...';
+        const response = await fetch('{{ route('broker.ai.leads') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ client_id: button.dataset.leadScore })
+        });
+        const result = await response.json();
+        button.textContent = response.ok ? `${result.priority} (${result.score})` : 'Unavailable';
+        button.disabled = false;
+    });
+});
+</script>
+@endpush
 
 <div class="mt-5">{{ $clients->links() }}</div>
 

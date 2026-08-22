@@ -7,6 +7,7 @@ use App\Models\AppNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class NotificationController extends Controller
 {
@@ -21,6 +22,7 @@ class NotificationController extends Controller
 
     public function markRead(AppNotification $notification): RedirectResponse
     {
+        abort_unless((int) $notification->user_id === (int) auth()->id(), 403);
         $notification->update(['is_read' => true, 'read_at' => now()]);
         return back();
     }
@@ -38,7 +40,7 @@ class NotificationController extends Controller
     public function send(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => ['required', Rule::exists('clients', 'user_id')->where('broker_id', auth()->id())],
             'title'   => 'required|string|max:255',
             'message' => 'nullable|string',
         ]);

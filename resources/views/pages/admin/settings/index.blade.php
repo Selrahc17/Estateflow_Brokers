@@ -72,7 +72,6 @@
                 @foreach([
                     ['Email Notifications','Send system alerts via email',true],
                     ['SMS Notifications','Send alerts via SMS',false],
-                    ['Payment Reminders','Auto-send payment due reminders to clients',true],
                     ['Document Alerts','Alert admins when documents need verification',true],
                     ['Reservation Alerts','Alert admins on new reservation submissions',true],
                     ['Broker Approval Alerts','Alert admins on new broker applications',true],

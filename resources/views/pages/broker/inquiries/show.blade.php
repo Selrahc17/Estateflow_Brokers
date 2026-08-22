@@ -9,10 +9,10 @@
             <a href="{{ route('broker.inquiries.index') }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium mb-2 inline-flex items-center gap-1">
                 ← Back to Inquiries
             </a>
-            <h1 class="text-3xl font-bold text-stone-800">Inquiry from {{ $inquiry->user->name }}</h1>
+            <h1 class="text-3xl font-bold text-stone-800">Inquiry from {{ $inquiry->user?->name ?? 'Guest' }}</h1>
         </div>
         <div>
-            <form action="{{ route('broker.inquiries.updateStatus', $inquiry->id) }}" method="POST" class="inline">
+            <form action="{{ route('broker.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
                 @csrf
                 @method('PATCH')
                 <div class="flex gap-2">
@@ -41,7 +41,7 @@
                 <div class="space-y-3">
                     <div>
                         <p class="text-xs text-stone-400 font-semibold uppercase">Full Name</p>
-                        <p class="text-lg font-semibold text-stone-800 mt-1">{{ $inquiry->user->name }}</p>
+                        <p class="text-lg font-semibold text-stone-800 mt-1">{{ $inquiry->user?->name ?? 'Guest' }}</p>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>

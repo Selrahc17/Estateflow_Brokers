@@ -34,8 +34,11 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-stone-700 mb-1">Description</label>
-                <textarea name="description" rows="3" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">{{ old('description') }}</textarea>
+                <div class="flex items-center justify-between mb-1">
+                    <label class="block text-sm font-medium text-stone-700">Description</label>
+                    <button type="button" data-ai-describe class="text-xs text-amber-700 hover:underline">Generate with AI</button>
+                </div>
+                <textarea id="property-description" name="description" rows="3" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">{{ old('description') }}</textarea>
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -242,6 +245,25 @@
             <a href="{{ route('broker.properties.index') }}" class="text-stone-500 hover:text-stone-700 text-sm">Cancel</a>
         </div>
     </form>
+
+    @push('scripts')
+    <script>
+    document.querySelector('[data-ai-describe]')?.addEventListener('click', async (button) => {
+        const target = document.getElementById('property-description');
+        button.currentTarget.disabled = true;
+        button.currentTarget.textContent = 'Generating...';
+        const response = await fetch('{{ route('broker.ai.describe') }}', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'},
+            body: JSON.stringify(Object.fromEntries(new FormData(document.querySelector('form'))))
+        });
+        const result = await response.json();
+        target.value = result.description || 'AI description is unavailable. Add an OpenAI API key or write the description manually.';
+        button.currentTarget.disabled = false;
+        button.currentTarget.textContent = 'Generate with AI';
+    });
+    </script>
+    @endpush
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>

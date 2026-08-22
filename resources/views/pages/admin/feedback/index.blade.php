@@ -25,7 +25,7 @@
     {{-- Feedback List --}}
     <div class="xl:col-span-2 space-y-4">
         <div class="flex gap-2 mb-2">
-            @foreach(['All','5 Star','4 Star','3 Star','Flagged']) as $tab)
+            @foreach(['All','5 Star','4 Star','3 Star','Flagged'] as $tab)
             <button class="text-xs px-3 py-1.5 rounded-lg {{ $tab==='All' ? 'bg-red-600 text-white' : 'bg-white border border-stone-200 text-stone-500 hover:bg-stone-50' }} transition font-medium">{{ $tab }}</button>
             @endforeach
         </div>

@@ -52,12 +52,14 @@ class LotController extends Controller
 
     public function edit(Lot $lot): View
     {
+        $this->ensureOwnership($lot);
         $properties = Property::where('broker_id', auth()->id())->pluck('name', 'id');
         return view('pages.lots.edit', compact('lot', 'properties'));
     }
 
     public function update(Request $request, Lot $lot): RedirectResponse
     {
+        $this->ensureOwnership($lot);
         $data = $request->validate([
             'property_id'  => ['required', Rule::exists('properties', 'id')->where('broker_id', auth()->id())],
             'lot_number'   => 'required|string|max:50',
@@ -75,7 +77,13 @@ class LotController extends Controller
 
     public function destroy(Lot $lot): RedirectResponse
     {
+        $this->ensureOwnership($lot);
         $lot->delete();
         return redirect()->route('broker.lots.index')->with('success', 'Lot deleted successfully.');
+    }
+
+    private function ensureOwnership(Lot $lot): void
+    {
+        abort_unless($lot->property?->broker_id === auth()->id(), 403);
     }
 }

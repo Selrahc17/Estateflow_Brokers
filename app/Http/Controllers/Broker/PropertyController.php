@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Broker;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
+use App\Services\AIService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -101,17 +103,20 @@ class PropertyController extends Controller
 
     public function show(Property $property): View
     {
+        $this->ensureOwnership($property);
         $property->load(['lots' => fn($q) => $q->withCount('reservations')]);
         return view('pages.properties.show', compact('property'));
     }
 
     public function edit(Property $property): View
     {
+        $this->ensureOwnership($property);
         return view('pages.properties.edit', compact('property'));
     }
 
     public function update(Request $request, Property $property): RedirectResponse
     {
+        $this->ensureOwnership($property);
         $data = $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -159,7 +164,33 @@ class PropertyController extends Controller
 
     public function destroy(Property $property): RedirectResponse
     {
+        $this->ensureOwnership($property);
         $property->delete();
         return redirect()->route('broker.properties.index')->with('success', 'Property deleted successfully.');
+    }
+
+    private function ensureOwnership(Property $property): void
+    {
+        abort_unless((int) $property->broker_id === (int) auth()->id(), 403);
+    }
+
+    public function aiDescribe(Request $request): JsonResponse
+    {
+        $specs = $request->validate([
+            'name'          => 'nullable|string',
+            'type'          => 'nullable|string',
+            'city'          => 'nullable|string',
+            'province'      => 'nullable|string',
+            'bedrooms'      => 'nullable|integer',
+            'bathrooms'     => 'nullable|integer',
+            'floor_area'    => 'nullable|numeric',
+            'lot_area'      => 'nullable|numeric',
+            'price'         => 'nullable|numeric',
+        ]);
+
+        $ai = app(AIService::class);
+        $description = $ai->generatePropertyDescription($specs);
+
+        return response()->json(['description' => $description]);
     }
 }

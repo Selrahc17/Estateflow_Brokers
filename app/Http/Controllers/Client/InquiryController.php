@@ -32,18 +32,22 @@ class InquiryController extends Controller
             'email' => 'required|email',
         ]);
 
-        $client = Client::where('email', $validated['email'])->first();
+        $user = auth()->user();
+        $contactEmail = $user?->email ?? $validated['email'];
+        $client = $user
+            ? Client::where('user_id', $user->id)->first()
+            : Client::where('email', $validated['email'])->first();
 
         if (! $client) {
             $client = new Client();
         }
 
         $client->fill([
-            'user_id' => auth()->id() ?? $client->user_id,
+            'user_id' => $user?->id ?? $client->user_id,
             'broker_id' => $property->broker_id,
-            'first_name' => $client->first_name ?: $this->extractFirstName($validated['email']),
-            'last_name' => $client->last_name ?: $this->extractLastName($validated['email']),
-            'email' => $validated['email'],
+            'first_name' => $client->first_name ?: $this->extractFirstName($contactEmail),
+            'last_name' => $client->last_name ?: $this->extractLastName($contactEmail),
+            'email' => $contactEmail,
             'phone' => $validated['phone'],
             'status' => 'active',
             'password' => $client->password ?: Hash::make(Str::random(24)),
@@ -57,7 +61,7 @@ class InquiryController extends Controller
             'broker_id' => $property->broker_id,
             'message' => $validated['message'],
             'phone' => $validated['phone'],
-            'email' => $validated['email'],
+            'email' => $contactEmail,
             'status' => 'new',
         ]);
 

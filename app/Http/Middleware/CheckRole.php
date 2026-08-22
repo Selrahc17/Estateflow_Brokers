@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
@@ -19,6 +20,13 @@ class CheckRole
 
         if (! $user || ! in_array($user->role, $roles)) {
             abort(403, 'Unauthorized access.');
+        }
+
+        if (! $user->is_active) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('auth.login')->withErrors(['email' => 'Your account has been suspended.']);
         }
 
         return $next($request);

@@ -25,7 +25,15 @@
         <h2 class="text-2xl font-bold text-stone-800 mb-1">Forgot Password?</h2>
         <p class="text-stone-400 text-sm mb-6">Enter your email and we'll send you a reset link.</p>
 
-        <form class="space-y-4">
+        @if(session('success'))
+        <div class="mb-5 rounded-2xl border border-green-200 bg-green-50 p-3 text-sm text-green-700">{{ session('success') }}</div>
+        @endif
+        @if($errors->any())
+        <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">{{ $errors->first() }}</div>
+        @endif
+
+        <form action="{{ route('auth.forgot.post') }}" method="POST" class="space-y-4">
+            @csrf
             <div>
                 <label class="text-sm text-stone-600 font-medium mb-1 block">Email Address</label>
                 <input type="email" placeholder="you@example.com"

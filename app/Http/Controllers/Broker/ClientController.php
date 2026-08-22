@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Broker;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\User;
+use App\Services\AIService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class ClientController extends Controller
 {
+    public function __construct(private AIService $ai) {}
+
     public function index(): View
     {
         $brokerId = auth()->id();
@@ -46,6 +51,7 @@ class ClientController extends Controller
         $clientIds = $clientIds->unique()->filter();
 
         $clients = Client::whereIn('id', $clientIds)
+            ->where('broker_id', $brokerId)
             ->withCount('reservations')
             ->latest()
             ->paginate(15);
@@ -55,6 +61,7 @@ class ClientController extends Controller
 
     public function show(Client $client): View
     {
+        $this->ensureOwnership($client);
         $client->load(['reservations' => fn($q) => $q->with('lot.property')]);
         return view('pages.clients.show', compact('client'));
     }
@@ -84,11 +91,13 @@ class ClientController extends Controller
 
     public function edit(Client $client): View
     {
+        $this->ensureOwnership($client);
         return view('pages.clients.edit', compact('client'));
     }
 
     public function update(Request $request, Client $client): RedirectResponse
     {
+        $this->ensureOwnership($client);
         $data = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
@@ -101,5 +110,40 @@ class ClientController extends Controller
         $client->update($data);
 
         return redirect()->route('broker.clients.index')->with('success', 'Client updated successfully.');
+    }
+
+    public function aiLeadScore(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'client_id' => ['required', Rule::exists('clients', 'id')->where('broker_id', auth()->id())],
+        ]);
+
+        $client = Client::findOrFail($data['client_id']);
+        $lastInquiry = \App\Models\Inquiry::where('broker_id', auth()->id())
+            ->where('email', $client->email)
+            ->latest()
+            ->first();
+
+        $lead = [
+            'client_id' => $client->id,
+            'name' => $client->full_name,
+            'inquiry_count' => \App\Models\Inquiry::where('broker_id', auth()->id())
+                ->where('email', $client->email)
+                ->count(),
+            'has_reservation' => \App\Models\Reservation::where('broker_id', auth()->id())
+                ->where('client_id', $client->id)
+                ->exists(),
+            'has_site_visit' => \App\Models\SiteVisit::where('broker_id', auth()->id())
+                ->where('client_id', $client->id)
+                ->exists(),
+            'days_since_last_contact' => $lastInquiry ? $lastInquiry->created_at->diffInDays(now()) : 99,
+        ];
+
+        return response()->json($this->ai->scoreLeads([$lead])[0]);
+    }
+
+    private function ensureOwnership(Client $client): void
+    {
+        abort_unless((int) $client->broker_id === (int) auth()->id(), 403);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BrokerController as AdminBrokerController;
+use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\AuditController as AdminAuditController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PropertyController as AdminPropertyController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Broker\ChatController as BrokerChatController;
 use App\Http\Controllers\Broker\ClientController as BrokerClientController;
 use App\Http\Controllers\Broker\DashboardController as BrokerDashboardController;
@@ -34,6 +36,9 @@ use App\Http\Controllers\Client\NotificationController as ClientNotificationCont
 use App\Http\Controllers\Client\ProfileController as ClientProfileController;
 use App\Http\Controllers\Client\PropertyController as ClientPropertyController;
 use App\Http\Controllers\Client\ReservationController as ClientReservationController;
+use App\Http\Controllers\Client\SiteVisitController as ClientSiteVisitController;
+use App\Services\AIService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
@@ -43,15 +48,29 @@ Route::post('/login', [AuthController::class, 'login'])->name('auth.login.post')
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('auth.register');
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
+Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('auth.forgot');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('auth.forgot.post');
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset.post');
 
 // ===================== PUBLIC CLIENT ROUTES =====================
-Route::redirect('/', '/properties');
+Route::get('/', [ClientPropertyController::class, 'index'])->name('home');
+
+Route::post('/api/chatbot', function (Request $request, AIService $ai) {
+    $data = $request->validate(['message' => 'required|string|max:1000']);
+
+    return response()->json([
+        'message' => $ai->chat($data['message'], 0, 'guest'),
+    ]);
+})->middleware('throttle:30,1')->name('api.chatbot');
 
 Route::get('/properties', [ClientPropertyController::class, 'index'])->name('client.properties');
+Route::get('/recommendations', [ClientPropertyController::class, 'recommendations'])->name('client.recommendations');
 Route::get('/properties/{slug}', [ClientPropertyController::class, 'show'])->name('client.property.show');
 Route::post('/properties/{property}/inquire', [ClientInquiryController::class, 'store'])->name('client.property.inquire');
 Route::view('/about', 'pages.client.about.index')->name('client.about');
 Route::view('/contact', 'pages.client.contact.index')->name('client.contact');
+Route::post('/contact', [ContactController::class, 'store'])->name('client.contact.store');
 Route::view('/privacy-policy', 'pages.client.legal.privacy')->name('client.legal.privacy');
 Route::view('/terms-of-use', 'pages.client.legal.terms')->name('client.legal.terms');
 Route::view('/inquiry/success', 'pages.client.inquiry.success')->name('client.inquiry.success');
@@ -61,8 +80,14 @@ Route::view('/offline', 'offline')->name('offline');
 Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client'])->group(function () {
     Route::get('/', [ClientDashboardController::class, 'index'])->name('home');
     Route::get('/reservation', [ClientReservationController::class, 'index'])->name('reservation');
+    Route::post('/reservation/{lot}', [ClientReservationController::class, 'store'])->name('reservation.store');
+    Route::get('/site-visits', [ClientSiteVisitController::class, 'index'])->name('site-visits');
+    Route::post('/site-visits/{property}', [ClientSiteVisitController::class, 'store'])->name('site-visits.store');
+    Route::patch('/site-visits/{siteVisit}/reschedule', [ClientSiteVisitController::class, 'reschedule'])->name('site-visits.reschedule');
+    Route::patch('/site-visits/{siteVisit}/cancel', [ClientSiteVisitController::class, 'cancel'])->name('site-visits.cancel');
     Route::get('/documents', [ClientDocumentController::class, 'index'])->name('documents');
     Route::post('/documents', [ClientDocumentController::class, 'store'])->name('documents.store');
+    Route::get('/documents/{document}/download', [ClientDocumentController::class, 'download'])->name('documents.download');
     Route::get('/notifications', [ClientNotificationController::class, 'index'])->name('notifications');
     Route::post('/notifications/read-all', [ClientNotificationController::class, 'markAllRead'])->name('notifications.read-all');
     Route::get('/chat', [ClientChatController::class, 'index'])->name('chat');
@@ -110,6 +135,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/documents/{document}/request-more', [AdminDocumentController::class, 'requestMore'])->name('documents.request-more');
     Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback');
     Route::post('/feedback/{feedback}/resolve', [AdminFeedbackController::class, 'resolve'])->name('feedback.resolve');
+    Route::get('/contact-messages', [AdminContactMessageController::class, 'index'])->name('contact-messages');
     Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit');
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');
@@ -178,6 +204,7 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->g
     Route::get('/clients/{client}/edit', [BrokerClientController::class, 'edit'])->name('clients.edit');
     Route::put('/clients/{client}', [BrokerClientController::class, 'update'])->name('clients.update');
     Route::get('/documents', [BrokerDocumentController::class, 'index'])->name('documents.index');
+    Route::get('/documents/{document}/download', [BrokerDocumentController::class, 'download'])->name('documents.download');
     Route::post('/documents/{document}/verify', [BrokerDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [BrokerDocumentController::class, 'reject'])->name('documents.reject');
     Route::get('/notifications', [BrokerNotificationController::class, 'index'])->name('notifications.index');
@@ -190,4 +217,6 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->g
     Route::get('/settings', [BrokerSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/profile', [BrokerSettingController::class, 'updateProfile'])->name('settings.profile');
     Route::post('/settings/password', [BrokerSettingController::class, 'updatePassword'])->name('settings.password');
+    Route::post('/ai/describe', [PropertyController::class, 'aiDescribe'])->name('ai.describe');
+    Route::post('/ai/leads', [\App\Http\Controllers\Broker\ClientController::class, 'aiLeadScore'])->name('ai.leads');
 });

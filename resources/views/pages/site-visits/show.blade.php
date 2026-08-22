@@ -47,7 +47,7 @@
             <h3 class="font-semibold text-stone-800 mb-4">Update Status</h3>
             <div class="flex flex-wrap gap-2">
                 @foreach(['pending' => 'Pending', 'confirmed' => 'Confirmed', 'completed' => 'Completed', 'cancelled' => 'Cancelled'] as $key => $label)
-                    <form action="{{ route('broker.site-visits.updateStatus', $siteVisit) }}" method="POST">
+                    <form action="{{ route('broker.site-visits.status', $siteVisit) }}" method="POST">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="status" value="{{ $key }}">

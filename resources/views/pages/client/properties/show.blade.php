@@ -233,12 +233,18 @@
                     @foreach($property->lots as $lot)
                     <div class="relative group">
                         <div class="w-full aspect-square {{ $lot->status === 'available' ? 'bg-green-400 hover:bg-green-500 cursor-pointer' : ($lot->status === 'reserved' ? 'bg-amber-400' : 'bg-red-400 opacity-60') }} rounded-lg flex items-center justify-center text-white text-xs font-bold transition">
-                            {{ $lot->name }}
+                            {{ $lot->lot_number }}
                         </div>
                         @if($lot->status === 'available')
                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-stone-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition z-10 pointer-events-none">
-                            {{ $lot->name }} — Available
+                            {{ $lot->lot_number }} — Available
                         </div>
+                        @auth
+                        <form action="{{ route('client.account.reservation.store', $lot) }}" method="POST" class="mt-2">
+                            @csrf
+                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg px-2 py-1.5 transition">Request</button>
+                        </form>
+                        @endauth
                         @endif
                     </div>
                     @endforeach
@@ -281,7 +287,8 @@
                     <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl text-sm font-semibold transition">
                         Send Inquiry
                     </button>
-                    <div class="flex gap-2">
+                </form>
+                <div class="flex gap-2 mt-3">
                         @php
                             $isFavorited = auth()->check() && auth()->user()->favorites()->where('property_id', $property->id)->exists();
                         @endphp
@@ -291,7 +298,13 @@
                                 {{ $isFavorited ? '❤️ Saved' : '🤍 Save' }}
                             </button>
                         </form>
-                    </div>
+                </div>
+                <form action="{{ route('client.account.site-visits.store', $property) }}" method="POST" class="space-y-3 mt-4 pt-4 border-t border-stone-100">
+                    @csrf
+                    <p class="text-sm font-semibold text-stone-700">Request a site visit</p>
+                    <input type="datetime-local" name="scheduled_at" required min="{{ now()->format('Y-m-d\\TH:i') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <textarea name="notes" rows="2" placeholder="Optional note for the broker" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
+                    <button type="submit" class="w-full border border-amber-600 text-amber-700 hover:bg-amber-50 py-2.5 rounded-xl text-sm font-semibold transition">Request Site Visit</button>
                 </form>
                 @else
                 <div class="space-y-3">

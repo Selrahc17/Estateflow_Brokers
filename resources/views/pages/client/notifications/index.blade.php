@@ -27,7 +27,7 @@
 
     <div class="flex justify-between items-center mb-6">
         <p class="text-sm text-stone-500">{{ $notifications->total() }} notification(s)</p>
-        <form action="{{ route('client.notifications.read-all') }}" method="POST">
+        <form action="{{ route('client.account.notifications.read-all') }}" method="POST">
             @csrf
             <button type="submit" class="text-xs text-amber-600 hover:underline">Mark all as read</button>
         </form>

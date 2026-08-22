@@ -13,7 +13,10 @@ class BrokerController extends Controller
     public function index(): View
     {
         $brokers = User::where('role', 'broker')
-            ->when(request('search'), fn($q) => $q->where('name','like','%'.request('search').'%')->orWhere('email','like','%'.request('search').'%'))
+            ->when(request('search'), fn($q) => $q->where(function ($query) {
+                $query->where('name', 'like', '%'.request('search').'%')
+                    ->orWhere('email', 'like', '%'.request('search').'%');
+            }))
             ->when(request('approval_status'), fn($q) => $q->where('is_approved', request('approval_status') === 'approved'))
             ->withCount('clients')
             ->latest()
@@ -44,19 +47,27 @@ class BrokerController extends Controller
 
     public function show(User $user): View
     {
+        $this->ensureBroker($user);
         $user->load('clients');
         return view('pages.admin.brokers.show', compact('user'));
     }
 
     public function approve(User $user): RedirectResponse
     {
+        $this->ensureBroker($user);
         $user->update(['is_approved' => true]);
         return back()->with('success', "Broker {$user->name} has been approved!");
     }
 
     public function reject(User $user): RedirectResponse
     {
+        $this->ensureBroker($user);
         $user->update(['is_approved' => false]);
         return back()->with('success', "Broker {$user->name} has been rejected.");
+    }
+
+    private function ensureBroker(User $user): void
+    {
+        abort_unless($user->isBroker(), 404);
     }
 }

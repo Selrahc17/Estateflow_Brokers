@@ -5,14 +5,38 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Lot;
 use App\Models\Property;
+use App\Services\AIService;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class PropertyController extends Controller
 {
+    public function __construct(private AIService $ai) {}
+
+    public function recommendations(Request $request): View
+    {
+        $preferences = $request->validate([
+            'type' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'max_price' => 'nullable|numeric|min:0',
+            'bedrooms' => 'nullable|integer|min:0',
+        ]);
+
+        $properties = $request->hasAny(array_keys($preferences))
+            ? $this->ai->recommendProperties($preferences)
+            : collect();
+
+        return view('pages.client.properties.recommendations', compact('properties', 'preferences'));
+    }
+
     public function index(): View
     {
         $properties = Property::where('status', 'available')
-            ->when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%')->orWhere('description', 'like', '%'.request('search').'%'))
+            ->when(request('search'), fn($q) => $q->where(function ($query) {
+                $query->where('name', 'like', '%'.request('search').'%')
+                    ->orWhere('description', 'like', '%'.request('search').'%');
+            }))
             ->when(request('type'), fn($q) => $q->where('type', request('type')))
             ->when(request('city'), fn($q) => $q->where('city', request('city')))
             ->when(request('province'), fn($q) => $q->where('province', request('province')))

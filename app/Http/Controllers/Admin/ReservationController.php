@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ReservationController extends Controller
@@ -29,7 +30,20 @@ class ReservationController extends Controller
     public function updateStatus(Request $request, Reservation $reservation): RedirectResponse
     {
         $request->validate(['status' => 'required|in:pending,confirmed,cancelled,completed']);
-        $reservation->update(['status' => $request->status]);
+
+        DB::transaction(function () use ($reservation, $request) {
+            $reservation->update(['status' => $request->status]);
+
+            if ($reservation->lot) {
+                $lotStatus = match ($request->status) {
+                    'cancelled' => 'available',
+                    'completed' => 'sold',
+                    default => 'reserved',
+                };
+
+                $reservation->lot->update(['status' => $lotStatus]);
+            }
+        });
 
         return redirect()->route('admin.reservations')->with('success', 'Reservation updated.');
     }

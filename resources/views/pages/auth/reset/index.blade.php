@@ -30,13 +30,17 @@
             <h1 class="text-2xl font-bold text-stone-800 mb-1">Reset Your Password</h1>
             <p class="text-stone-400 text-sm mb-6">Enter your new password below. Make sure it's strong and secure.</p>
 
-            <form class="space-y-4">
+            <form action="{{ route('auth.reset.post') }}" method="POST" class="space-y-4">
+                @csrf
+                <input type="hidden" name="token" value="{{ $token }}">
+                <input type="hidden" name="email" value="{{ $email ?? old('email') }}">
 
                 {{-- New Password --}}
                 <div>
                     <label class="text-sm font-semibold text-stone-600 mb-1.5 block">New Password</label>
                     <div class="relative">
                         <input :type="showNew ? 'text' : 'password'"
+                            name="password"
                             @input="
                                 let v = $event.target.value;
                                 strength = 0;
@@ -76,6 +80,7 @@
                     <label class="text-sm font-semibold text-stone-600 mb-1.5 block">Confirm New Password</label>
                     <div class="relative">
                         <input :type="showConfirm ? 'text' : 'password'"
+                            name="password_confirmation"
                             placeholder="••••••••"
                             class="w-full border border-stone-200 rounded-xl px-4 py-3 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                         <button type="button" @click="showConfirm = !showConfirm"
@@ -102,10 +107,10 @@
                     @endforeach
                 </div>
 
-                <a href="{{ route('auth.login') }}"
+                <button type="submit"
                     class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl font-semibold text-sm transition">
                     Reset Password
-                </a>
+                </button>
 
             </form>
 

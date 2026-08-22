@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Property;
+use App\Models\Client;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -46,5 +47,38 @@ class ClientInquiryCreatesBrokerClientTest extends TestCase
             'email' => 'client@example.com',
             'status' => 'active',
         ]);
+    }
+
+    public function test_authenticated_inquiry_uses_the_logged_in_client_identity(): void
+    {
+        $broker = User::factory()->create(['role' => 'broker', 'is_active' => true, 'is_approved' => true]);
+        $clientUser = User::factory()->create(['role' => 'client', 'email' => 'real-client@example.com']);
+        Client::create([
+            'user_id' => $clientUser->id,
+            'broker_id' => $broker->id,
+            'first_name' => 'Real',
+            'last_name' => 'Client',
+            'email' => $clientUser->email,
+            'password' => 'password',
+        ]);
+        $property = Property::create([
+            'broker_id' => $broker->id,
+            'name' => 'Secure Listing',
+            'slug' => 'secure-listing',
+            'type' => 'House and Lot',
+            'status' => 'available',
+        ]);
+
+        $this->actingAs($clientUser)->post(route('client.property.inquire', $property), [
+            'message' => 'I would like more information about this listing.',
+            'phone' => '09171234567',
+            'email' => 'someone-else@example.com',
+        ]);
+
+        $this->assertDatabaseHas('inquiries', [
+            'user_id' => $clientUser->id,
+            'email' => $clientUser->email,
+        ]);
+        $this->assertDatabaseMissing('clients', ['email' => 'someone-else@example.com']);
     }
 }

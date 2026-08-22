@@ -38,7 +38,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase mb-1">Buyer</p>
-                            <p class="font-semibold text-stone-800">{{ $inquiry->user->name }}</p>
+                            <p class="font-semibold text-stone-800">{{ $inquiry->user?->name ?? 'Guest' }}</p>
                             <p class="text-xs text-stone-400 mt-1">{{ $inquiry->email }}</p>
                         </div>
 
@@ -56,7 +56,7 @@
 
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase mb-1">Status</p>
-                            <form action="{{ route('broker.inquiries.updateStatus', $inquiry->id) }}" method="POST" class="inline">
+                            <form action="{{ route('broker.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PATCH')
                                 <select name="status" onchange="this.form.submit()" 

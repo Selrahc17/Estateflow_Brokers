@@ -3,6 +3,19 @@
 
 @section('content')
 
+@if(session('success'))
+<div class="max-w-6xl mx-auto px-6 pt-6">
+    <div class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm">{{ session('success') }}</div>
+</div>
+@endif
+@if($errors->any())
+<div class="max-w-6xl mx-auto px-6 pt-6">
+    <div class="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+        @foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach
+    </div>
+</div>
+@endif
+
 {{-- Hero --}}
 <div class="bg-gradient-to-r from-stone-900 to-amber-900 text-white">
     <div class="max-w-6xl mx-auto px-6 py-14 text-center">
@@ -54,32 +67,32 @@
             <h2 class="font-bold text-stone-800 text-xl mb-1">Send Us a Message</h2>
             <p class="text-stone-400 text-sm mb-6">Fill out the form and we'll respond within 24 hours.</p>
 
-            <form class="space-y-4">
+            <form action="{{ route('client.contact.store') }}" method="POST" class="space-y-4">
+                @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">First Name</label>
-                        <input type="text" placeholder="Juan" class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="text" name="first_name" value="{{ old('first_name') }}" placeholder="Juan" required class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Last Name</label>
-                        <input type="text" placeholder="dela Cruz" class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="text" name="last_name" value="{{ old('last_name') }}" placeholder="dela Cruz" required class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                     </div>
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Email Address</label>
-                    <input type="email" placeholder="juan@email.com" class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="email" name="email" value="{{ old('email') }}" placeholder="juan@email.com" required class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Phone Number</label>
-                    <input type="text" placeholder="+63 912 345 6789" class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="text" name="phone" value="{{ old('phone') }}" placeholder="+63 912 345 6789" class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Subject</label>
-                    <select class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 text-stone-600">
+                    <select name="subject" required class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 text-stone-600">
                         <option value="">Select a topic</option>
                         <option>Property Inquiry</option>
                         <option>Reservation Question</option>
-                        <option>Payment Concern</option>
                         <option>Document Submission</option>
                         <option>General Inquiry</option>
                         <option>Complaint / Feedback</option>
@@ -87,7 +100,7 @@
                 </div>
                 <div>
                     <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Message</label>
-                    <textarea rows="5" placeholder="Tell us how we can help you..." class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
+                    <textarea name="message" rows="5" placeholder="Tell us how we can help you..." required class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none">{{ old('message') }}</textarea>
                 </div>
                 <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>

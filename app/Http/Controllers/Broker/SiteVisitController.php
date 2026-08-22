@@ -10,6 +10,7 @@ use App\Models\SiteVisit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule;
 
 class SiteVisitController extends Controller
 {
@@ -26,8 +27,8 @@ class SiteVisitController extends Controller
 
     public function create(): View
     {
-        $clients = Client::all();
-        $properties = Property::all();
+        $clients = Client::where('broker_id', auth()->id())->get();
+        $properties = Property::where('broker_id', auth()->id())->get();
         $inquiries = Inquiry::where('broker_id', auth()->id())->get();
 
         return view('pages.site-visits.create', compact('clients', 'properties', 'inquiries'));
@@ -36,9 +37,9 @@ class SiteVisitController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'client_id'   => 'required|exists:clients,id',
-            'property_id' => 'required|exists:properties,id',
-            'inquiry_id'  => 'nullable|exists:inquiries,id',
+            'client_id'   => ['required', Rule::exists('clients', 'id')->where('broker_id', auth()->id())],
+            'property_id' => ['required', Rule::exists('properties', 'id')->where('broker_id', auth()->id())],
+            'inquiry_id'  => ['nullable', Rule::exists('inquiries', 'id')->where('broker_id', auth()->id())],
             'scheduled_at' => 'required|date',
             'notes'        => 'nullable|string',
             'status'       => 'required|in:pending,confirmed,completed,cancelled',
@@ -62,8 +63,8 @@ class SiteVisitController extends Controller
     {
         abort_if($siteVisit->broker_id !== auth()->id(), 403);
 
-        $clients = Client::all();
-        $properties = Property::all();
+        $clients = Client::where('broker_id', auth()->id())->get();
+        $properties = Property::where('broker_id', auth()->id())->get();
         $inquiries = Inquiry::where('broker_id', auth()->id())->get();
 
         return view('pages.site-visits.edit', compact('siteVisit', 'clients', 'properties', 'inquiries'));
@@ -74,9 +75,9 @@ class SiteVisitController extends Controller
         abort_if($siteVisit->broker_id !== auth()->id(), 403);
 
         $data = $request->validate([
-            'client_id'   => 'required|exists:clients,id',
-            'property_id' => 'required|exists:properties,id',
-            'inquiry_id'  => 'nullable|exists:inquiries,id',
+            'client_id'   => ['required', Rule::exists('clients', 'id')->where('broker_id', auth()->id())],
+            'property_id' => ['required', Rule::exists('properties', 'id')->where('broker_id', auth()->id())],
+            'inquiry_id'  => ['nullable', Rule::exists('inquiries', 'id')->where('broker_id', auth()->id())],
             'scheduled_at' => 'required|date',
             'notes'        => 'nullable|string',
             'status'       => 'required|in:pending,confirmed,completed,cancelled',

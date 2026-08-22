@@ -19,7 +19,6 @@ class DashboardController extends Controller
             'total_clients'     => Client::count(),
             'total_properties'  => Property::count(),
             'total_reservations' => Reservation::count(),
-            'total_revenue'     => 0, // Placeholder, since no payment handling per scope
         ];
 
         $recentUsers = User::latest()->take(5)->get();

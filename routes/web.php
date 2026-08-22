@@ -147,7 +147,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 Route::get('/api/geocode/search', function () {
     $q = request('q');
     if (!$q || strlen($q) < 2) return response()->json([]);
-    $res = Http::withoutVerifying()->withHeaders(['User-Agent' => 'EstateFlowBrokers/1.0'])
+    $res = Http::withHeaders(['User-Agent' => 'EstateFlowBrokers/1.0'])
         ->get('https://nominatim.openstreetmap.org/search', [
             'format' => 'json', 'addressdetails' => 1,
             'q' => $q, 'limit' => 6, 'countrycodes' => 'ph',
@@ -158,7 +158,7 @@ Route::get('/api/geocode/search', function () {
 Route::get('/api/geocode/reverse', function () {
     $lat = request('lat'); $lon = request('lon');
     if (!$lat || !$lon) return response()->json([]);
-    $res = Http::withoutVerifying()->withHeaders(['User-Agent' => 'EstateFlowBrokers/1.0'])
+    $res = Http::withHeaders(['User-Agent' => 'EstateFlowBrokers/1.0'])
         ->get('https://nominatim.openstreetmap.org/reverse', [
             'format' => 'json', 'addressdetails' => 1,
             'lat' => $lat, 'lon' => $lon,

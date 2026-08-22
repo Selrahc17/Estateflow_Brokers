@@ -45,7 +45,7 @@
             ['1','Browse Properties','Explore our curated listings of house & lot, lot only, and condominium properties across the Philippines.','M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'],
             ['2','Reserve a Lot','Choose your preferred lot and submit a reservation request. Our broker will guide you through the process.','M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
             ['3','Submit Documents','Upload your required documents through your client portal. Track approval status in real time.','M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
-            ['4','Complete Payment','Pay your monthly installments and track your progress until full ownership is achieved.','M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z'],
+            ['4','Schedule a Site Visit','Choose a convenient time to view the property with your broker before making a decision.','M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
         ] as $step)
         <div class="relative bg-white rounded-2xl border border-stone-200 p-6 hover:shadow-md transition">
             <div class="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center text-white font-bold text-lg mb-4">{{ $step[0] }}</div>
@@ -67,7 +67,7 @@
             @foreach([
                 ['🏆','Licensed Professionals','All our brokers and agents are PRC-licensed and verified for your peace of mind.'],
                 ['🤖','AI-Powered Assistance','Our AI assistant is available 24/7 to answer your property and reservation questions.'],
-                ['📱','Easy Online Access','Manage your reservation, payments, and documents anytime from any device.'],
+                ['📱','Easy Online Access','Manage your reservations, appointments, and documents anytime from any device.'],
                 ['🔒','Secure & Transparent','All transactions and documents are handled securely with full transparency.'],
                 ['💬','Dedicated Support','Your assigned broker is always available to guide you through every step.'],
                 ['⭐','Proven Track Record','Over 1,200 satisfied clients and counting across the Philippines.'],

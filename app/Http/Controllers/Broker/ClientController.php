@@ -52,6 +52,14 @@ class ClientController extends Controller
 
         $clients = Client::whereIn('id', $clientIds)
             ->where('broker_id', $brokerId)
+            ->when(request('search'), function ($query) {
+                $search = request('search');
+                $query->where(function ($searchQuery) use ($search) {
+                    $searchQuery->where('first_name', 'like', '%'.$search.'%')
+                        ->orWhere('last_name', 'like', '%'.$search.'%')
+                        ->orWhere('email', 'like', '%'.$search.'%');
+                });
+            })
             ->withCount('reservations')
             ->latest()
             ->paginate(15);

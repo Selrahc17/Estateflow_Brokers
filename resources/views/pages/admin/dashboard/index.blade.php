@@ -5,14 +5,13 @@
 
 @section('content')
 
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
     @foreach([
         ['Total Users', $stats['total_users'], 'bg-blue-50', 'text-blue-600'],
         ['Brokers', $stats['total_brokers'], 'bg-amber-50', 'text-amber-600'],
         ['Clients', $stats['total_clients'], 'bg-indigo-50', 'text-indigo-600'],
         ['Properties', $stats['total_properties'], 'bg-green-50', 'text-green-600'],
         ['Reservations', $stats['total_reservations'], 'bg-purple-50', 'text-purple-600'],
-        ['Revenue', '₱'.number_format($stats['total_revenue'],0), 'bg-emerald-50', 'text-emerald-600'],
     ] as $s)
     <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
         <p class="text-xl font-bold {{ $s[3] }}">{{ $s[1] }}</p>

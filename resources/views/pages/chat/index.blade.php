@@ -13,7 +13,6 @@
         <div class="space-y-2 flex-1 overflow-y-auto">
             @foreach([
                 ['Juan dela Cruz','What is the price of Lot 12-B?','2 min ago',true],
-                ['Maria Santos','When is my next payment due?','1 hr ago',false],
                 ['Pedro Reyes','Can I change my lot preference?','Yesterday',false],
                 ['Anonymous','What properties are available?','Yesterday',false],
                 ['Ana Lim','How do I submit documents?','2 days ago',false],
@@ -50,7 +49,7 @@
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                 </div>
                 <div class="bg-stone-100 rounded-2xl rounded-tl-none px-4 py-3 max-w-md">
-                    <p class="text-sm text-stone-700">Hello! I'm EstateFlow AI. How can I help you today? You can ask me about property listings, lot availability, payment schedules, or document requirements.</p>
+                    <p class="text-sm text-stone-700">Hello! I'm EstateFlow AI. How can I help you today? You can ask me about property listings, lot availability, or document requirements.</p>
                     <p class="text-xs text-stone-400 mt-1">9:00 AM</p>
                 </div>
             </div>
@@ -81,7 +80,7 @@
         <div class="px-5 py-2 border-t border-stone-100">
             <p class="text-xs text-stone-400 mb-2">Suggested questions:</p>
             <div class="flex flex-wrap gap-2">
-                @foreach(['What lots are available?','When is my payment due?','How to submit documents?','What are the requirements?'] as $q)
+                @foreach(['What lots are available?','How to submit documents?','What are the requirements?'] as $q)
                 <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition">{{ $q }}</button>
                 @endforeach
             </div>

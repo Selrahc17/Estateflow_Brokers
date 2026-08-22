@@ -64,12 +64,6 @@
                 <input type="text" name="phone" placeholder="+63 912 345 6789" value="{{ old('phone') }}" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
             </div>
 
-            {{-- Broker-only field --}}
-            <div x-show="role === 'broker'">
-                <label class="text-sm text-stone-600 font-medium mb-1 block">PRC License Number</label>
-                <input type="text" name="prc_license" placeholder="PRC-2024-00000" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-            </div>
-
             <div>
                 <label class="text-sm text-stone-600 font-medium mb-1 block">Password</label>
                 <input type="password" name="password" placeholder="••••••••" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">

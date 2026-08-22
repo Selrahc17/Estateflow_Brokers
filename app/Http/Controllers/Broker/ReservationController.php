@@ -100,16 +100,17 @@ class ReservationController extends Controller
             'status' => 'required|in:pending,confirmed,cancelled,completed',
         ]);
 
-        $oldStatus = $reservation->status;
         $reservation->update($data);
 
         // Update lot status accordingly
-        if ($data['status'] === 'cancelled') {
-            $reservation->lot->update(['status' => 'available']);
-        } elseif ($data['status'] === 'confirmed') {
-            $reservation->lot->update(['status' => 'reserved']);
-        } elseif ($data['status'] === 'completed') {
-            $reservation->lot->update(['status' => 'sold']);
+        if ($reservation->lot) {
+            $lotStatus = match ($data['status']) {
+                'cancelled' => 'available',
+                'completed' => 'sold',
+                default => 'reserved',
+            };
+
+            $reservation->lot->update(['status' => $lotStatus]);
         }
 
         return redirect()->route('broker.reservations.show', $reservation)

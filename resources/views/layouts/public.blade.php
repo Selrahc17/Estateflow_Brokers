@@ -180,7 +180,6 @@
         <div x-show="mobileMenu" x-transition class="sm:hidden border-t border-stone-100 dark:border-stone-800 px-4 py-4 bg-white dark:bg-stone-900 space-y-1">
             <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-1">Browse</p>
             <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1 font-medium">All Properties</a>
-            <a href="{{ route('client.recommendations') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1 font-medium">Find Your Match</a>
             <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">House and Lot</a>
             <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Lot Only</a>
             <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Condominium</a>
@@ -201,7 +200,6 @@
         {{-- Desktop Nav Pills --}}
         <div class="hidden sm:flex max-w-7xl mx-auto px-6 gap-1 pb-2">
             <a href="{{ route('client.properties') }}" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ !request('type') && !request('status') ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">All Properties</a>
-            <a href="{{ route('client.recommendations') }}" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request()->routeIs('client.recommendations') ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Find Your Match</a>
             <a href="{{ route('client.properties') }}?status=Pre-Selling" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'Pre-Selling' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Pre-Selling</a>
             <a href="{{ route('client.properties') }}?status=RFO" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'RFO' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Ready for Occupancy</a>
             <a href="{{ route('client.properties') }}?type=House+and+Lot" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'House and Lot' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">House & Lot</a>
@@ -262,7 +260,7 @@
     </footer>
 
     {{-- Floating AI Chatbot Widget --}}
-    <div class="fixed bottom-6 right-6 z-50" x-data="{ chatOpen: false, message: '', sending: false, messages: [{from:'ai',text:'Hi there! 👋 I\'m EstateFlow AI. Ask me anything about properties, reservations, or site visits!'}], async send() { const text = this.message.trim(); if (!text || this.sending) return; this.messages.push({from:'user',text}); this.message = ''; this.sending = true; try { const response = await fetch('{{ route('api.chatbot') }}', { method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'}, body:JSON.stringify({message:text}) }); const result = await response.json(); this.messages.push({from:'ai',text:result.message || 'Please try again shortly.'}); } catch (error) { this.messages.push({from:'ai',text:'The assistant is temporarily unavailable. Please try again shortly.'}); } finally { this.sending = false; } } }">
+    <div class="fixed bottom-6 right-6 z-50" x-data="{ chatOpen: false, message: '', messages: [{from:'ai',text:'Hi there! 👋 I\'m EstateFlow AI. Ask me anything about properties, reservations, or payments!'}] }">
 
         {{-- Chat Window --}}
         <div x-show="chatOpen"
@@ -313,9 +311,10 @@
             {{-- Quick Replies --}}
             <div class="px-4 py-2 border-t border-stone-100 bg-white">
                 <div class="flex gap-1.5 flex-wrap">
-                    <button @click="message='My documents';send()" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">My documents</button>
-                    <button @click="message='Lot details';send()" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Lot details</button>
-                    <button @click="message='Contact broker';send()" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Contact broker</button>
+                    <button @click="messages.push({from:'user',text:'Payment due?'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Payment due?</button>
+                    <button @click="messages.push({from:'user',text:'My documents'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">My documents</button>
+                    <button @click="messages.push({from:'user',text:'Lot details'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Lot details</button>
+                    <button @click="messages.push({from:'user',text:'Contact broker'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Contact broker</button>
                 </div>
             </div>
 
@@ -324,12 +323,12 @@
                 <div class="flex gap-2">
                     <input
                         x-model="message"
-                        @keydown.enter.prevent="send()"
+                        @keydown.enter="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
                         type="text"
                         placeholder="Ask anything..."
                         class="flex-1 border border-stone-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-stone-50">
                     <button
-                        @click="send()"
+                        @click="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
                         class="w-8 h-8 bg-amber-600 hover:bg-amber-700 text-white rounded-xl flex items-center justify-center transition shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                     </button>

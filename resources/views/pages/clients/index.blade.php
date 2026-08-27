@@ -10,7 +10,7 @@
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search clients..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 w-64">
         <button type="submit" class="bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg text-sm transition">Search</button>
     </form>
-    <a href="{{ route('broker.clients.create') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+    <a href="{{ route('agent.clients.create') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add Client
     </a>
@@ -51,8 +51,8 @@
             </span>
             <div class="flex gap-3">
                 <button type="button" data-lead-score="{{ $client->id }}" class="text-xs text-blue-600 hover:underline">Score Lead</button>
-                <a href="{{ route('broker.clients.show', $client) }}" class="text-xs text-amber-600 hover:underline">View</a>
-                <a href="{{ route('broker.clients.edit', $client) }}" class="text-xs text-stone-400 hover:underline">Edit</a>
+                <a href="{{ route('agent.clients.show', $client) }}" class="text-xs text-amber-600 hover:underline">View</a>
+                <a href="{{ route('agent.clients.edit', $client) }}" class="text-xs text-stone-400 hover:underline">Edit</a>
             </div>
         </div>
     </div>
@@ -67,7 +67,7 @@ document.querySelectorAll('[data-lead-score]').forEach((button) => {
     button.addEventListener('click', async () => {
         button.disabled = true;
         button.textContent = 'Scoring...';
-        const response = await fetch('{{ route('broker.ai.leads') }}', {
+        const response = await fetch('{{ route('agent.ai.leads') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

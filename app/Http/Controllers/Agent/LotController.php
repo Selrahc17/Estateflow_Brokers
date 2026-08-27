@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lot;
@@ -47,7 +47,7 @@ class LotController extends Controller
 
         Lot::create($data);
 
-        return redirect()->route('broker.lots.index')->with('success', 'Lot created successfully.');
+        return redirect()->route('agent.lots.index')->with('success', 'Lot created successfully.');
     }
 
     public function edit(Lot $lot): View
@@ -72,14 +72,14 @@ class LotController extends Controller
 
         $lot->update($data);
 
-        return redirect()->route('broker.lots.index')->with('success', 'Lot updated successfully.');
+        return redirect()->route('agent.lots.index')->with('success', 'Lot updated successfully.');
     }
 
     public function destroy(Lot $lot): RedirectResponse
     {
         $this->ensureOwnership($lot);
         $lot->delete();
-        return redirect()->route('broker.lots.index')->with('success', 'Lot deleted successfully.');
+        return redirect()->route('agent.lots.index')->with('success', 'Lot deleted successfully.');
     }
 
     private function ensureOwnership(Lot $lot): void

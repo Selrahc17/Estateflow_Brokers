@@ -39,7 +39,7 @@
         {{-- Update Status --}}
         <div class="bg-white rounded-xl border border-stone-200 p-5">
             <h2 class="font-semibold text-stone-800 mb-3">Update Status</h2>
-            <form action="{{ route('broker.reservations.status', $reservation) }}" method="POST" class="flex gap-2">
+            <form action="{{ route('agent.reservations.status', $reservation) }}" method="POST" class="flex gap-2">
                 @csrf
                 @method('PATCH')
                 <select name="status" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">

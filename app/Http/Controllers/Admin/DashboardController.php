@@ -15,7 +15,7 @@ class DashboardController extends Controller
     {
         $stats = [
             'total_users'       => User::count(),
-            'total_brokers'     => User::where('role', 'broker')->count(),
+            'total_brokers'     => User::where('role', 'agent')->count(),
             'total_clients'     => Client::count(),
             'total_properties'  => Property::count(),
             'total_reservations' => Reservation::count(),
@@ -25,7 +25,7 @@ class DashboardController extends Controller
         $recentReservations = Reservation::with(['client', 'broker'])->latest()->take(5)->get();
         
         // Most active brokers (by number of properties)
-        $mostActiveBrokers = User::where('role', 'broker')
+        $mostActiveBrokers = User::where('role', 'agent')
             ->withCount('properties')
             ->orderBy('properties_count', 'desc')
             ->take(5)

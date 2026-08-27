@@ -37,7 +37,7 @@
             @endforeach
         </select>
     </form>
-    <a href="{{ route('broker.reservations.create') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+    <a href="{{ route('agent.reservations.create') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Reservation
     </a>
@@ -74,11 +74,11 @@
                 </td>
                 <td class="px-5 py-3 text-stone-400 text-xs">{{ $res->created_at->format('M d, Y') }}</td>
                 <td class="px-5 py-3">
-                    <a href="{{ route('broker.reservations.show', $res) }}" class="text-xs text-amber-600 hover:underline">View</a>
+                    <a href="{{ route('agent.reservations.show', $res) }}" class="text-xs text-amber-600 hover:underline">View</a>
                 </td>
             </tr>
             @empty
-            <tr><td colspan="7" class="px-5 py-10 text-center text-stone-400">No reservations yet. <a href="{{ route('broker.reservations.create') }}" class="text-amber-600 hover:underline">Create one</a></td></tr>
+            <tr><td colspan="7" class="px-5 py-10 text-center text-stone-400">No reservations yet. <a href="{{ route('agent.reservations.create') }}" class="text-amber-600 hover:underline">Create one</a></td></tr>
             @endforelse
         </tbody>
     </table>

@@ -12,19 +12,23 @@ class SettingController extends Controller
 {
     public function index(): View
     {
-        return view('pages.settings.index');
+        return view('pages.broker.settings.index');
     }
 
     public function updateProfile(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name'   => 'required|string|max:255',
-            'email'  => 'required|email|unique:users,email,' . auth()->id(),
-            'phone'  => 'nullable|string|max:20',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . auth()->id(),
+            'phone' => 'nullable|string|max:20',
             'avatar' => 'nullable|image|max:2048',
         ]);
 
-        $update = ['name' => $data['name'], 'email' => $data['email'], 'phone' => $data['phone'] ?? null];
+        $update = [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?? null,
+        ];
 
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
@@ -42,7 +46,7 @@ class SettingController extends Controller
     {
         $request->validate([
             'current_password' => 'required|current_password',
-            'password'         => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         auth()->user()->update(['password' => $request->password]);

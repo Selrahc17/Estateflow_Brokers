@@ -6,13 +6,13 @@
     {{-- Header --}}
     <div class="flex items-center justify-between mb-8">
         <div>
-            <a href="{{ route('broker.inquiries.index') }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium mb-2 inline-flex items-center gap-1">
+            <a href="{{ route('agent.inquiries.index') }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium mb-2 inline-flex items-center gap-1">
                 ← Back to Inquiries
             </a>
             <h1 class="text-3xl font-bold text-stone-800">Inquiry from {{ $inquiry->user?->name ?? 'Guest' }}</h1>
         </div>
         <div>
-            <form action="{{ route('broker.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
+            <form action="{{ route('agent.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
                 @csrf
                 @method('PATCH')
                 <div class="flex gap-2">
@@ -66,7 +66,7 @@
                 <div class="space-y-4">
                     <div>
                         <p class="text-xs text-stone-400 font-semibold uppercase">Property Name</p>
-                        <a href="{{ route('broker.properties.show', $inquiry->property->id) }}" class="text-amber-600 hover:text-amber-700 font-semibold text-lg mt-1">
+                        <a href="{{ route('agent.properties.show', $inquiry->property->id) }}" class="text-amber-600 hover:text-amber-700 font-semibold text-lg mt-1">
                             {{ $inquiry->property->name }}
                         </a>
                     </div>

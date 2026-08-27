@@ -6,7 +6,7 @@
 @section('content')
 <div class="max-w-2xl">
     <div class="bg-white rounded-xl border border-stone-200 p-6">
-        <form action="{{ route('broker.reservations.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('agent.reservations.store') }}" method="POST" class="space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">Client</label>
@@ -60,7 +60,7 @@
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Create Reservation</button>
-                <a href="{{ route('broker.reservations.index') }}" class="px-5 py-2 rounded-lg text-sm font-medium border border-stone-200 text-stone-600 hover:bg-stone-50 transition">Cancel</a>
+                <a href="{{ route('agent.reservations.index') }}" class="px-5 py-2 rounded-lg text-sm font-medium border border-stone-200 text-stone-600 hover:bg-stone-50 transition">Cancel</a>
             </div>
         </form>
     </div>

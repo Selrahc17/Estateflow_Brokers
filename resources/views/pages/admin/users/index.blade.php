@@ -17,7 +17,7 @@
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search users..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 w-56">
         <select name="role" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
             <option value="">All Roles</option>
-            @foreach(['admin','broker','client'] as $r)
+            @foreach(['admin','agent','client'] as $r)
             <option value="{{ $r }}" {{ request('role') === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>
             @endforeach
         </select>
@@ -45,7 +45,7 @@
             <tr class="hover:bg-stone-50 transition">
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 {{ $user->role === 'broker' ? 'bg-amber-100 text-amber-700' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} rounded-full flex items-center justify-center text-xs font-bold shrink-0">
+                        <div class="w-8 h-8 {{ $user->role === 'agent' ? 'bg-amber-100 text-amber-700' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} rounded-full flex items-center justify-center text-xs font-bold shrink-0">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
                         <div>
@@ -54,7 +54,7 @@
                                 <span class="px-1.5 py-0.5 rounded text-xs font-medium {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
                                     {{ $user->is_active ? 'Active' : 'Suspended' }}
                                 </span>
-                                @if($user->role === 'broker')
+                                @if($user->role === 'agent')
                                 <span class="px-1.5 py-0.5 rounded text-xs font-medium {{ $user->is_approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
                                     {{ $user->is_approved ? 'Approved' : 'Pending Approval' }}
                                 </span>
@@ -64,7 +64,7 @@
                     </div>
                 </td>
                 <td class="px-5 py-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ $user->role === 'broker' ? 'bg-amber-100 text-amber-700' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ $user->role === 'agent' ? 'bg-amber-100 text-amber-700' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
                         {{ ucfirst($user->role) }}
                     </span>
                 </td>

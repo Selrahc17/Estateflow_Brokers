@@ -10,7 +10,7 @@
     @php
         $totalReservations = $data['reservations_by_status']->sum() ?? 0;
         $totalClients = $data['by_role']['client'] ?? 0;
-        $totalBrokers = $data['by_role']['broker'] ?? 0;
+        $totalBrokers = $data['by_role']['agent'] ?? 0;
         $totalProperties = \App\Models\Property::count();
     @endphp
     @foreach([
@@ -32,7 +32,7 @@
     <div class="bg-white rounded-xl border border-stone-200 p-5">
         <h2 class="font-semibold text-stone-800 mb-4">Top Brokers</h2>
         @php
-            $topBrokers = \App\Models\User::where('role', 'broker')
+            $topBrokers = \App\Models\User::where('role', 'agent')
                 ->withCount('properties')
                 ->orderBy('properties_count', 'desc')
                 ->take(4)

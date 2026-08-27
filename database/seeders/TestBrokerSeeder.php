@@ -16,7 +16,7 @@ class TestBrokerSeeder extends Seeder
                 'name' => 'Test Broker',
                 'email' => 'broker@test.com',
                 'password' => Hash::make('password123'),
-                'role' => 'broker',
+                'role' => 'agent',
                 'is_approved' => true,
                 'is_active' => true
             ]

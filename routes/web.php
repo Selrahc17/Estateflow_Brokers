@@ -14,18 +14,22 @@ use App\Http\Controllers\Admin\PropertyController as AdminPropertyController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\Broker\ChatController as BrokerChatController;
-use App\Http\Controllers\Broker\ClientController as BrokerClientController;
+use App\Http\Controllers\Messaging\MessageController;
 use App\Http\Controllers\Broker\DashboardController as BrokerDashboardController;
-use App\Http\Controllers\Broker\DocumentController as BrokerDocumentController;
-use App\Http\Controllers\Broker\InquiryController as BrokerInquiryController;
-use App\Http\Controllers\Broker\LotController;
-use App\Http\Controllers\Broker\NotificationController as BrokerNotificationController;
-use App\Http\Controllers\Broker\PropertyController;
-use App\Http\Controllers\Broker\ReportController as BrokerReportController;
-use App\Http\Controllers\Broker\ReservationController as BrokerReservationController;
+use App\Http\Controllers\Broker\AgentController as BrokerAgentController;
 use App\Http\Controllers\Broker\SettingController as BrokerSettingController;
-use App\Http\Controllers\Broker\SiteVisitController;
+use App\Http\Controllers\Agent\ChatController as BrokerChatController;
+use App\Http\Controllers\Agent\ClientController as BrokerClientController;
+use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
+use App\Http\Controllers\Agent\DocumentController as BrokerDocumentController;
+use App\Http\Controllers\Agent\InquiryController as BrokerInquiryController;
+use App\Http\Controllers\Agent\LotController;
+use App\Http\Controllers\Agent\NotificationController as BrokerNotificationController;
+use App\Http\Controllers\Agent\PropertyController;
+use App\Http\Controllers\Agent\ReportController as BrokerReportController;
+use App\Http\Controllers\Agent\ReservationController as BrokerReservationController;
+use App\Http\Controllers\Agent\SettingController as AgentSettingController;
+use App\Http\Controllers\Agent\SiteVisitController;
 use App\Http\Controllers\Client\ChatController as ClientChatController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 use App\Http\Controllers\Client\DocumentController as ClientDocumentController;
@@ -144,6 +148,24 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 });
 
 // ===================== NOMINATIM PROXY =====================
+Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->group(function () {
+    Route::get('/dashboard', [BrokerDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/performance', [BrokerDashboardController::class, 'performance'])->name('performance');
+    Route::get('/property-lists', [BrokerDashboardController::class, 'propertyLists'])->name('property-lists');
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/settings', [BrokerSettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings/profile', [BrokerSettingController::class, 'updateProfile'])->name('settings.profile');
+    Route::post('/settings/password', [BrokerSettingController::class, 'updatePassword'])->name('settings.password');
+    Route::get('/agents', [BrokerAgentController::class, 'index'])->name('agents.index');
+    Route::get('/agents/create', [BrokerAgentController::class, 'create'])->name('agents.create');
+    Route::post('/agents', [BrokerAgentController::class, 'store'])->name('agents.store');
+    Route::get('/agents/{agent}/edit', [BrokerAgentController::class, 'edit'])->name('agents.edit');
+    Route::put('/agents/{agent}', [BrokerAgentController::class, 'update'])->name('agents.update');
+    Route::delete('/agents/{agent}', [BrokerAgentController::class, 'destroy'])->name('agents.destroy');
+    Route::patch('/agents/{agent}/toggle-status', [BrokerAgentController::class, 'toggleStatus'])->name('agents.toggle-status');
+});
+
 Route::get('/api/geocode/search', function () {
     $q = request('q');
     if (!$q || strlen($q) < 2) return response()->json([]);
@@ -167,8 +189,10 @@ Route::get('/api/geocode/reverse', function () {
 })->middleware('auth');
 
 // ===================== BROKER ROUTES =====================
-Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->group(function () {
-    Route::get('/dashboard', [BrokerDashboardController::class, 'index'])->name('dashboard');
+Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent'])->group(function () {
+    Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
     Route::get('/properties/create', [PropertyController::class, 'create'])->name('properties.create');
     Route::post('/properties', [PropertyController::class, 'store'])->name('properties.store');
@@ -214,9 +238,9 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->g
     Route::get('/chat', [BrokerChatController::class, 'index'])->name('chat.index');
     Route::post('/chat', [BrokerChatController::class, 'store'])->name('chat.store');
     Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');
-    Route::get('/settings', [BrokerSettingController::class, 'index'])->name('settings.index');
-    Route::post('/settings/profile', [BrokerSettingController::class, 'updateProfile'])->name('settings.profile');
-    Route::post('/settings/password', [BrokerSettingController::class, 'updatePassword'])->name('settings.password');
+    Route::get('/settings', [AgentSettingController::class, 'index'])->name('settings.index');
+    Route::post('/settings/profile', [AgentSettingController::class, 'updateProfile'])->name('settings.profile');
+    Route::post('/settings/password', [AgentSettingController::class, 'updatePassword'])->name('settings.password');
     Route::post('/ai/describe', [PropertyController::class, 'aiDescribe'])->name('ai.describe');
-    Route::post('/ai/leads', [\App\Http\Controllers\Broker\ClientController::class, 'aiLeadScore'])->name('ai.leads');
+    Route::post('/ai/leads', [\App\Http\Controllers\Agent\ClientController::class, 'aiLeadScore'])->name('ai.leads');
 });

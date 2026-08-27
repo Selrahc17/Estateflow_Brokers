@@ -11,12 +11,12 @@ class TestDataSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create test broker if not exists
+        // Create test agent if not exists
         $broker = User::where('email', 'broker@estateflow.com')->first();
         if (!$broker) {
             $broker = User::firstOrCreate(
                 ['email' => 'broker@estateflow.com'],
-                ['name' => 'Test Broker']
+                ['name' => 'Test Agent', 'role' => 'agent']
             );
         }
 

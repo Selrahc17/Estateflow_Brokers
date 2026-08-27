@@ -11,8 +11,8 @@
             <div class="flex items-start justify-between mb-4">
                 <h2 class="text-lg font-semibold text-stone-800">Property Information</h2>
                 <div class="flex gap-2">
-                    <a href="{{ route('broker.properties.edit', $property) }}" class="text-sm text-amber-600 hover:underline">Edit</a>
-                    <form method="POST" action="{{ route('broker.properties.destroy', $property) }}" onsubmit="return confirm('Delete this property?')">
+                    <a href="{{ route('agent.properties.edit', $property) }}" class="text-sm text-amber-600 hover:underline">Edit</a>
+                    <form method="POST" action="{{ route('agent.properties.destroy', $property) }}" onsubmit="return confirm('Delete this property?')">
                         @csrf @method('DELETE')
                         <button class="text-sm text-red-500 hover:underline">Delete</button>
                     </form>
@@ -58,7 +58,7 @@
         <div class="bg-white rounded-xl border border-stone-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold text-stone-800">Lots</h2>
-                <a href="{{ route('broker.lots.create') }}?property_id={{ $property->id }}" class="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg font-medium transition">Add Lot</a>
+                <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg font-medium transition">Add Lot</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -85,7 +85,7 @@
                                     {{ ucfirst($lot->status) }}
                                 </span>
                             </td>
-                            <td class="py-2.5"><a href="{{ route('broker.lots.edit', $lot) }}" class="text-amber-600 hover:underline text-xs">Edit</a></td>
+                            <td class="py-2.5"><a href="{{ route('agent.lots.edit', $lot) }}" class="text-amber-600 hover:underline text-xs">Edit</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="6" class="py-8 text-center text-stone-400">No lots added yet.</td></tr>
@@ -101,9 +101,9 @@
         <div class="bg-white rounded-xl border border-stone-200 p-4">
             <h3 class="text-sm font-semibold text-stone-700 mb-3">Quick Actions</h3>
             <div class="space-y-2">
-                <a href="{{ route('broker.lots.create') }}?property_id={{ $property->id }}" class="block text-center text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 py-2 rounded-lg transition font-medium">+ Add Lot</a>
-                <a href="{{ route('broker.properties.edit', $property) }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">Edit Property</a>
-                <a href="{{ route('broker.reservations.create') }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">+ New Reservation</a>
+                <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="block text-center text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 py-2 rounded-lg transition font-medium">+ Add Lot</a>
+                <a href="{{ route('agent.properties.edit', $property) }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">Edit Property</a>
+                <a href="{{ route('agent.reservations.create') }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">+ New Reservation</a>
             </div>
         </div>
     </div>

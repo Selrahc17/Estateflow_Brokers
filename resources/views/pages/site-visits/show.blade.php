@@ -47,7 +47,7 @@
             <h3 class="font-semibold text-stone-800 mb-4">Update Status</h3>
             <div class="flex flex-wrap gap-2">
                 @foreach(['pending' => 'Pending', 'confirmed' => 'Confirmed', 'completed' => 'Completed', 'cancelled' => 'Cancelled'] as $key => $label)
-                    <form action="{{ route('broker.site-visits.status', $siteVisit) }}" method="POST">
+                    <form action="{{ route('agent.site-visits.status', $siteVisit) }}" method="POST">
                         @csrf
                         @method('PATCH')
                         <input type="hidden" name="status" value="{{ $key }}">
@@ -70,10 +70,10 @@
         <div class="bg-white rounded-xl border border-stone-200 p-6">
             <h3 class="font-semibold text-stone-800 mb-4">Actions</h3>
             <div class="space-y-2">
-                <a href="{{ route('broker.site-visits.edit', $siteVisit) }}" class="flex items-center gap-2 px-4 py-2.5 border border-stone-200 rounded-lg text-sm text-stone-600 hover:bg-stone-50 transition">
+                <a href="{{ route('agent.site-visits.edit', $siteVisit) }}" class="flex items-center gap-2 px-4 py-2.5 border border-stone-200 rounded-lg text-sm text-stone-600 hover:bg-stone-50 transition">
                     Edit Site Visit
                 </a>
-                <a href="{{ route('broker.site-visits.index') }}" class="flex items-center gap-2 px-4 py-2.5 border border-stone-200 rounded-lg text-sm text-stone-600 hover:bg-stone-50 transition">
+                <a href="{{ route('agent.site-visits.index') }}" class="flex items-center gap-2 px-4 py-2.5 border border-stone-200 rounded-lg text-sm text-stone-600 hover:bg-stone-50 transition">
                     Back to All Site Visits
                 </a>
             </div>

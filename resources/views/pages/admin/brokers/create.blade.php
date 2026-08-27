@@ -1,7 +1,7 @@
 @extends('layouts.admin')
-@section('title', 'Add Broker')
-@section('page-title', 'Add Broker')
-@section('page-subtitle', 'Register a new broker account')
+@section('title', 'Add Agent')
+@section('page-title', 'Add Agent')
+@section('page-subtitle', 'Register a new agent account')
 
 @section('content')
 <div class="max-w-lg">
@@ -28,7 +28,7 @@
                 <input type="password" name="password_confirmation" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
             </div>
             <div class="flex gap-3 pt-2">
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Create Broker</button>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Create Agent</button>
                 <a href="{{ route('admin.brokers') }}" class="px-5 py-2 rounded-lg text-sm font-medium border border-stone-200 text-stone-600 hover:bg-stone-50 transition">Cancel</a>
             </div>
         </form>

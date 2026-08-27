@@ -42,7 +42,7 @@ class TestUsersSeeder extends Seeder
                 'name' => 'Test Broker',
                 'email' => 'broker@test.com',
                 'password' => Hash::make('password123'),
-                'role' => 'broker',
+                'role' => 'agent',
                 'is_approved' => true,
                 'is_active' => true
             ]
@@ -54,7 +54,7 @@ class TestUsersSeeder extends Seeder
                 'name' => 'EstateFlow Broker',
                 'email' => 'broker@estateflow.com',
                 'password' => Hash::make('broker123'),
-                'role' => 'broker',
+                'role' => 'agent',
                 'is_approved' => true,
                 'is_active' => true
             ]

@@ -11,13 +11,15 @@ class ChatMessage extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'sender_id', 'receiver_id', 'message', 'is_read', 'sender_type',
+        'sender_id', 'receiver_id', 'message', 'attachment', 'is_read', 'delivered_at', 'seen_at', 'sender_type',
     ];
 
     protected function casts(): array
     {
         return [
             'is_read' => 'boolean',
+            'delivered_at' => 'datetime',
+            'seen_at' => 'datetime',
         ];
     }
 

@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto bg-white rounded-xl border border-stone-200 p-6">
-    <form method="POST" action="{{ route('broker.lots.store') }}">
+    <form method="POST" action="{{ route('agent.lots.store') }}">
         @csrf
         <div class="space-y-4">
             <div>
@@ -56,7 +56,7 @@
         </div>
         <div class="flex items-center gap-3 mt-6 pt-6 border-t border-stone-200">
             <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition">Create Lot</button>
-            <a href="{{ route('broker.lots.index') }}" class="text-stone-500 hover:text-stone-700 text-sm">Cancel</a>
+            <a href="{{ route('agent.lots.index') }}" class="text-stone-500 hover:text-stone-700 text-sm">Cancel</a>
         </div>
     </form>
 </div>

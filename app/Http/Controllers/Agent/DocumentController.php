@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Document;
@@ -30,7 +30,7 @@ class DocumentController extends Controller
             'uploaded_by' => auth()->id(),
         ]);
 
-        return redirect()->route('broker.documents.index')->with('success', 'Document verified successfully.');
+        return redirect()->route('agent.documents.index')->with('success', 'Document verified successfully.');
     }
 
     public function reject(Request $request, Document $document): RedirectResponse
@@ -43,7 +43,7 @@ class DocumentController extends Controller
             'uploaded_by' => auth()->id(),
         ]);
 
-        return redirect()->route('broker.documents.index')->with('success', 'Document rejected.');
+        return redirect()->route('agent.documents.index')->with('success', 'Document rejected.');
     }
 
     public function download(Document $document)

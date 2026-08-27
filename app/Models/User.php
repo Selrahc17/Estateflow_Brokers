@@ -13,7 +13,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'is_active', 'is_approved', 'phone', 'avatar'
+        'name', 'email', 'password', 'role', 'broker_id', 'is_active', 'is_approved', 'phone', 'avatar'
     ];
 
     protected $hidden = [
@@ -34,14 +34,24 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isBroker(): bool
+    public function isAgent(): bool
     {
-        return $this->role === 'broker';
+        return $this->role === 'agent';
     }
 
     public function isClient(): bool
     {
         return $this->role === 'client';
+    }
+
+    public function broker()
+    {
+        return $this->belongsTo(self::class, 'broker_id');
+    }
+
+    public function agents()
+    {
+        return $this->hasMany(self::class, 'broker_id')->where('role', 'agent');
     }
 
     // A broker has many clients
@@ -84,5 +94,10 @@ class User extends Authenticatable
     public function siteVisits()
     {
         return $this->hasMany(SiteVisit::class, 'broker_id');
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'broker_id');
     }
 }

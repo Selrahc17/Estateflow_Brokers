@@ -12,7 +12,7 @@ class BrokerController extends Controller
 {
     public function index(): View
     {
-        $brokers = User::where('role', 'broker')
+        $brokers = User::where('role', 'agent')
             ->when(request('search'), fn($q) => $q->where(function ($query) {
                 $query->where('name', 'like', '%'.request('search').'%')
                     ->orWhere('email', 'like', '%'.request('search').'%');
@@ -38,8 +38,8 @@ class BrokerController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $data['role'] = 'broker';
-        $data['is_approved'] = false; // New brokers need approval
+        $data['role'] = 'agent';
+        $data['is_approved'] = false; // New agents need approval
         User::create($data);
 
         return redirect()->route('admin.brokers')->with('success', 'Broker created successfully. Pending approval.');
@@ -68,6 +68,6 @@ class BrokerController extends Controller
 
     private function ensureBroker(User $user): void
     {
-        abort_unless($user->isBroker(), 404);
+        abort_unless($user->isAgent(), 404);
     }
 }

@@ -29,7 +29,7 @@
             <div class="flex justify-between"><span class="text-stone-400">Joined</span><span class="text-stone-700">{{ $client->created_at->format('M d, Y') }}</span></div>
         </div>
         <div class="mt-5 pt-4 border-t border-stone-100">
-            <a href="{{ route('broker.clients.edit', $client) }}" class="block text-center bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Edit Client</a>
+            <a href="{{ route('agent.clients.edit', $client) }}" class="block text-center bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Edit Client</a>
         </div>
     </div>
 
@@ -38,7 +38,7 @@
         <div class="bg-white rounded-xl border border-stone-200 p-5">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="font-semibold text-stone-800">Reservations</h2>
-                <a href="{{ route('broker.reservations.create') }}" class="text-xs text-amber-600 hover:underline">+ New</a>
+                <a href="{{ route('agent.reservations.create') }}" class="text-xs text-amber-600 hover:underline">+ New</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">

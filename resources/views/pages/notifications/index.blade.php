@@ -10,7 +10,7 @@
     <div class="xl:col-span-2 space-y-3">
         <div class="flex justify-between items-center mb-2">
             <p class="text-sm text-stone-500">{{ $notifications->total() }} notification(s)</p>
-            <form action="{{ route('broker.notifications.read-all') }}" method="POST">
+            <form action="{{ route('agent.notifications.read-all') }}" method="POST">
                 @csrf
                 <button type="submit" class="text-xs text-amber-600 hover:underline">Mark all as read</button>
             </form>
@@ -26,7 +26,7 @@
             <div class="flex flex-col items-end gap-1 shrink-0">
                 <span class="text-xs text-stone-400">{{ $notif->created_at->diffForHumans() }}</span>
                 @if(!$notif->is_read)
-                <form action="{{ route('broker.notifications.read', $notif) }}" method="POST">
+                <form action="{{ route('agent.notifications.read', $notif) }}" method="POST">
                     @csrf
                     <button type="submit" class="text-xs text-amber-600 hover:underline">Mark read</button>
                 </form>
@@ -45,7 +45,7 @@
     {{-- Send Notification --}}
     <div class="bg-white rounded-xl border border-stone-200 p-5">
         <h2 class="font-semibold text-stone-800 mb-4">Send Notification</h2>
-        <form action="{{ route('broker.notifications.send') ?? '#' }}" method="POST" class="space-y-3">
+        <form action="{{ route('agent.notifications.send') ?? '#' }}" method="POST" class="space-y-3">
             @csrf
             <div>
                 <label class="text-xs text-stone-500 mb-1 block">Recipient (User ID)</label>

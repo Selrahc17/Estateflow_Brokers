@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
@@ -94,7 +94,7 @@ class ClientController extends Controller
 
         Client::create($data);
 
-        return redirect()->route('broker.clients.index')->with('success', 'Client added successfully.');
+        return redirect()->route('agent.clients.index')->with('success', 'Client added successfully.');
     }
 
     public function edit(Client $client): View
@@ -117,7 +117,7 @@ class ClientController extends Controller
 
         $client->update($data);
 
-        return redirect()->route('broker.clients.index')->with('success', 'Client updated successfully.');
+        return redirect()->route('agent.clients.index')->with('success', 'Client updated successfully.');
     }
 
     public function aiLeadScore(Request $request): JsonResponse

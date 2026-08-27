@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Inquiry;
@@ -20,14 +20,14 @@ class InquiryController extends Controller
 
         $statuses = ['new', 'contacted', 'site_visit_scheduled', 'negotiating', 'closed', 'lost'];
 
-        return view('pages.broker.inquiries.index', compact('inquiries', 'statuses'));
+        return view('pages.agent.inquiries.index', compact('inquiries', 'statuses'));
     }
 
     public function show(Inquiry $inquiry): View
     {
         abort_if($inquiry->broker_id !== auth()->id(), 403);
 
-        return view('pages.broker.inquiries.show', compact('inquiry'));
+        return view('pages.agent.inquiries.show', compact('inquiry'));
     }
 
     public function updateStatus(Request $request, Inquiry $inquiry): RedirectResponse

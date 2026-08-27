@@ -19,7 +19,7 @@
             <option value="sold" {{ request('status') == 'sold' ? 'selected' : '' }}>Sold</option>
         </select>
     </form>
-    <a href="{{ route('broker.lots.create') }}" class="inline-flex bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2 transition">
+    <a href="{{ route('agent.lots.create') }}" class="inline-flex bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add Lot
     </a>
@@ -53,7 +53,7 @@
                             {{ ucfirst($lot->status) }}
                         </span>
                     </td>
-                    <td class="px-4 py-3"><a href="{{ route('broker.lots.edit', $lot) }}" class="text-amber-600 hover:underline text-xs">Edit</a></td>
+                    <td class="px-4 py-3"><a href="{{ route('agent.lots.edit', $lot) }}" class="text-amber-600 hover:underline text-xs">Edit</a></td>
                 </tr>
             @empty
                 <tr><td colspan="7" class="px-4 py-8 text-center text-stone-400">No lots found.</td></tr>

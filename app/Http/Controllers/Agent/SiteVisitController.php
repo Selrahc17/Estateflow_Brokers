@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
@@ -49,7 +49,7 @@ class SiteVisitController extends Controller
 
         SiteVisit::create($data);
 
-        return redirect()->route('broker.site-visits.index')->with('success', 'Site visit scheduled successfully!');
+        return redirect()->route('agent.site-visits.index')->with('success', 'Site visit scheduled successfully!');
     }
 
     public function show(SiteVisit $siteVisit): View
@@ -85,7 +85,7 @@ class SiteVisitController extends Controller
 
         $siteVisit->update($data);
 
-        return redirect()->route('broker.site-visits.index')->with('success', 'Site visit updated successfully!');
+        return redirect()->route('agent.site-visits.index')->with('success', 'Site visit updated successfully!');
     }
 
     public function updateStatus(Request $request, SiteVisit $siteVisit): RedirectResponse

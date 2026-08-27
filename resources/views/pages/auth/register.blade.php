@@ -36,9 +36,9 @@
                     <button type="button" @click="role = 'client'"
                         :class="role === 'client' ? 'bg-white text-amber-700 shadow-sm' : 'text-stone-500'"
                         class="flex-1 py-2 rounded-lg text-sm font-medium transition">Client</button>
-                    <button type="button" @click="role = 'broker'"
-                        :class="role === 'broker' ? 'bg-white text-amber-700 shadow-sm' : 'text-stone-500'"
-                        class="flex-1 py-2 rounded-lg text-sm font-medium transition">Broker / Agent</button>
+                    <button type="button" @click="role = 'agent'"
+                        :class="role === 'agent' ? 'bg-white text-amber-700 shadow-sm' : 'text-stone-500'"
+                        class="flex-1 py-2 rounded-lg text-sm font-medium transition">Agent</button>
                 </div>
                 <input type="hidden" name="role" :value="role">
             </div>

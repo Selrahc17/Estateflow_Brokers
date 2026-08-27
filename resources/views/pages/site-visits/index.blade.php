@@ -14,7 +14,7 @@
             </a>
         @endforeach
     </div>
-    <a href="{{ route('broker.site-visits.create') }}" class="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
+    <a href="{{ route('agent.site-visits.create') }}" class="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Site Visit
     </a>
@@ -51,8 +51,8 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center gap-2 justify-end">
-                                <a href="{{ route('broker.site-visits.show', $visit) }}" class="text-xs text-amber-600 hover:underline">View</a>
-                                <a href="{{ route('broker.site-visits.edit', $visit) }}" class="text-xs text-blue-600 hover:underline">Edit</a>
+                                <a href="{{ route('agent.site-visits.show', $visit) }}" class="text-xs text-amber-600 hover:underline">View</a>
+                                <a href="{{ route('agent.site-visits.edit', $visit) }}" class="text-xs text-blue-600 hover:underline">Edit</a>
                             </div>
                         </td>
                     </tr>

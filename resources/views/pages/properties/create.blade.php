@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto bg-white rounded-xl border border-stone-200 p-6" x-data="{ ...mapPicker(), selectedType: '{{ old('type', '') }}' }">
-    <form method="POST" action="{{ route('broker.properties.store') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('agent.properties.store') }}" enctype="multipart/form-data">
         @csrf
 
         @if(session('duplicate_property'))
@@ -242,7 +242,7 @@
 
         <div class="flex items-center gap-3 mt-6 pt-6 border-t border-stone-200">
             <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition">Create Property</button>
-            <a href="{{ route('broker.properties.index') }}" class="text-stone-500 hover:text-stone-700 text-sm">Cancel</a>
+            <a href="{{ route('agent.properties.index') }}" class="text-stone-500 hover:text-stone-700 text-sm">Cancel</a>
         </div>
     </form>
 
@@ -252,7 +252,7 @@
         const target = document.getElementById('property-description');
         button.currentTarget.disabled = true;
         button.currentTarget.textContent = 'Generating...';
-        const response = await fetch('{{ route('broker.ai.describe') }}', {
+        const response = await fetch('{{ route('agent.ai.describe') }}', {
             method: 'POST',
             headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'},
             body: JSON.stringify(Object.fromEntries(new FormData(document.querySelector('form'))))

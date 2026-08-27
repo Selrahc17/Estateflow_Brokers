@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
@@ -82,7 +82,7 @@ class ReservationController extends Controller
             ])->withInput();
         }
 
-        return redirect()->route('broker.reservations.index')
+        return redirect()->route('agent.reservations.index')
             ->with('success', "Reservation {$reservation->reservation_code} created successfully.");
     }
 
@@ -113,7 +113,7 @@ class ReservationController extends Controller
             $reservation->lot->update(['status' => $lotStatus]);
         }
 
-        return redirect()->route('broker.reservations.show', $reservation)
+        return redirect()->route('agent.reservations.show', $reservation)
             ->with('success', 'Reservation status updated successfully.');
     }
 

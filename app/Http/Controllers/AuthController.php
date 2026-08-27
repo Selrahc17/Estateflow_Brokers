@@ -36,7 +36,7 @@ class AuthController extends Controller
             'email'      => 'required|email|unique:users,email',
             'phone'      => 'nullable|string|max:20',
             'password'   => 'required|string|min:8|confirmed',
-            'role'       => 'required|in:client,broker',
+            'role'       => 'required|in:client,agent',
         ]);
 
         $fullName = $request->first_name . ' ' . $request->last_name;
@@ -47,7 +47,7 @@ class AuthController extends Controller
             'email'    => $request->email,
             'password' => $hashedPassword,
             'role'     => $request->role,
-            'is_approved' => $request->role === 'broker' ? false : true,
+            'is_approved' => $request->role === 'agent' ? false : true,
             'is_active' => true,
         ]);
 
@@ -87,11 +87,11 @@ class AuthController extends Controller
                 ])->onlyInput('email');
             }
 
-            // Check if broker is approved
-            if ($user->role === 'broker' && !$user->is_approved) {
+            // Check if agent is approved
+            if ($user->role === 'agent' && !$user->is_approved) {
                 Auth::logout();
                 return back()->withErrors([
-                    'email' => 'Your broker account is pending approval.',
+                    'email' => 'Your agent account is pending approval.',
                 ])->onlyInput('email');
             }
 
@@ -119,6 +119,7 @@ class AuthController extends Controller
         return match ($user->role) {
             'admin'  => route('admin.dashboard'),
             'broker' => route('broker.dashboard'),
+            'agent'  => route('agent.dashboard'),
             default  => route('client.properties'),
         };
     }

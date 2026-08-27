@@ -73,7 +73,7 @@
         <div class="space-y-3">
             @forelse($recentUsers as $user)
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 {{ $user->role==='broker' ? 'bg-amber-100 text-amber-700' : ($user->role==='admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} rounded-full flex items-center justify-center text-xs font-bold shrink-0">
+                <div class="w-8 h-8 {{ $user->role==='agent' ? 'bg-amber-100 text-amber-700' : ($user->role==='admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} rounded-full flex items-center justify-center text-xs font-bold shrink-0">
                     {{ strtoupper(substr($user->name,0,1)) }}
                 </div>
                 <div class="flex-1 min-w-0">

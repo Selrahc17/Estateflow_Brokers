@@ -1,7 +1,7 @@
 @extends('layouts.admin')
-@section('title', 'Broker Management')
-@section('page-title', 'Broker Management')
-@section('page-subtitle', 'Manage all brokers and agents')
+@section('title', 'Agent Management')
+@section('page-title', 'Agent Management')
+@section('page-subtitle', 'Manage all agents')
 
 @section('content')
 
@@ -11,12 +11,12 @@
 
 <div class="flex flex-col sm:flex-row gap-3 justify-between mb-5">
     <form method="GET" class="flex gap-2">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search brokers..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 w-56">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search agents..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 w-56">
         <button type="submit" class="bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg text-sm transition">Search</button>
     </form>
     <a href="{{ route('admin.brokers.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        Add Broker
+        Add Agent
     </a>
 </div>
 
@@ -60,7 +60,7 @@
     </div>
     @empty
     <div class="col-span-3 py-12 text-center text-stone-400">
-        No brokers found. <a href="{{ route('admin.brokers.create') }}" class="text-red-600 hover:underline">Add one</a>
+        No agents found. <a href="{{ route('admin.brokers.create') }}" class="text-red-600 hover:underline">Add one</a>
     </div>
     @endforelse
 </div>

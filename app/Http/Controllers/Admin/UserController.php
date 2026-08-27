@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -24,7 +25,8 @@ class UserController extends Controller
 
     public function create(): View
     {
-        return view('pages.admin.users.create');
+        $brokers = User::where('role', 'broker')->orderBy('name')->get();
+        return view('pages.admin.users.create', compact('brokers'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -33,8 +35,11 @@ class UserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role'     => 'required|in:admin,broker,client',
+            'role'     => 'required|in:admin,broker,agent,client',
+            'broker_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'broker')],
         ]);
+
+        $data['broker_id'] = $data['role'] === 'agent' ? ($data['broker_id'] ?? null) : null;
 
         User::create($data);
 
@@ -43,7 +48,8 @@ class UserController extends Controller
 
     public function edit(User $user): View
     {
-        return view('pages.admin.users.edit', compact('user'));
+        $brokers = User::where('role', 'broker')->whereKeyNot($user->id)->orderBy('name')->get();
+        return view('pages.admin.users.edit', compact('user', 'brokers'));
     }
 
     public function update(Request $request, User $user): RedirectResponse
@@ -51,8 +57,11 @@ class UserController extends Controller
         $data = $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role'  => 'required|in:admin,broker,client',
+            'role'  => 'required|in:admin,broker,agent,client',
+            'broker_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'broker')],
         ]);
+
+        $data['broker_id'] = $data['role'] === 'agent' ? ($data['broker_id'] ?? null) : null;
 
         if ($request->filled('password')) {
             $request->validate(['password' => 'string|min:8|confirmed']);

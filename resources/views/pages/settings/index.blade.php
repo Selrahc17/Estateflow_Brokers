@@ -43,7 +43,7 @@
         {{-- Edit Profile --}}
         <div class="bg-white rounded-xl border border-stone-200 p-6">
             <h2 class="font-semibold text-stone-800 mb-4">Edit Profile</h2>
-            <form action="{{ route('broker.settings.profile') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ route('agent.settings.profile') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -70,7 +70,7 @@
         {{-- Change Password --}}
         <div class="bg-white rounded-xl border border-stone-200 p-6">
             <h2 class="font-semibold text-stone-800 mb-4">Change Password</h2>
-            <form action="{{ route('broker.settings.password') }}" method="POST" class="space-y-3">
+            <form action="{{ route('agent.settings.password') }}" method="POST" class="space-y-3">
                 @csrf
                 <div>
                     <label class="text-xs text-stone-500 mb-1 block">Current Password</label>

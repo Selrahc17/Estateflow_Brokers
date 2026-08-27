@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
@@ -37,7 +37,7 @@ class ChatController extends Controller
             'sender_type' => 'user',
         ]);
 
-        $aiReply = $this->ai->chat($data['message'], auth()->id(), 'broker');
+        $aiReply = $this->ai->chat($data['message'], auth()->id(), 'agent');
 
         ChatMessage::create([
             'sender_id'   => null,
@@ -46,6 +46,6 @@ class ChatController extends Controller
             'sender_type' => 'ai',
         ]);
 
-        return redirect()->route('broker.chat.index');
+        return redirect()->route('agent.chat.index');
     }
 }

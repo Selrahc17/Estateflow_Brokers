@@ -1,6 +1,6 @@
 @extends('layouts.admin')
-@section('title', 'Broker Details')
-@section('page-title', 'Broker Details')
+@section('title', 'Agent Details')
+@section('page-title', 'Agent Details')
 @section('page-subtitle', '{{ $user->name }}')
 
 @section('content')
@@ -14,7 +14,7 @@
             <div>
                 <p class="font-bold text-stone-800 text-lg">{{ $user->name }}</p>
                 <p class="text-sm text-stone-400">{{ $user->email }}</p>
-                <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Broker</span>
+                <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Agent</span>
             </div>
         </div>
         <div class="space-y-3 text-sm">

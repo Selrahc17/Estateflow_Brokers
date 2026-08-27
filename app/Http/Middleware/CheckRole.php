@@ -29,11 +29,11 @@ class CheckRole
             return redirect()->route('auth.login')->withErrors(['email' => 'Your account has been suspended.']);
         }
 
-        if ($user->role === 'broker' && ! $user->is_approved) {
+        if ($user->role === 'agent' && ! $user->is_approved) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
-            return redirect()->route('auth.login')->withErrors(['email' => 'Your broker account is pending approval.']);
+            return redirect()->route('auth.login')->withErrors(['email' => 'Your agent account is pending approval.']);
         }
 
         return $next($request);

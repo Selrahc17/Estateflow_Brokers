@@ -6,7 +6,7 @@
 @section('content')
 
 <div class="max-w-2xl mx-auto bg-white rounded-xl border border-stone-200 p-6">
-    <form action="{{ route('broker.site-visits.update', $siteVisit) }}" method="POST">
+    <form action="{{ route('agent.site-visits.update', $siteVisit) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -60,7 +60,7 @@
         </div>
 
         <div class="flex gap-3 pt-4 border-t border-stone-100">
-            <a href="{{ route('broker.site-visits.index') }}" class="flex-1 px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-600 hover:bg-stone-50 transition text-center">
+            <a href="{{ route('agent.site-visits.index') }}" class="flex-1 px-4 py-2 border border-stone-200 rounded-lg text-sm text-stone-600 hover:bg-stone-50 transition text-center">
                 Cancel
             </a>
             <button type="submit" class="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-medium transition">

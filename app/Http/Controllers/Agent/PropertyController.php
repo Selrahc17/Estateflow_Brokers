@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Broker;
+namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
@@ -98,7 +98,7 @@ class PropertyController extends Controller
 
         Property::create($data);
 
-        return redirect()->route('broker.properties.index')->with('success', 'Property created successfully.');
+        return redirect()->route('agent.properties.index')->with('success', 'Property created successfully.');
     }
 
     public function show(Property $property): View
@@ -159,14 +159,14 @@ class PropertyController extends Controller
 
         $property->update($data);
 
-        return redirect()->route('broker.properties.index')->with('success', 'Property updated successfully.');
+        return redirect()->route('agent.properties.index')->with('success', 'Property updated successfully.');
     }
 
     public function destroy(Property $property): RedirectResponse
     {
         $this->ensureOwnership($property);
         $property->delete();
-        return redirect()->route('broker.properties.index')->with('success', 'Property deleted successfully.');
+        return redirect()->route('agent.properties.index')->with('success', 'Property deleted successfully.');
     }
 
     private function ensureOwnership(Property $property): void

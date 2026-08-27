@@ -6,7 +6,7 @@
 @section('content')
 <div class="max-w-2xl">
     <div class="bg-white rounded-xl border border-stone-200 p-6">
-        <form action="{{ route('broker.clients.update', $client) }}" method="POST" class="space-y-4">
+        <form action="{{ route('agent.clients.update', $client) }}" method="POST" class="space-y-4">
             @csrf
             @method('PUT')
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -44,7 +44,7 @@
             </div>
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Update Client</button>
-                <a href="{{ route('broker.clients.index') }}" class="px-5 py-2 rounded-lg text-sm font-medium border border-stone-200 text-stone-600 hover:bg-stone-50 transition">Cancel</a>
+                <a href="{{ route('agent.clients.index') }}" class="px-5 py-2 rounded-lg text-sm font-medium border border-stone-200 text-stone-600 hover:bg-stone-50 transition">Cancel</a>
             </div>
         </form>
     </div>

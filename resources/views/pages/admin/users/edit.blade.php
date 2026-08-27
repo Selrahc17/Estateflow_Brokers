@@ -4,7 +4,7 @@
 @section('page-subtitle', '{{ $user->name }}')
 
 @section('content')
-<div class="max-w-lg">
+<div class="max-w-lg" x-data="{ role: '{{ old('role', $user->role) }}' }">
     <div class="bg-white rounded-xl border border-stone-200 p-6">
         <form action="{{ route('admin.users.update', $user) }}" method="POST" class="space-y-4">
             @csrf
@@ -21,11 +21,21 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">Role</label>
-                <select name="role" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
-                    @foreach(['admin','broker','client'] as $r)
-                    <option value="{{ $r }}" {{ old('role', $user->role) === $r ? 'selected' : '' }}>{{ ucfirst($r) }}</option>
+                <select name="role" x-model="role" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                    @foreach(['admin','broker','agent','client'] as $r)
+                    <option value="{{ $r }}">{{ ucfirst($r) }}</option>
                     @endforeach
                 </select>
+            </div>
+            <div x-show="role === 'agent'">
+                <label class="block text-sm font-medium text-stone-700 mb-1">Assign Broker</label>
+                <select name="broker_id" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                    <option value="">Select a Broker</option>
+                    @foreach($brokers as $broker)
+                    <option value="{{ $broker->id }}" {{ old('broker_id', $user->broker_id) == $broker->id ? 'selected' : '' }}>{{ $broker->name }}</option>
+                    @endforeach
+                </select>
+                @error('broker_id')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">New Password <span class="text-stone-400 font-normal">(leave blank to keep current)</span></label>

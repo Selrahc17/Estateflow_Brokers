@@ -27,7 +27,7 @@
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-2">
                         <svg class="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        <a href="{{ route('broker.documents.download', $doc) }}" class="font-medium text-stone-700 hover:text-amber-600">{{ $doc->name }}</a>
+                        <a href="{{ route('agent.documents.download', $doc) }}" class="font-medium text-stone-700 hover:text-amber-600">{{ $doc->name }}</a>
                     </div>
                 </td>
                 <td class="px-5 py-3 text-stone-500">{{ $doc->client?->full_name ?? '—' }}</td>
@@ -44,17 +44,17 @@
                 <td class="px-5 py-3">
                     @if($doc->status === 'pending')
                     <div class="flex gap-2">
-                        <form action="{{ route('broker.documents.verify', $doc) }}" method="POST">
+                        <form action="{{ route('agent.documents.verify', $doc) }}" method="POST">
                             @csrf
                             <button type="submit" class="text-xs bg-green-100 text-green-700 hover:bg-green-200 px-2.5 py-1 rounded-lg font-medium transition">Verify</button>
                         </form>
-                        <form action="{{ route('broker.documents.reject', $doc) }}" method="POST">
+                        <form action="{{ route('agent.documents.reject', $doc) }}" method="POST">
                             @csrf
                             <button type="submit" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-2.5 py-1 rounded-lg font-medium transition">Reject</button>
                         </form>
                     </div>
                     @else
-                    <a href="{{ route('broker.documents.download', $doc) }}" class="text-xs text-amber-600 hover:underline">Download</a>
+                    <a href="{{ route('agent.documents.download', $doc) }}" class="text-xs text-amber-600 hover:underline">Download</a>
                     @endif
                 </td>
             </tr>

@@ -16,7 +16,7 @@
         @php
             $allCount = \App\Models\Inquiry::where('broker_id', auth()->id())->count();
         @endphp
-        <a href="{{ route('broker.inquiries.index') }}" 
+        <a href="{{ route('agent.inquiries.index') }}" 
            class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition {{ !request('status') ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}">
             All ({{ $allCount }})
         </a>
@@ -24,7 +24,7 @@
             @php
                 $count = \App\Models\Inquiry::where('broker_id', auth()->id())->where('status', $value)->count();
             @endphp
-            <a href="{{ route('broker.inquiries.index', ['status' => $value]) }}"
+            <a href="{{ route('agent.inquiries.index', ['status' => $value]) }}"
                class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition {{ request('status') === $value ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}">
                 {{ $label }} ({{ $count }})
             </a>
@@ -44,7 +44,7 @@
 
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase mb-1">Property</p>
-                            <a href="{{ route('broker.properties.show', $inquiry->property->id) }}" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                            <a href="{{ route('agent.properties.show', $inquiry->property->id) }}" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
                                 {{ $inquiry->property->name }}
                             </a>
                         </div>
@@ -56,7 +56,7 @@
 
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase mb-1">Status</p>
-                            <form action="{{ route('broker.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
+                            <form action="{{ route('agent.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PATCH')
                                 <select name="status" onchange="this.form.submit()" 
@@ -72,7 +72,7 @@
 
                         <div class="text-right">
                             <p class="text-xs text-stone-400 mb-2">{{ $inquiry->created_at->diffForHumans() }}</p>
-                            <a href="{{ route('broker.inquiries.show', $inquiry->id) }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium">
+                            <a href="{{ route('agent.inquiries.show', $inquiry->id) }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium">
                                 View Details →
                             </a>
                         </div>

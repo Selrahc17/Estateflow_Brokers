@@ -57,7 +57,7 @@
     <div class="xl:col-span-2 bg-white rounded-xl border border-stone-200 p-5">
         <div class="flex items-center justify-between mb-4">
             <h2 class="font-semibold text-stone-800">Recent Reservations</h2>
-        <a href="{{ route('broker.reservations.index') }}" class="text-xs text-amber-600 hover:underline">View all</a>
+        <a href="{{ route('agent.reservations.index') }}" class="text-xs text-amber-600 hover:underline">View all</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -102,15 +102,15 @@
         <div class="bg-white rounded-xl border border-stone-200 p-5">
             <h2 class="font-semibold text-stone-800 mb-4">Quick Actions</h2>
             <div class="space-y-2">
-                <a href="{{ route('broker.reservations.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition text-sm font-medium">
+                <a href="{{ route('agent.reservations.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     New Reservation
                 </a>
-                <a href="{{ route('broker.clients.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
+                <a href="{{ route('agent.clients.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                     Add Client
                 </a>
-                <a href="{{ route('broker.properties.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
+                <a href="{{ route('agent.properties.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-stone-50 hover:bg-stone-100 text-stone-700 transition text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Add Property
                 </a>

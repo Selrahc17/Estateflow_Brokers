@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             'name'     => 'Broker Name',
             'email'    => 'broker@estateflow.com',
             'password' => 'broker123',
-            'role'     => 'broker',
+            'role'     => 'agent',
         ]);
 
         // Test Client (User + Client profile)

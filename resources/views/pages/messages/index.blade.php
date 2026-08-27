@@ -8,13 +8,13 @@
 @extends(auth()->user()->role === 'broker' ? 'layouts.broker' : 'layouts.app')
 @section('title', 'Messages')
 @section('page-title', 'Messages')
-@section('page-subtitle', 'Message your ' . (auth()->user()->role === 'broker' ? 'Agents' : 'Broker'))
+@section('page-subtitle', auth()->user()->role === 'broker' ? 'Message your Agents' : 'Message your Broker or Clients')
 
 @section('content')
 <div class="grid min-h-[620px] grid-cols-1 overflow-hidden rounded-xl border border-stone-200 bg-white lg:grid-cols-[260px_1fr]">
     <aside class="border-b border-stone-200 bg-stone-50 lg:border-b-0 lg:border-r">
         <div class="border-b border-stone-200 px-4 py-4">
-            <h2 class="font-semibold text-stone-800">{{ auth()->user()->role === 'broker' ? 'Your Agents' : 'Your Broker' }}</h2>
+            <h2 class="font-semibold text-stone-800">{{ auth()->user()->role === 'broker' ? 'Your Agents' : 'Your Contacts' }}</h2>
             <p class="mt-1 text-xs text-stone-500">{{ $contacts->count() }} contact{{ $contacts->count() !== 1 ? 's' : '' }}</p>
         </div>
         <div class="max-h-[520px] overflow-y-auto p-2">

@@ -28,6 +28,15 @@ class PropertyController extends Controller
         return view('pages.properties.index', compact('properties'));
     }
 
+    public function commission(): View
+    {
+        $properties = Property::where('broker_id', auth()->id())
+            ->latest()
+            ->paginate(12);
+
+        return view('pages.commission.index', compact('properties'));
+    }
+
     public function create(): View
     {
         return view('pages.properties.create');
@@ -45,6 +54,8 @@ class PropertyController extends Controller
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
+            'agent_commission' => 'nullable|numeric|min:0|max:100',
+            'valid_until' => 'nullable|date',
             'status'      => 'required|in:available,sold,coming_soon',
             'bedrooms'    => 'nullable|integer|min:0',
             'bathrooms'   => 'nullable|integer|min:0',
@@ -127,6 +138,8 @@ class PropertyController extends Controller
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
+            'agent_commission' => 'nullable|numeric|min:0|max:100',
+            'valid_until' => 'nullable|date',
             'status'      => 'required|in:available,sold,coming_soon',
             'bedrooms'    => 'nullable|integer|min:0',
             'bathrooms'   => 'nullable|integer|min:0',

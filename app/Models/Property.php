@@ -12,7 +12,7 @@ class Property extends Model
 
     protected $fillable = [
         'broker_id', 'name', 'slug', 'description', 'address',
-        'city', 'province', 'type', 'latitude', 'longitude', 'price', 'status',
+        'city', 'province', 'type', 'latitude', 'longitude', 'price', 'agent_commission', 'valid_until', 'status',
         'bedrooms', 'bathrooms', 'floor_area', 'lot_area', 'frontage', 'stories', 'parking_slots',
         'featured_image', 'images', 'amenities', 'view_count',
     ];
@@ -21,6 +21,8 @@ class Property extends Model
     {
         return [
             'price'    => 'decimal:2',
+            'agent_commission' => 'decimal:2',
+            'valid_until' => 'date',
             'images'   => 'array',
             'amenities' => 'array',
         ];

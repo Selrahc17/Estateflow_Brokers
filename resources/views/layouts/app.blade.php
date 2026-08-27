@@ -44,6 +44,11 @@
                 <span x-show="sidebarOpen" class="text-sm font-medium">Properties</span>
             </a>
 
+            <a href="{{ route('agent.commission') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('agent.commission') ? 'bg-amber-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.12-4 2.5s1.79 2.5 4 2.5 4 1.12 4 2.5-1.79 2.5-4 2.5m0-10V5m0 13v1m8-7a8 8 0 11-16 0 8 8 0 0116 0z"/></svg>
+                <span x-show="sidebarOpen" class="text-sm font-medium">My Commission</span>
+            </a>
+
             <a href="{{ route('agent.lots.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('agent.lots.*') ? 'bg-amber-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
                 <span x-show="sidebarOpen" class="text-sm font-medium">Lot Availability</span>

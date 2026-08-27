@@ -41,6 +41,16 @@
                            class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                 </div>
                 <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Commission Rate (%)</label>
+                    <input type="number" name="agent_commission" step="0.01" min="0" max="100" value="{{ old('agent_commission', $property->agent_commission) }}"
+                           class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-stone-700 mb-1">Valid Until</label>
+                    <input type="date" name="valid_until" value="{{ old('valid_until', $property->valid_until?->format('Y-m-d')) }}"
+                           class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-stone-700 mb-1">Status</label>
                     <select name="status" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
                         @foreach(['available' => 'Available', 'coming_soon' => 'Coming Soon', 'sold' => 'Sold'] as $val => $label)

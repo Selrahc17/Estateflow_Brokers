@@ -7,7 +7,10 @@ use App\Models\Inquiry;
 use App\Models\Property;
 use App\Models\Reservation;
 use App\Models\SiteVisit;
+use Carbon\Carbon;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -27,7 +30,35 @@ class DashboardController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('pages.broker.dashboard', compact('stats', 'agents'));
+        $agentIds = $broker->agents()->select('users.id');
+        $months = collect(range(5, 0))->map(fn ($monthsAgo) => Carbon::now()->subMonths($monthsAgo));
+        $sales = $this->monthlyCounts($months, Reservation::class, $agentIds, fn ($query) => $query->whereIn('status', ['confirmed', 'completed']));
+        $leads = $this->monthlyCounts($months, Inquiry::class, $agentIds);
+        $viewings = $this->monthlyCounts($months, SiteVisit::class, $agentIds);
+
+        $stats['sales_this_month'] = $sales->last();
+        $stats['leads_this_month'] = $leads->last();
+        $stats['viewings_this_month'] = $viewings->last();
+        $chart = [
+            'labels' => $months->map(fn ($month) => $month->format('M'))->values(),
+            'sales' => $sales->values(),
+            'leads' => $leads->values(),
+            'viewings' => $viewings->values(),
+        ];
+
+        return view('pages.broker.dashboard', compact('stats', 'agents', 'chart'));
+    }
+
+    private function monthlyCounts($months, string $model, $agentIds, ?callable $filter = null)
+    {
+        return $months->map(function ($month) use ($model, $agentIds, $filter) {
+            $query = $model::whereIn('broker_id', $agentIds)
+                ->whereBetween('created_at', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()]);
+            if ($filter) {
+                $filter($query);
+            }
+            return $query->count();
+        });
     }
 
     public function performance(): View
@@ -53,5 +84,20 @@ class DashboardController extends Controller
             ->paginate(12);
 
         return view('pages.broker.properties.index', compact('properties'));
+    }
+
+    public function updatePropertyTerms(Request $request, Property $property): RedirectResponse
+    {
+        $agentIds = auth()->user()->agents()->pluck('users.id');
+        abort_unless($agentIds->contains((int) $property->broker_id), 404);
+
+        $data = $request->validate([
+            'agent_commission' => 'nullable|numeric|min:0|max:100',
+            'valid_until' => 'nullable|date',
+        ]);
+
+        $property->update($data);
+
+        return back()->with('success', 'Commission rate and validity updated.');
     }
 }

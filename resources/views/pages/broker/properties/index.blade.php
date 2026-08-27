@@ -4,6 +4,9 @@
 @section('page-subtitle', 'Review properties listed by Agents under your account')
 
 @section('content')
+@if(session('success'))
+<div class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{{ session('success') }}</div>
+@endif
 <div class="mb-5 flex items-center justify-between">
     <div>
         <h2 class="font-semibold text-stone-800">Property Listings</h2>
@@ -32,16 +35,21 @@
                 <span class="shrink-0 text-sm font-semibold text-green-600">{{ $property->price ? '₱' . number_format($property->price, 2) : 'Price not set' }}</span>
             </div>
             <p class="mt-1 text-xs text-stone-500">Agent: {{ $property->broker?->name ?? 'Unassigned' }}</p>
-            <dl class="mt-4 grid grid-cols-2 gap-3 border-t border-stone-100 pt-4">
-                <div>
-                    <dt class="text-xs text-stone-400">Agent Commission</dt>
-                    <dd class="mt-1 text-sm font-medium text-stone-600">Not tracked</dd>
+            <form action="{{ route('broker.property-lists.terms', $property) }}" method="POST" class="mt-4 space-y-3 border-t border-stone-100 pt-4">
+                @csrf
+                @method('PATCH')
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-stone-400">Commission Rate (%)</label>
+                        <input type="number" name="agent_commission" min="0" max="100" step="0.01" value="{{ old('agent_commission', $property->agent_commission) }}" class="mt-1 w-full rounded-lg border border-stone-200 px-2.5 py-2 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400">
+                    </div>
+                    <div>
+                        <label class="text-xs text-stone-400">Valid Until</label>
+                        <input type="date" name="valid_until" value="{{ old('valid_until', $property->valid_until?->format('Y-m-d')) }}" class="mt-1 w-full rounded-lg border border-stone-200 px-2.5 py-2 text-sm focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-400">
+                    </div>
                 </div>
-                <div>
-                    <dt class="text-xs text-stone-400">Valid Until</dt>
-                    <dd class="mt-1 text-sm font-medium text-stone-600">Not set</dd>
-                </div>
-            </dl>
+                <button type="submit" class="w-full rounded-lg bg-red-600 py-2 text-xs font-medium text-white transition hover:bg-red-700">Save Terms</button>
+            </form>
         </div>
     </article>
     @empty

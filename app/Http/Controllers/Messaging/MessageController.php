@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Messaging;
 
 use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
+use App\Models\Client;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class MessageController extends Controller
     {
         $user = auth()->user();
         $contacts = $this->contacts($user);
-        $contactIds = $contacts->modelKeys();
+        $contactIds = $contacts->pluck('id');
 
         ChatMessage::where('receiver_id', $user->id)
             ->whereIn('sender_id', $contactIds)
@@ -58,7 +59,7 @@ class MessageController extends Controller
             'photo' => ['nullable', 'image', 'max:5120'],
         ]);
 
-        $contactIds = $this->contacts($user)->modelKeys();
+        $contactIds = $this->contacts($user)->pluck('id');
         abort_unless(in_array((int) $data['receiver_id'], $contactIds, true), 403);
 
         $attachment = null;
@@ -84,6 +85,13 @@ class MessageController extends Controller
             return $user->agents()->orderBy('name')->get();
         }
 
-        return $user->broker ? collect([$user->broker]) : collect();
+        $broker = $user->broker ? collect([$user->broker]) : collect();
+        $clients = Client::where('broker_id', $user->id)
+            ->with('user')
+            ->get()
+            ->pluck('user')
+            ->filter();
+
+        return $broker->merge($clients)->unique('id')->values();
     }
 }

@@ -1,7 +1,9 @@
 @extends('layouts.app')
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
-@section('page-subtitle', 'Welcome back, {{ auth()->user()->name }}!')
+@section('page-subtitle')
+    Welcome back, {{ auth()->user()->name }}!
+@endsection
 
 @section('content')
 

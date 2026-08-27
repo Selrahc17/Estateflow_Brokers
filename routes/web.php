@@ -18,15 +18,18 @@ use App\Http\Controllers\Messaging\MessageController;
 use App\Http\Controllers\Broker\DashboardController as BrokerDashboardController;
 use App\Http\Controllers\Broker\AgentController as BrokerAgentController;
 use App\Http\Controllers\Broker\SettingController as BrokerSettingController;
+use App\Http\Controllers\Broker\AuditController as BrokerAuditController;
+use App\Http\Controllers\Broker\NotificationController as BrokerNotificationController;
+use App\Http\Controllers\Broker\ReportController as BrokerReportController;
 use App\Http\Controllers\Agent\ChatController as BrokerChatController;
 use App\Http\Controllers\Agent\ClientController as BrokerClientController;
 use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
 use App\Http\Controllers\Agent\DocumentController as BrokerDocumentController;
 use App\Http\Controllers\Agent\InquiryController as BrokerInquiryController;
 use App\Http\Controllers\Agent\LotController;
-use App\Http\Controllers\Agent\NotificationController as BrokerNotificationController;
+use App\Http\Controllers\Agent\NotificationController as AgentNotificationController;
 use App\Http\Controllers\Agent\PropertyController;
-use App\Http\Controllers\Agent\ReportController as BrokerReportController;
+use App\Http\Controllers\Agent\ReportController as AgentReportController;
 use App\Http\Controllers\Agent\ReservationController as BrokerReservationController;
 use App\Http\Controllers\Agent\SettingController as AgentSettingController;
 use App\Http\Controllers\Agent\SiteVisitController;
@@ -148,15 +151,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 });
 
 // ===================== NOMINATIM PROXY =====================
-Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker'])->group(function () {
+Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'audit'])->group(function () {
     Route::get('/dashboard', [BrokerDashboardController::class, 'index'])->name('dashboard');
     Route::get('/performance', [BrokerDashboardController::class, 'performance'])->name('performance');
     Route::get('/property-lists', [BrokerDashboardController::class, 'propertyLists'])->name('property-lists');
+    Route::patch('/property-lists/{property}/terms', [BrokerDashboardController::class, 'updatePropertyTerms'])->name('property-lists.terms');
+    Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/notifications', [BrokerNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [BrokerNotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [BrokerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::post('/notifications/send', [BrokerNotificationController::class, 'send'])->name('notifications.send');
     Route::get('/settings', [BrokerSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/profile', [BrokerSettingController::class, 'updateProfile'])->name('settings.profile');
     Route::post('/settings/password', [BrokerSettingController::class, 'updatePassword'])->name('settings.password');
+    Route::get('/audit', [BrokerAuditController::class, 'index'])->name('audit.index');
     Route::get('/agents', [BrokerAgentController::class, 'index'])->name('agents.index');
     Route::get('/agents/create', [BrokerAgentController::class, 'create'])->name('agents.create');
     Route::post('/agents', [BrokerAgentController::class, 'store'])->name('agents.store');
@@ -189,8 +199,9 @@ Route::get('/api/geocode/reverse', function () {
 })->middleware('auth');
 
 // ===================== BROKER ROUTES =====================
-Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent'])->group(function () {
+Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit'])->group(function () {
     Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/commission', [PropertyController::class, 'commission'])->name('commission');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
@@ -231,13 +242,13 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent'])->grou
     Route::get('/documents/{document}/download', [BrokerDocumentController::class, 'download'])->name('documents.download');
     Route::post('/documents/{document}/verify', [BrokerDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [BrokerDocumentController::class, 'reject'])->name('documents.reject');
-    Route::get('/notifications', [BrokerNotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{notification}/read', [BrokerNotificationController::class, 'markRead'])->name('notifications.read');
-    Route::post('/notifications/read-all', [BrokerNotificationController::class, 'markAllRead'])->name('notifications.read-all');
-    Route::post('/notifications/send', [BrokerNotificationController::class, 'send'])->name('notifications.send');
+    Route::get('/notifications', [AgentNotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [AgentNotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [AgentNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::post('/notifications/send', [AgentNotificationController::class, 'send'])->name('notifications.send');
     Route::get('/chat', [BrokerChatController::class, 'index'])->name('chat.index');
     Route::post('/chat', [BrokerChatController::class, 'store'])->name('chat.store');
-    Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports', [AgentReportController::class, 'index'])->name('reports.index');
     Route::get('/settings', [AgentSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/profile', [AgentSettingController::class, 'updateProfile'])->name('settings.profile');
     Route::post('/settings/password', [AgentSettingController::class, 'updatePassword'])->name('settings.password');

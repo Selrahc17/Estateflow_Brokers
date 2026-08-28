@@ -39,7 +39,7 @@ class ProfileController extends Controller
             $file = $request->file('avatar');
             $filename = 'client-avatars/' . uniqid() . '.' . $file->getClientOriginalExtension();
             \Illuminate\Support\Facades\Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-            $userData['avatar'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+            $userData['avatar'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
         }
 
         $user->update($userData);

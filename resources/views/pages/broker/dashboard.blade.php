@@ -20,7 +20,10 @@
 </div>
 
 @php
-    $chartMax = max(1, max($chart['sales']->all()), max($chart['leads']->all()), max($chart['viewings']->all()));
+    $chartLabels   = $chart['labels']->toJson();
+    $chartSales    = $chart['sales']->toJson();
+    $chartLeads    = $chart['leads']->toJson();
+    $chartViewings = $chart['viewings']->toJson();
 @endphp
 <div class="bg-white rounded-xl border border-stone-200 mb-6">
     <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-stone-100">
@@ -28,35 +31,98 @@
             <h2 class="font-semibold text-stone-800">Team Activity</h2>
             <p class="mt-1 text-xs text-stone-500">Monthly activity from your assigned Agents</p>
         </div>
-        <div class="flex items-center gap-4 text-xs text-stone-500">
-            <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-red-500"></span>Sales</span>
-            <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-blue-500"></span>Leads</span>
-            <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-500"></span>Viewings</span>
+        <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center gap-3 text-xs text-stone-500 mr-3">
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-red-500"></span>Sales</span>
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-blue-500"></span>Leads</span>
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-500"></span>Viewings</span>
+            </div>
+            <div class="flex items-center gap-1">
+                <button onclick="setChartType('bar')" id="btn-bar" class="chart-type-btn px-3 py-1 rounded-lg text-xs font-medium bg-red-600 text-white transition">Bar</button>
+                <button onclick="setChartType('line')" id="btn-line" class="chart-type-btn px-3 py-1 rounded-lg text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200 transition">Line</button>
+            </div>
         </div>
     </div>
-    <div class="grid grid-cols-6 gap-2 px-5 pt-5 sm:gap-4">
-        @foreach($chart['labels'] as $index => $label)
-        <div class="flex min-w-0 flex-col items-center gap-2">
-            <div class="flex h-40 w-full items-end justify-center gap-0.5 sm:gap-1">
-                @foreach([
-                    [$chart['sales'][$index], 'bg-red-500'],
-                    [$chart['leads'][$index], 'bg-blue-500'],
-                    [$chart['viewings'][$index], 'bg-amber-500'],
-                ] as [$value, $color])
-                <div class="group relative flex h-full w-1/4 items-end">
-                    <div class="w-full rounded-t-sm {{ $color }} transition-opacity group-hover:opacity-75" style="height: {{ max(8, ($value / $chartMax) * 100) }}%" title="{{ $value }}"></div>
-                    <span class="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 text-[10px] text-stone-500 opacity-0 group-hover:opacity-100">{{ $value }}</span>
-                </div>
-                @endforeach
-            </div>
-            <span class="text-xs text-stone-400">{{ $label }}</span>
-        </div>
+    <div class="flex flex-wrap gap-1.5 px-5 pt-4">
+        <button onclick="showMonth(null)" id="btn-all" class="month-btn px-3 py-1 rounded-full text-xs font-medium bg-red-600 text-white transition">All</button>
+        @foreach($chart['labels'] as $i => $label)
+        <button onclick="showMonth({{ $i }})" id="btn-month-{{ $i }}" class="month-btn px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200 transition">{{ $label }}</button>
         @endforeach
     </div>
-    <div class="flex justify-end gap-5 px-5 py-4 text-xs text-stone-500">
-        <span>Viewings this month: <strong class="text-stone-700">{{ $stats['viewings_this_month'] }}</strong></span>
+    <div class="px-5 py-4">
+        <canvas id="teamActivityChart" height="100"></canvas>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const allLabels   = {!! $chartLabels !!};
+const allSales    = {!! $chartSales !!};
+const allLeads    = {!! $chartLeads !!};
+const allViewings = {!! $chartViewings !!};
+
+let currentType = 'bar';
+let currentMonth = null;
+
+const ctx = document.getElementById('teamActivityChart').getContext('2d');
+const chart = new Chart(ctx, {
+    type: 'bar',
+    data: buildData(null),
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false },
+        },
+        scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+            y: { beginAtZero: true, ticks: { precision: 0, font: { size: 11 } }, grid: { color: '#f5f5f4' } },
+        },
+    },
+});
+
+function buildData(monthIndex) {
+    const labels   = monthIndex !== null ? [allLabels[monthIndex]]   : allLabels;
+    const sales    = monthIndex !== null ? [allSales[monthIndex]]    : allSales;
+    const leads    = monthIndex !== null ? [allLeads[monthIndex]]    : allLeads;
+    const viewings = monthIndex !== null ? [allViewings[monthIndex]] : allViewings;
+    return {
+        labels,
+        datasets: [
+            { label: 'Sales',    data: sales,    backgroundColor: 'rgba(239,68,68,0.8)',   borderColor: 'rgb(239,68,68)',   borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4 },
+            { label: 'Leads',   data: leads,    backgroundColor: 'rgba(59,130,246,0.8)',  borderColor: 'rgb(59,130,246)',  borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4 },
+            { label: 'Viewings',data: viewings, backgroundColor: 'rgba(245,158,11,0.8)', borderColor: 'rgb(245,158,11)', borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4 },
+        ],
+    };
+}
+
+function setChartType(type) {
+    currentType = type;
+    chart.config.type = type;
+    chart.update();
+    document.querySelectorAll('.chart-type-btn').forEach(b => {
+        b.classList.toggle('bg-red-600', b.id === 'btn-' + type);
+        b.classList.toggle('text-white', b.id === 'btn-' + type);
+        b.classList.toggle('bg-stone-100', b.id !== 'btn-' + type);
+        b.classList.toggle('text-stone-600', b.id !== 'btn-' + type);
+    });
+}
+
+function showMonth(index) {
+    currentMonth = index;
+    chart.data = buildData(index);
+    chart.update();
+    document.querySelectorAll('.month-btn').forEach(b => {
+        const active = (index === null && b.id === 'btn-all') || b.id === 'btn-month-' + index;
+        b.classList.toggle('bg-red-600', active);
+        b.classList.toggle('text-white', active);
+        b.classList.toggle('bg-stone-100', !active);
+        b.classList.toggle('text-stone-600', !active);
+    });
+}
+</script>
+@endpush
 
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
     <div class="xl:col-span-2 bg-white rounded-xl border border-stone-200">

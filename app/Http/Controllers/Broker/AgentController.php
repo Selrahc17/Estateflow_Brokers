@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -14,7 +15,14 @@ class AgentController extends Controller
 {
     public function index(): View
     {
-        $agents = auth()->user()->agents()->latest()->paginate(15);
+        $agents = auth()->user()->agents()
+            ->withCount('properties')
+            ->when(request('search'), fn($q) => $q->where(function ($query) {
+                $query->where('name', 'like', '%' . request('search') . '%')
+                      ->orWhere('email', 'like', '%' . request('search') . '%');
+            }))
+            ->latest()
+            ->paginate(12);
 
         return view('pages.broker.agents.index', compact('agents'));
     }
@@ -27,17 +35,30 @@ class AgentController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
+            'name'     => ['required', 'string', 'max:255'],
+            'email'    => ['required', 'email', 'unique:users,email'],
+            'phone'    => ['nullable', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'avatar'   => ['nullable', 'image', 'max:2048'],
         ]);
 
+        $avatarUrl = null;
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = 'agent-avatars/' . uniqid() . '.' . $file->getClientOriginalExtension();
+            Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
+            $avatarUrl = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
+        }
+
         User::create([
-            ...$data,
-            'password' => Hash::make($data['password']),
-            'role' => 'agent',
-            'broker_id' => auth()->id(),
-            'is_active' => true,
+            'name'        => $data['name'],
+            'email'       => $data['email'],
+            'phone'       => $data['phone'] ?? null,
+            'password'    => Hash::make($data['password']),
+            'avatar'      => $avatarUrl,
+            'role'        => 'agent',
+            'broker_id'   => auth()->id(),
+            'is_active'   => true,
             'is_approved' => true,
         ]);
 
@@ -47,7 +68,6 @@ class AgentController extends Controller
     public function edit(User $agent): View
     {
         $this->ensureOwnedAgent($agent);
-
         return view('pages.broker.agents.edit', compact('agent'));
     }
 
@@ -56,9 +76,18 @@ class AgentController extends Controller
         $this->ensureOwnedAgent($agent);
 
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', Rule::unique('users', 'email')->ignore($agent->id)],
+            'name'   => ['required', 'string', 'max:255'],
+            'email'  => ['required', 'email', Rule::unique('users', 'email')->ignore($agent->id)],
+            'phone'  => ['nullable', 'string', 'max:20'],
+            'avatar' => ['nullable', 'image', 'max:2048'],
         ]);
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = 'agent-avatars/' . uniqid() . '.' . $file->getClientOriginalExtension();
+            Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
+            $data['avatar'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
+        }
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->validate([
@@ -75,7 +104,6 @@ class AgentController extends Controller
     {
         $this->ensureOwnedAgent($agent);
         $agent->delete();
-
         return redirect()->route('broker.agents.index')->with('success', 'Agent deleted successfully.');
     }
 
@@ -83,7 +111,6 @@ class AgentController extends Controller
     {
         $this->ensureOwnedAgent($agent);
         $agent->update(['is_active' => !$agent->is_active]);
-
         return back()->with('success', 'Agent ' . ($agent->is_active ? 'activated' : 'suspended') . ' successfully.');
     }
 

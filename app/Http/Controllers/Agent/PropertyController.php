@@ -93,7 +93,7 @@ class PropertyController extends Controller
             $file = $request->file('featured_image');
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             \Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-            $data['featured_image'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+            $data['featured_image'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
         }
 
         if ($request->hasFile('images')) {
@@ -102,7 +102,7 @@ class PropertyController extends Controller
             foreach ($request->file('images') as $img) {
                 $filename = uniqid() . '.' . $img->getClientOriginalExtension();
                 \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
-                $urls[] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+                $urls[] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
             }
             $data['images'] = $urls;
         }
@@ -156,7 +156,7 @@ class PropertyController extends Controller
             $file = $request->file('featured_image');
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             \Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-            $data['featured_image'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+            $data['featured_image'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
         }
 
         if ($request->hasFile('images')) {
@@ -165,7 +165,7 @@ class PropertyController extends Controller
             foreach ($request->file('images') as $img) {
                 $filename = uniqid() . '.' . $img->getClientOriginalExtension();
                 \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
-                $urls[] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+                $urls[] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
             }
             $data['images'] = $urls;
         }

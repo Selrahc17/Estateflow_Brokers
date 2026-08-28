@@ -44,7 +44,7 @@ class BrokerController extends Controller
         $file = $request->file('avatar');
         $filename = 'broker-avatars/' . uniqid() . '.' . $file->getClientOriginalExtension();
         Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-        $data['avatar'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+        $data['avatar'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
 
         $data['role'] = 'broker';
         $data['is_approved'] = false; // New brokers need approval

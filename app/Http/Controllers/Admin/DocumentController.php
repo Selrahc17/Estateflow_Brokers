@@ -31,7 +31,7 @@ class DocumentController extends Controller
         $file = $request->file('file');
         $filename = 'broker-documents/' . uniqid() . '.' . $file->getClientOriginalExtension();
         \Illuminate\Support\Facades\Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-        $path = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+        $path = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
         $size = round($file->getSize() / 1024) . ' KB';
 
         Document::create([

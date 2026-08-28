@@ -34,7 +34,7 @@ class SettingController extends Controller
             $file = $request->file('avatar');
             $filename = 'avatars/' . auth()->id() . '_' . time() . '.' . $file->getClientOriginalExtension();
             Storage::disk('supabase')->put($filename, file_get_contents($file));
-            $update['avatar'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+            $update['avatar'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
         }
 
         auth()->user()->update($update);

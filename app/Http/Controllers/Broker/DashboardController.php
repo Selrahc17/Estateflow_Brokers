@@ -31,18 +31,18 @@ class DashboardController extends Controller
             ->paginate(15);
 
         $agentIds = $broker->agents()->select('users.id');
-        $months = collect(range(5, 0))->map(fn ($monthsAgo) => Carbon::now()->subMonths($monthsAgo));
-        $sales = $this->monthlyCounts($months, Reservation::class, $agentIds, fn ($query) => $query->whereIn('status', ['confirmed', 'completed']));
-        $leads = $this->monthlyCounts($months, Inquiry::class, $agentIds);
-        $viewings = $this->monthlyCounts($months, SiteVisit::class, $agentIds);
+        $allMonths = collect(range(11, 0))->map(fn ($monthsAgo) => Carbon::now()->subMonths($monthsAgo));
+        $sales    = $this->monthlyCounts($allMonths, Reservation::class, $agentIds, fn ($query) => $query->whereIn('status', ['confirmed', 'completed']));
+        $leads    = $this->monthlyCounts($allMonths, Inquiry::class, $agentIds);
+        $viewings = $this->monthlyCounts($allMonths, SiteVisit::class, $agentIds);
 
-        $stats['sales_this_month'] = $sales->last();
-        $stats['leads_this_month'] = $leads->last();
+        $stats['sales_this_month']    = $sales->last();
+        $stats['leads_this_month']    = $leads->last();
         $stats['viewings_this_month'] = $viewings->last();
         $chart = [
-            'labels' => $months->map(fn ($month) => $month->format('M'))->values(),
-            'sales' => $sales->values(),
-            'leads' => $leads->values(),
+            'labels'   => $allMonths->map(fn ($m) => $m->format('M Y'))->values(),
+            'sales'    => $sales->values(),
+            'leads'    => $leads->values(),
             'viewings' => $viewings->values(),
         ];
 

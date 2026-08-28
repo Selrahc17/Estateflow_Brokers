@@ -137,9 +137,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/reservations/{reservation}', [AdminReservationController::class, 'show'])->name('reservations.show');
     Route::patch('/reservations/{reservation}/status', [AdminReservationController::class, 'updateStatus'])->name('reservations.status');
     Route::get('/documents', [AdminDocumentController::class, 'index'])->name('documents');
+    Route::post('/documents', [AdminDocumentController::class, 'store'])->name('documents.store');
     Route::post('/documents/{document}/verify', [AdminDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [AdminDocumentController::class, 'reject'])->name('documents.reject');
     Route::post('/documents/{document}/request-more', [AdminDocumentController::class, 'requestMore'])->name('documents.request-more');
+    Route::delete('/documents/{document}', [AdminDocumentController::class, 'destroy'])->name('documents.destroy');
     Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback');
     Route::post('/feedback/{feedback}/resolve', [AdminFeedbackController::class, 'resolve'])->name('feedback.resolve');
     Route::get('/contact-messages', [AdminContactMessageController::class, 'index'])->name('contact-messages');

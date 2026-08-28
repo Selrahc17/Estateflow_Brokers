@@ -1,7 +1,7 @@
 @extends('layouts.admin')
-@section('title', 'Agent Management')
-@section('page-title', 'Agent Management')
-@section('page-subtitle', 'Manage all agents')
+@section('title', 'Broker Management')
+@section('page-title', 'Broker Management')
+@section('page-subtitle', 'Manage all brokers')
 
 @section('content')
 
@@ -11,12 +11,12 @@
 
 <div class="flex flex-col sm:flex-row gap-3 justify-between mb-5">
     <form method="GET" class="flex gap-2">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search agents..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 w-56">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search brokers..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 w-56">
         <button type="submit" class="bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg text-sm transition">Search</button>
     </form>
     <a href="{{ route('admin.brokers.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-        Add Agent
+        Add Broker
     </a>
 </div>
 
@@ -24,12 +24,17 @@
     @forelse($brokers as $broker)
     <div class="bg-white rounded-xl border border-stone-200 p-5 hover:shadow-md transition">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-700 font-bold text-lg shrink-0">
-                {{ strtoupper(substr($broker->name, 0, 1)) }}
+            <div class="w-12 h-12 overflow-hidden bg-amber-100 rounded-xl flex items-center justify-center text-amber-700 font-bold text-lg shrink-0">
+                @if($broker->avatar)
+                    <img src="{{ str_starts_with($broker->avatar, 'http') ? $broker->avatar : asset('storage/' . $broker->avatar) }}" alt="{{ $broker->name }} profile picture" class="w-full h-full object-cover">
+                @else
+                    {{ strtoupper(substr($broker->name, 0, 1)) }}
+                @endif
             </div>
             <div>
                 <p class="font-semibold text-stone-800">{{ $broker->name }}</p>
                 <p class="text-xs text-stone-400">{{ $broker->email }}</p>
+                <p class="text-xs text-stone-500">License: {{ $broker->license_number ?? 'Not provided' }}</p>
                 <span class="mt-1 inline-block px-2 py-0.5 rounded-full text-xs font-medium {{ $broker->is_approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
                     {{ $broker->is_approved ? 'Approved' : 'Pending Approval' }}
                 </span>
@@ -60,7 +65,7 @@
     </div>
     @empty
     <div class="col-span-3 py-12 text-center text-stone-400">
-        No agents found. <a href="{{ route('admin.brokers.create') }}" class="text-red-600 hover:underline">Add one</a>
+        No brokers found. <a href="{{ route('admin.brokers.create') }}" class="text-red-600 hover:underline">Add one</a>
     </div>
     @endforelse
 </div>

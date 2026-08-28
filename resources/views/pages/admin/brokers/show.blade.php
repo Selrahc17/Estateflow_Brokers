@@ -8,13 +8,18 @@
 
     <div class="bg-white rounded-xl border border-stone-200 p-6">
         <div class="flex items-center gap-4 mb-5">
-            <div class="w-14 h-14 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-2xl">
-                {{ strtoupper(substr($user->name, 0, 1)) }}
+            <div class="w-14 h-14 overflow-hidden bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-2xl">
+                @if($user->avatar)
+                    <img src="{{ str_starts_with($user->avatar, 'http') ? $user->avatar : asset('storage/' . $user->avatar) }}" alt="{{ $user->name }} profile picture" class="w-full h-full object-cover">
+                @else
+                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                @endif
             </div>
             <div>
                 <p class="font-bold text-stone-800 text-lg">{{ $user->name }}</p>
                 <p class="text-sm text-stone-400">{{ $user->email }}</p>
-                <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Agent</span>
+                <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">Broker</span>
+                <p class="mt-2 text-xs text-stone-500">License: {{ $user->license_number ?? 'Not provided' }}</p>
             </div>
         </div>
         <div class="space-y-3 text-sm">

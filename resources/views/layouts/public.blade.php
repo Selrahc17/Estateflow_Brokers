@@ -96,7 +96,11 @@
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.outside="open = false"
                             class="flex items-center gap-2 border border-stone-200 dark:border-stone-700 rounded-xl px-3 py-2 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
-                            <div class="w-7 h-7 bg-amber-600 rounded-full flex items-center justify-center text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                            @if(auth()->user()->avatar)
+                                <img src="{{ str_starts_with(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar) }}" class="w-7 h-7 rounded-full object-cover">
+                            @else
+                                <div class="w-7 h-7 bg-amber-600 rounded-full flex items-center justify-center text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                            @endif
                             <span class="text-sm font-medium text-stone-700 dark:text-stone-200">{{ explode(' ', auth()->user()->name)[0] }}</span>
                             <svg class="w-4 h-4 text-stone-400 transition" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </button>

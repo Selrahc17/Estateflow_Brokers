@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class BrokerController extends Controller
 {
     public function index(): View
     {
-        $brokers = User::where('role', 'agent')
+        $brokers = User::where('role', 'broker')
             ->when(request('search'), fn($q) => $q->where(function ($query) {
                 $query->where('name', 'like', '%'.request('search').'%')
                     ->orWhere('email', 'like', '%'.request('search').'%');
@@ -33,13 +34,20 @@ class BrokerController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:users,email',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+            'license_number' => 'required|string|max:100|unique:users,license_number',
+            'avatar' => 'required|image|max:2048',
         ]);
 
-        $data['role'] = 'agent';
-        $data['is_approved'] = false; // New agents need approval
+        $file = $request->file('avatar');
+        $filename = 'broker-avatars/' . uniqid() . '.' . $file->getClientOriginalExtension();
+        Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
+        $data['avatar'] = 'https://yungpjrhvpjneanvyxnt.supabase.co/storage/v1/object/public/properties/' . $filename;
+
+        $data['role'] = 'broker';
+        $data['is_approved'] = false; // New brokers need approval
         User::create($data);
 
         return redirect()->route('admin.brokers')->with('success', 'Broker created successfully. Pending approval.');
@@ -68,6 +76,6 @@ class BrokerController extends Controller
 
     private function ensureBroker(User $user): void
     {
-        abort_unless($user->isAgent(), 404);
+        abort_unless($user->role === 'broker', 404);
     }
 }

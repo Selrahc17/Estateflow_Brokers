@@ -1,12 +1,12 @@
 @extends('layouts.admin')
-@section('title', 'Add Agent')
-@section('page-title', 'Add Agent')
-@section('page-subtitle', 'Register a new agent account')
+@section('title', 'Add Broker')
+@section('page-title', 'Add Broker')
+@section('page-subtitle', 'Register a new Broker account')
 
 @section('content')
 <div class="max-w-lg">
     <div class="bg-white rounded-xl border border-stone-200 p-6">
-        <form action="{{ route('admin.brokers.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('admin.brokers.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">Full Name</label>
@@ -19,6 +19,16 @@
                 @error('email')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
             <div>
+                <label class="block text-sm font-medium text-stone-700 mb-1">Profile Picture</label>
+                <input type="file" name="avatar" accept="image/*" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                @error('avatar')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-stone-700 mb-1">License Number</label>
+                <input type="text" name="license_number" value="{{ old('license_number') }}" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                @error('license_number')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+            </div>
+            <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">Password</label>
                 <input type="password" name="password" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
                 @error('password')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
@@ -28,7 +38,7 @@
                 <input type="password" name="password_confirmation" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
             </div>
             <div class="flex gap-3 pt-2">
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Create Agent</button>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Create Broker</button>
                 <a href="{{ route('admin.brokers') }}" class="px-5 py-2 rounded-lg text-sm font-medium border border-stone-200 text-stone-600 hover:bg-stone-50 transition">Cancel</a>
             </div>
         </form>

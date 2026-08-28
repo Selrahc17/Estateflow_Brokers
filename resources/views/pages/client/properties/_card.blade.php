@@ -28,7 +28,7 @@
 
     {{-- Content --}}
     <div class="p-4">
-        <h3 class="font-semibold text-stone-800 dark:text-white text-sm mb-1 group-hover:text-amber-600 transition">{{ $property->name }}</h3>
+        <h3 class="font-semibold text-stone-800 dark:text-white text-sm mb-1 group-hover:text-teal-700 transition">{{ $property->name }}</h3>
         <p class="text-xs text-stone-400 flex items-center gap-1 mb-3">
             <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             {{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? 'Location TBA') }}
@@ -69,12 +69,12 @@
             <div>
                 @if($property->price)
                 <p class="text-xs text-stone-400">Starting at</p>
-                <p class="text-base font-bold text-amber-600">₱{{ number_format($property->price, 0) }}</p>
+                <p class="text-base font-bold text-teal-700">₱{{ number_format($property->price, 0) }}</p>
                 @else
                 <p class="text-sm font-medium text-stone-400">Price on request</p>
                 @endif
             </div>
-            <span class="text-xs text-amber-600 font-medium group-hover:underline">View Details →</span>
+            <span class="text-xs text-teal-700 font-medium group-hover:underline">View Details →</span>
         </div>
     </div>
 </a>

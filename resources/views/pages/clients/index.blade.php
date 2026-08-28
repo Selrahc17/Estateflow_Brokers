@@ -7,10 +7,10 @@
 
 <div class="flex flex-col sm:flex-row gap-3 justify-between mb-5">
     <form method="GET" class="flex gap-2">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search clients..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 w-64">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search clients..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 w-64">
         <button type="submit" class="bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-lg text-sm transition">Search</button>
     </form>
-    <a href="{{ route('agent.clients.create') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
+    <a href="{{ route('agent.clients.create') }}" class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add Client
     </a>
@@ -24,7 +24,7 @@
     @forelse($clients as $client)
     <div class="bg-white rounded-xl border border-stone-200 p-5 hover:shadow-md transition">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-11 h-11 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-lg">
+            <div class="w-11 h-11 bg-teal-100 rounded-full flex items-center justify-center text-teal-800 font-bold text-lg">
                 {{ strtoupper(substr($client->first_name, 0, 1)) }}
             </div>
             <div>
@@ -51,7 +51,7 @@
             </span>
             <div class="flex gap-3">
                 <button type="button" data-lead-score="{{ $client->id }}" class="text-xs text-blue-600 hover:underline">Score Lead</button>
-                <a href="{{ route('agent.clients.show', $client) }}" class="text-xs text-amber-600 hover:underline">View</a>
+                <a href="{{ route('agent.clients.show', $client) }}" class="text-xs text-teal-700 hover:underline">View</a>
                 <a href="{{ route('agent.clients.edit', $client) }}" class="text-xs text-stone-400 hover:underline">Edit</a>
             </div>
         </div>

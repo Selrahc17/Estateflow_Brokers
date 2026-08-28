@@ -20,7 +20,7 @@
     </div>
     <div class="bg-white rounded-xl border border-stone-200 p-4">
         <p class="text-xs text-stone-500 mb-1">Total Reservations</p>
-        <p class="text-xl font-bold text-amber-600">{{ $data['total_reservations'] }}</p>
+        <p class="text-xl font-bold text-teal-700">{{ $data['total_reservations'] }}</p>
     </div>
 </div>
 
@@ -62,7 +62,7 @@
                     <span class="text-stone-500">{{ $count }}</span>
                 </div>
                 <div class="w-full bg-stone-100 rounded-full h-2">
-                    <div class="bg-amber-500 h-2 rounded-full" style="width: {{ $pct }}%"></div>
+                    <div class="bg-teal-600 h-2 rounded-full" style="width: {{ $pct }}%"></div>
                 </div>
             </div>
             @endforeach
@@ -81,7 +81,7 @@
             @php $amount = $data['monthly_payments'][$month] ?? 0; $max = $data['monthly_payments']->max() ?: 1; $h = round($amount/$max*120); @endphp
             <div class="flex-1 flex flex-col items-center gap-1">
                 @if($amount > 0)<span class="text-xs text-stone-500">{{ number_format($amount/1000,0) }}K</span>@else<span class="text-xs text-stone-300">—</span>@endif
-                <div class="w-full {{ $amount > 0 ? 'bg-amber-400 hover:bg-amber-500' : 'bg-stone-100' }} rounded-t-md transition" style="height: {{ max($h,4) }}px"></div>
+                <div class="w-full {{ $amount > 0 ? 'bg-teal-500 hover:bg-teal-600' : 'bg-stone-100' }} rounded-t-md transition" style="height: {{ max($h,4) }}px"></div>
                 <span class="text-xs text-stone-400">{{ date('M', mktime(0,0,0,$month,1)) }}</span>
             </div>
             @endforeach
@@ -107,7 +107,7 @@
         @forelse($topClients as $tp)
         <div class="flex items-center justify-between p-3 bg-stone-50 rounded-lg mb-2">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-sm">{{ strtoupper(substr($tp->client?->first_name ?? '?', 0, 1)) }}</div>
+                <div class="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center text-teal-800 font-bold text-sm">{{ strtoupper(substr($tp->client?->first_name ?? '?', 0, 1)) }}</div>
                 <p class="text-sm font-medium text-stone-700">{{ $tp->client?->full_name ?? '—' }}</p>
             </div>
             <span class="text-sm font-semibold text-stone-700">₱{{ number_format($tp->total, 2) }}</span>

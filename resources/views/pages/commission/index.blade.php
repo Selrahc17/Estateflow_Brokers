@@ -30,7 +30,7 @@
             <dl class="mt-4 space-y-3 border-t border-stone-100 pt-4">
                 <div class="flex items-center justify-between gap-3">
                     <dt class="text-xs text-stone-400">Commission Rate</dt>
-                    <dd class="text-sm font-semibold text-amber-600">{{ $property->agent_commission !== null ? number_format($property->agent_commission, 2) . '%' : 'Not set' }}</dd>
+                    <dd class="text-sm font-semibold text-teal-700">{{ $property->agent_commission !== null ? number_format($property->agent_commission, 2) . '%' : 'Not set' }}</dd>
                 </div>
                 <div class="flex items-center justify-between gap-3">
                     <dt class="text-xs text-stone-400">Valid Until</dt>

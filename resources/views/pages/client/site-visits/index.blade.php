@@ -2,9 +2,9 @@
 @section('title', 'My Appointments')
 
 @section('content')
-<div class="bg-gradient-to-r from-stone-900 to-amber-900 text-white">
+<div class="bg-gradient-to-r from-[#112E3B] to-[#1A6B79] text-white">
     <div class="max-w-6xl mx-auto px-6 py-10">
-        <p class="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-1">My Appointments</p>
+        <p class="text-teal-500 text-xs uppercase tracking-widest font-semibold mb-1">My Appointments</p>
         <h1 class="text-2xl font-bold">Site Visit Requests</h1>
     </div>
 </div>
@@ -30,7 +30,7 @@
                 @csrf
                 @method('PATCH')
                 <input type="datetime-local" name="scheduled_at" required min="{{ now()->format('Y-m-d\\TH:i') }}" class="border border-stone-200 rounded-lg px-2 py-1 text-xs">
-                <button type="submit" class="text-xs text-amber-700 hover:underline">Reschedule</button>
+                <button type="submit" class="text-xs text-teal-800 hover:underline">Reschedule</button>
             </form>
             <form action="{{ route('client.account.site-visits.cancel', $siteVisit) }}" method="POST">
                 @csrf

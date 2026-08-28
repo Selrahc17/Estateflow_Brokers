@@ -28,7 +28,7 @@
                         <p class="text-xs text-stone-400">{{ $agent->email }}</p>
                     </td>
                     <td class="px-5 py-4 font-semibold text-blue-600">{{ $agent->leads_count }}</td>
-                    <td class="px-5 py-4 font-semibold text-amber-600">{{ $agent->viewings_count }}</td>
+                    <td class="px-5 py-4 font-semibold text-teal-700">{{ $agent->viewings_count }}</td>
                     <td class="px-5 py-4 font-semibold text-green-600">{{ $agent->sales_count }}</td>
                     <td class="px-5 py-4 text-stone-400">Not tracked</td>
                 </tr>

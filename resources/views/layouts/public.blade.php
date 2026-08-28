@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#d97706">
+    <meta name="theme-color" content="#1A6B79">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="EstateFlow">
@@ -26,12 +26,16 @@
 
             {{-- Logo --}}
             <a href="{{ route('client.properties') }}" class="flex items-center gap-2 shrink-0">
-                <div class="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                    </svg>
+                <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center overflow-hidden">
+                    @if($appLogo)
+                        <img src="{{ $appLogo }}" class="w-full h-full object-cover">
+                    @else
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                    @endif
                 </div>
-                <span class="text-lg font-bold text-stone-800 dark:text-white">Estate<span class="text-amber-600">Flow</span></span>
+                <span class="text-lg font-bold text-stone-800 dark:text-white">Estate<span class="text-teal-600">Flow</span></span>
             </a>
 
             {{-- Search Bar (Desktop) --}}
@@ -63,7 +67,7 @@
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-4 flex items-center justify-center transition shrink-0">
+                    <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-4 flex items-center justify-center transition shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
                     </button>
                 </form>
@@ -79,7 +83,7 @@
 
                 {{-- Dark Mode Toggle --}}
                 <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)"
-                    class="w-10 h-10 flex items-center justify-center border border-stone-200 dark:border-stone-700 rounded-xl text-stone-500 dark:text-amber-400 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
+                    class="w-10 h-10 flex items-center justify-center border border-stone-200 dark:border-stone-700 rounded-xl text-stone-500 dark:text-teal-400 hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                     <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
                     <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 </button>
@@ -87,8 +91,8 @@
                 {{-- Desktop Nav --}}
                 <div class="hidden sm:flex items-center gap-2">
                     @guest
-                    <a href="{{ route('auth.login') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-amber-600 transition px-3 py-2">Sign In</a>
-                    <a href="{{ route('auth.register') }}" class="bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium px-4 py-2 rounded-xl transition">Register</a>
+                    <a href="{{ route('auth.login') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-teal-600 transition px-3 py-2">Sign In</a>
+                    <a href="{{ route('auth.register') }}" class="bg-teal-700 hover:bg-teal-800 text-white text-sm font-medium px-4 py-2 rounded-xl transition">Register</a>
                     @endguest
 
                     @auth
@@ -99,7 +103,7 @@
                             @if(auth()->user()->avatar)
                                 <img src="{{ str_starts_with(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar) }}" class="w-7 h-7 rounded-full object-cover">
                             @else
-                                <div class="w-7 h-7 bg-amber-600 rounded-full flex items-center justify-center text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                                <div class="w-7 h-7 bg-teal-700 rounded-full flex items-center justify-center text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
                             @endif
                             <span class="text-sm font-medium text-stone-700 dark:text-stone-200">{{ explode(' ', auth()->user()->name)[0] }}</span>
                             <svg class="w-4 h-4 text-stone-400 transition" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -116,34 +120,34 @@
                             <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-800">
                                 <p class="text-sm font-semibold text-stone-800 dark:text-white">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-stone-400">{{ auth()->user()->email }}</p>
-                                <a href="{{ route('client.account.profile') }}" class="text-xs text-amber-600 hover:underline mt-0.5 inline-block">Edit Profile →</a>
+                                <a href="{{ route('client.account.profile') }}" class="text-xs text-teal-600 hover:underline mt-0.5 inline-block">Edit Profile →</a>
                             </div>
 
                             {{-- Nav Links --}}
                             <div class="py-1 dark:[&_a]:text-stone-300 dark:[&_a:hover]:bg-stone-800 dark:[&_a:hover]:text-amber-400">
-                                <a href="{{ route('client.account.reservation') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-amber-700 transition {{ request()->routeIs('client.account.reservation') ? 'bg-amber-50 text-amber-700' : '' }}">
+                                <a href="{{ route('client.account.reservation') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.reservation') ? 'bg-teal-50 text-teal-700' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     My Reservation
                                 </a>
-                                <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-amber-700 transition {{ request()->routeIs('client.account.documents') ? 'bg-amber-50 text-amber-700' : '' }}">
+                                <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.documents') ? 'bg-teal-50 text-teal-700' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     My Documents
                                 </a>
                                 @php
                                     $unreadCount = \App\Models\AppNotification::where('user_id', auth()->id())->where('is_read', false)->count();
                                 @endphp
-                                <a href="{{ route('client.account.notifications') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-amber-700 transition {{ request()->routeIs('client.account.notifications') ? 'bg-amber-50 text-amber-700' : '' }}">
+                                <a href="{{ route('client.account.notifications') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.notifications') ? 'bg-teal-50 text-teal-700' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                                     Notifications
                                     @if($unreadCount > 0)
                                         <span class="ml-auto bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">{{ $unreadCount }}</span>
                                     @endif
                                 </a>
-                                <a href="{{ route('client.account.feedback') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-amber-700 transition {{ request()->routeIs('client.account.feedback') ? 'bg-amber-50 text-amber-700' : '' }}">
+                                <a href="{{ route('client.account.feedback') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.feedback') ? 'bg-teal-50 text-teal-700' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                                     Feedback & Ratings
                                 </a>
-                                <a href="{{ route('client.account.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-amber-50 hover:text-amber-700 transition {{ request()->routeIs('client.account.profile') ? 'bg-amber-50 text-amber-700' : '' }}">
+                                <a href="{{ route('client.account.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.profile') ? 'bg-teal-50 text-teal-700' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     My Profile
                                 </a>
@@ -183,33 +187,33 @@
         {{-- Mobile Menu --}}
         <div x-show="mobileMenu" x-transition class="sm:hidden border-t border-stone-100 dark:border-stone-800 px-4 py-4 bg-white dark:bg-stone-900 space-y-1">
             <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-1">Browse</p>
-            <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1 font-medium">All Properties</a>
-            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">House and Lot</a>
-            <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Lot Only</a>
-            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-amber-600 py-2 px-1">Condominium</a>
+            <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1 font-medium">All Properties</a>
+            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-teal-600 py-2 px-1">House and Lot</a>
+            <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-teal-600 py-2 px-1">Lot Only</a>
+            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-teal-600 py-2 px-1">Condominium</a>
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2">
                 <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-2">My Account</p>
-                <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">My Reservation</a>
-                <a href="{{ route('client.account.documents') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">My Documents</a>
-                <a href="{{ route('client.account.notifications') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">Notifications</a>
-                <a href="{{ route('client.account.feedback') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">Feedback & Ratings</a>
-                <a href="{{ route('client.account.profile') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-amber-600 py-2 px-1">My Profile</a>
+                <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Reservation</a>
+                <a href="{{ route('client.account.documents') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Documents</a>
+                <a href="{{ route('client.account.notifications') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">Notifications</a>
+                <a href="{{ route('client.account.feedback') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">Feedback & Ratings</a>
+                <a href="{{ route('client.account.profile') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Profile</a>
             </div>
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2 flex gap-2">
                 <a href="{{ route('auth.login') }}" class="flex-1 text-center border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 text-sm py-2 rounded-xl">Sign In</a>
-                <a href="{{ route('auth.register') }}" class="flex-1 text-center bg-amber-600 text-white text-sm py-2 rounded-xl">Register</a>
+                <a href="{{ route('auth.register') }}" class="flex-1 text-center bg-teal-700 text-white text-sm py-2 rounded-xl">Register</a>
             </div>
         </div>
 
         {{-- Desktop Nav Pills --}}
         <div class="hidden sm:flex max-w-7xl mx-auto px-6 gap-1 pb-2">
-            <a href="{{ route('client.properties') }}" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ !request('type') && !request('status') ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">All Properties</a>
-            <a href="{{ route('client.properties') }}?status=Pre-Selling" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'Pre-Selling' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Pre-Selling</a>
-            <a href="{{ route('client.properties') }}?status=RFO" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'RFO' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Ready for Occupancy</a>
-            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'House and Lot' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">House & Lot</a>
-            <a href="{{ route('client.properties') }}?type=Lot+Only" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Lot Only' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Lot Only</a>
-            <a href="{{ route('client.properties') }}?type=Condominium" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Condominium' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Condominium</a>
-            <a href="{{ route('client.properties') }}?type=Commercial" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Commercial' ? 'bg-amber-100 text-amber-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Commercial</a>
+            <a href="{{ route('client.properties') }}" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ !request('type') && !request('status') ? 'bg-teal-100 text-teal-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">All Properties</a>
+            <a href="{{ route('client.properties') }}?status=Pre-Selling" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'Pre-Selling' ? 'bg-teal-100 text-teal-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Pre-Selling</a>
+            <a href="{{ route('client.properties') }}?status=RFO" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('status') == 'RFO' ? 'bg-teal-100 text-teal-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Ready for Occupancy</a>
+            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'House and Lot' ? 'bg-teal-100 text-teal-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">House & Lot</a>
+            <a href="{{ route('client.properties') }}?type=Lot+Only" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Lot Only' ? 'bg-teal-100 text-teal-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Lot Only</a>
+            <a href="{{ route('client.properties') }}?type=Condominium" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Condominium' ? 'bg-teal-100 text-teal-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Condominium</a>
+            <a href="{{ route('client.properties') }}?type=Commercial" class="text-xs font-medium px-3 py-1.5 rounded-lg {{ request('type') == 'Commercial' ? 'bg-teal-100 text-teal-700' : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800' }} transition">Commercial</a>
         </div>
     </header>
 
@@ -223,8 +227,12 @@
         <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-4 gap-8">
             <div class="sm:col-span-1">
                 <div class="flex items-center gap-2 mb-3">
-                    <div class="w-7 h-7 bg-amber-600 rounded-lg flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    <div class="w-7 h-7 bg-teal-700 rounded-lg flex items-center justify-center overflow-hidden">
+                        @if($appLogo)
+                            <img src="{{ $appLogo }}" class="w-full h-full object-cover">
+                        @else
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        @endif
                     </div>
                     <span class="text-white font-bold">EstateFlow</span>
                 </div>
@@ -277,14 +285,18 @@
              class="absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden mb-2">
 
             {{-- Chat Header --}}
-            <div class="bg-gradient-to-r from-stone-800 to-amber-800 px-4 py-3 flex items-center justify-between">
+            <div class="bg-gradient-to-r from-[#112E3B] to-[#1A6B79] px-4 py-3 flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-amber-500 rounded-xl flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+                    <div class="w-9 h-9 bg-teal-500 rounded-xl flex items-center justify-center shrink-0 overflow-hidden">
+                        @if(\App\Models\Setting::get('chatbot_logo'))
+                            <img src="{{ \App\Models\Setting::get('chatbot_logo') }}" class="w-full h-full object-cover">
+                        @else
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+                        @endif
                     </div>
                     <div>
                         <p class="text-white font-semibold text-sm">EstateFlow AI</p>
-                        <p class="text-amber-300 text-xs flex items-center gap-1">
+                        <p class="text-teal-300 text-xs flex items-center gap-1">
                             <span class="w-1.5 h-1.5 bg-green-400 rounded-full inline-block animate-pulse"></span>
                             Online · Always available
                         </p>
@@ -300,11 +312,15 @@
                 <template x-for="(msg, i) in messages" :key="i">
                     <div :class="msg.from === 'user' ? 'flex flex-row-reverse items-end gap-2' : 'flex items-end gap-2'">
                         <template x-if="msg.from === 'ai'">
-                            <div class="w-6 h-6 bg-amber-600 rounded-full flex items-center justify-center shrink-0">
-                                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+                            <div class="w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center shrink-0 overflow-hidden">
+                                @if(\App\Models\Setting::get('chatbot_logo'))
+                                    <img src="{{ \App\Models\Setting::get('chatbot_logo') }}" class="w-full h-full object-cover">
+                                @else
+                                    <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+                                @endif
                             </div>
                         </template>
-                        <div :class="msg.from === 'user' ? 'bg-amber-600 text-white rounded-2xl rounded-br-none' : 'bg-white border border-stone-200 text-stone-700 rounded-2xl rounded-bl-none'"
+                        <div :class="msg.from === 'user' ? 'bg-teal-700 text-white rounded-2xl rounded-br-none' : 'bg-white border border-stone-200 text-stone-700 rounded-2xl rounded-bl-none'"
                              class="px-3 py-2 max-w-xs shadow-sm">
                             <p class="text-xs leading-relaxed" x-text="msg.text"></p>
                         </div>
@@ -315,10 +331,10 @@
             {{-- Quick Replies --}}
             <div class="px-4 py-2 border-t border-stone-100 bg-white">
                 <div class="flex gap-1.5 flex-wrap">
-                    <button @click="messages.push({from:'user',text:'Payment due?'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Payment due?</button>
-                    <button @click="messages.push({from:'user',text:'My documents'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">My documents</button>
-                    <button @click="messages.push({from:'user',text:'Lot details'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Lot details</button>
-                    <button @click="messages.push({from:'user',text:'Contact agent'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-amber-200">Contact agent</button>
+                    <button @click="messages.push({from:'user',text:'Payment due?'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">Payment due?</button>
+                    <button @click="messages.push({from:'user',text:'My documents'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">My documents</button>
+                    <button @click="messages.push({from:'user',text:'Lot details'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">Lot details</button>
+                    <button @click="messages.push({from:'user',text:'Contact agent'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">Contact agent</button>
                 </div>
             </div>
 
@@ -330,23 +346,30 @@
                         @keydown.enter="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
                         type="text"
                         placeholder="Ask anything..."
-                        class="flex-1 border border-stone-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 bg-stone-50">
+                        class="flex-1 border border-stone-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 bg-stone-50">
                     <button
                         @click="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
-                        class="w-8 h-8 bg-amber-600 hover:bg-amber-700 text-white rounded-xl flex items-center justify-center transition shrink-0">
+                        class="w-8 h-8 bg-teal-700 hover:bg-teal-800 text-white rounded-xl flex items-center justify-center transition shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                     </button>
                 </div>
                 <p class="text-center text-xs text-stone-400 mt-2">
-                    <a href="{{ route('client.account.chat') }}" class="hover:text-amber-600 transition">Open full AI Assistant →</a>
+                    <a href="{{ route('client.account.chat') }}" class="hover:text-teal-600 transition">Open full AI Assistant →</a>
                 </p>
             </div>
         </div>
 
         {{-- Toggle Button --}}
+        @php $chatbotLogo = \App\Models\Setting::get('chatbot_logo'); @endphp
         <button type="button" @click.stop="chatOpen = !chatOpen"
-            class="w-14 h-14 bg-amber-600 hover:bg-amber-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 relative">
-            <svg x-show="!chatOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+            class="w-14 h-14 bg-teal-700 hover:bg-teal-800 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95 relative">
+            <span x-show="!chatOpen" class="flex items-center justify-center">
+                @if($chatbotLogo)
+                    <img src="{{ $chatbotLogo }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-white/40">
+                @else
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                @endif
+            </span>
             <svg x-show="chatOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             {{-- Notification dot --}}
             <span x-show="!chatOpen" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</span>

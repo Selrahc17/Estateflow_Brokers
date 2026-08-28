@@ -6,7 +6,7 @@
     {{-- Header --}}
     <div class="flex items-center justify-between mb-8">
         <div>
-            <a href="{{ route('client.account.inquiries') }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium mb-2 inline-flex items-center gap-1">
+            <a href="{{ route('client.account.inquiries') }}" class="text-teal-700 hover:text-teal-800 text-sm font-medium mb-2 inline-flex items-center gap-1">
                 ← Back to Inquiries
             </a>
             <h1 class="text-3xl font-bold text-stone-800">Inquiry Details</h1>
@@ -37,7 +37,7 @@
                 <div class="space-y-4">
                     <div>
                         <p class="text-xs text-stone-400 font-semibold uppercase">Property Name</p>
-                        <a href="{{ route('client.property.show', $inquiry->property->slug) }}" class="text-amber-600 hover:text-amber-700 font-semibold">
+                        <a href="{{ route('client.property.show', $inquiry->property->slug) }}" class="text-teal-700 hover:text-teal-800 font-semibold">
                             {{ $inquiry->property->name }}
                         </a>
                     </div>
@@ -54,7 +54,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase">Price</p>
-                            <p class="text-lg font-bold text-amber-600 mt-1">₱{{ number_format($inquiry->property->price, 0) }}</p>
+                            <p class="text-lg font-bold text-teal-700 mt-1">₱{{ number_format($inquiry->property->price, 0) }}</p>
                         </div>
                         @if($inquiry->lot)
                         <div>
@@ -90,7 +90,7 @@
                 <div class="space-y-3">
                     <div class="flex gap-3">
                         <div class="text-sm text-stone-400 w-32 shrink-0">{{ $inquiry->created_at->format('M d, Y H:i') }}</div>
-                        <div class="flex-1 pb-3 border-l-2 border-amber-300 pl-4">
+                        <div class="flex-1 pb-3 border-l-2 border-teal-400 pl-4">
                             <p class="font-semibold text-stone-700">Inquiry Submitted</p>
                             <p class="text-xs text-stone-400">Your inquiry was sent to the broker</p>
                         </div>
@@ -114,7 +114,7 @@
                 <h2 class="text-lg font-semibold text-stone-800 mb-4">Broker Contact</h2>
                 
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-amber-600 rounded-full flex items-center justify-center text-white text-lg font-bold">
+                    <div class="w-12 h-12 bg-teal-700 rounded-full flex items-center justify-center text-white text-lg font-bold">
                         {{ substr($inquiry->broker->name, 0, 1) }}
                     </div>
                     <div>
@@ -132,7 +132,7 @@
                 </div>
 
                 <div class="mt-4 pt-4 space-y-2">
-                    <a href="{{ route('client.account.chat') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2 rounded-lg text-sm font-semibold transition">
+                    <a href="{{ route('client.account.chat') }}" class="block w-full text-center bg-teal-700 hover:bg-teal-800 text-white py-2 rounded-lg text-sm font-semibold transition">
                         Message Broker
                     </a>
                     <a href="{{ route('client.properties') }}" class="block w-full text-center border border-stone-200 text-stone-700 hover:bg-stone-50 py-2 rounded-lg text-sm font-medium transition">
@@ -142,9 +142,9 @@
             </div>
 
             {{-- Help Section --}}
-            <div class="bg-amber-50 rounded-lg border border-amber-200 p-4">
-                <p class="text-xs font-semibold text-amber-900 uppercase mb-2">💡 Next Steps</p>
-                <ul class="text-xs text-amber-900 space-y-1.5">
+            <div class="bg-teal-50 rounded-lg border border-teal-200 p-4">
+                <p class="text-xs font-semibold text-teal-900 uppercase mb-2">💡 Next Steps</p>
+                <ul class="text-xs text-teal-900 space-y-1.5">
                     <li class="flex gap-2">
                         <span>✓</span>
                         <span>Broker will review your inquiry</span>

@@ -25,7 +25,7 @@
             <div class="text-5xl mb-3">🤍</div>
             <h3 class="text-xl font-semibold text-stone-700 mb-2">No saved properties yet</h3>
             <p class="text-stone-400 mb-6">Start exploring properties and save your favorites!</p>
-            <a href="{{ route('client.properties') }}" class="inline-block bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-xl font-semibold transition">
+            <a href="{{ route('client.properties') }}" class="inline-block bg-teal-700 hover:bg-teal-800 text-white px-6 py-3 rounded-xl font-semibold transition">
                 Browse Properties
             </a>
         </div>

@@ -64,7 +64,7 @@
                 <td class="px-5 py-3">
                     <span class="px-2 py-0.5 rounded-full text-xs font-medium
                         {{ $log[2]==='Admin' ? 'bg-red-100 text-red-700' : '' }}
-                        {{ $log[2]==='Broker' ? 'bg-amber-100 text-amber-700' : '' }}
+                        {{ $log[2]==='Broker' ? 'bg-teal-100 text-teal-800' : '' }}
                         {{ $log[2]==='Client' ? 'bg-blue-100 text-blue-700' : '' }}
                         {{ $log[2]==='—' ? 'bg-stone-100 text-stone-500' : '' }}">
                         {{ $log[2] }}

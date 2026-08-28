@@ -17,7 +17,7 @@
             $allCount = \App\Models\Inquiry::where('broker_id', auth()->id())->count();
         @endphp
         <a href="{{ route('agent.inquiries.index') }}" 
-           class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition {{ !request('status') ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}">
+           class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition {{ !request('status') ? 'bg-teal-700 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}">
             All ({{ $allCount }})
         </a>
         @foreach(['new' => 'New', 'contacted' => 'Contacted', 'site_visit_scheduled' => 'Site Visit Scheduled', 'negotiating' => 'Negotiating', 'closed' => 'Closed', 'lost' => 'Lost'] as $value => $label)
@@ -25,7 +25,7 @@
                 $count = \App\Models\Inquiry::where('broker_id', auth()->id())->where('status', $value)->count();
             @endphp
             <a href="{{ route('agent.inquiries.index', ['status' => $value]) }}"
-               class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition {{ request('status') === $value ? 'bg-amber-600 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}">
+               class="px-4 py-2 rounded-lg font-medium whitespace-nowrap transition {{ request('status') === $value ? 'bg-teal-700 text-white' : 'bg-stone-100 text-stone-700 hover:bg-stone-200' }}">
                 {{ $label }} ({{ $count }})
             </a>
         @endforeach
@@ -44,7 +44,7 @@
 
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase mb-1">Property</p>
-                            <a href="{{ route('agent.properties.show', $inquiry->property->id) }}" class="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                            <a href="{{ route('agent.properties.show', $inquiry->property->id) }}" class="text-teal-700 hover:text-teal-800 font-medium text-sm">
                                 {{ $inquiry->property->name }}
                             </a>
                         </div>
@@ -60,7 +60,7 @@
                                 @csrf
                                 @method('PATCH')
                                 <select name="status" onchange="this.form.submit()" 
-                                        class="text-xs px-2 py-1 rounded border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-400">
+                                        class="text-xs px-2 py-1 rounded border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-400">
                                     @foreach($statuses as $status)
                                         <option value="{{ $status }}" {{ $inquiry->status === $status ? 'selected' : '' }}>
                                             {{ ucfirst(str_replace('_', ' ', $status)) }}
@@ -72,7 +72,7 @@
 
                         <div class="text-right">
                             <p class="text-xs text-stone-400 mb-2">{{ $inquiry->created_at->diffForHumans() }}</p>
-                            <a href="{{ route('agent.inquiries.show', $inquiry->id) }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium">
+                            <a href="{{ route('agent.inquiries.show', $inquiry->id) }}" class="text-teal-700 hover:text-teal-800 text-sm font-medium">
                                 View Details →
                             </a>
                         </div>

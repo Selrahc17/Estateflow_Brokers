@@ -11,8 +11,8 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
 
     <div class="bg-white rounded-xl p-5 border border-stone-200 flex items-center gap-4">
-        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+        <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center">
+            <svg class="w-6 h-6 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
         </div>
         <div>
             <p class="text-sm text-stone-500">Total Properties</p>
@@ -59,7 +59,7 @@
     <div class="xl:col-span-2 bg-white rounded-xl border border-stone-200 p-5">
         <div class="flex items-center justify-between mb-4">
             <h2 class="font-semibold text-stone-800">Recent Reservations</h2>
-        <a href="{{ route('agent.reservations.index') }}" class="text-xs text-amber-600 hover:underline">View all</a>
+        <a href="{{ route('agent.reservations.index') }}" class="text-xs text-teal-700 hover:underline">View all</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -104,7 +104,7 @@
         <div class="bg-white rounded-xl border border-stone-200 p-5">
             <h2 class="font-semibold text-stone-800 mb-4">Quick Actions</h2>
             <div class="space-y-2">
-                <a href="{{ route('agent.reservations.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-700 transition text-sm font-medium">
+                <a href="{{ route('agent.reservations.create') }}" class="flex items-center gap-3 p-3 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-800 transition text-sm font-medium">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     New Reservation
                 </a>
@@ -127,8 +127,8 @@
                     $recentNotifs = \App\Models\AppNotification::where('user_id', auth()->id())->latest()->take(5)->get();
                 @endphp
                 @forelse($recentNotifs as $notif)
-                <div class="flex items-start gap-3 p-3 {{ !$notif->is_read ? 'bg-amber-50' : 'bg-stone-50' }} rounded-lg">
-                    <div class="w-2 h-2 {{ !$notif->is_read ? 'bg-amber-500' : 'bg-stone-500' }} rounded-full mt-1.5 shrink-0"></div>
+                <div class="flex items-start gap-3 p-3 {{ !$notif->is_read ? 'bg-teal-50' : 'bg-stone-50' }} rounded-lg">
+                    <div class="w-2 h-2 {{ !$notif->is_read ? 'bg-teal-600' : 'bg-stone-500' }} rounded-full mt-1.5 shrink-0"></div>
                     <div class="flex-1">
                         <p class="text-sm font-medium text-stone-700">{{ $notif->title }}</p>
                         <p class="text-xs text-stone-500">{{ $notif->created_at->diffForHumans() }}</p>

@@ -148,6 +148,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit');
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');
+    Route::post('/settings/profile', [AdminSettingController::class, 'updateProfile'])->name('settings.profile');
+    Route::post('/settings/password', [AdminSettingController::class, 'updatePassword'])->name('settings.password');
+    Route::post('/settings/logo', [AdminSettingController::class, 'updateLogo'])->name('settings.logo');
+    Route::post('/settings/chatbot-logo', [AdminSettingController::class, 'updateChatbotLogo'])->name('settings.chatbot-logo');
     Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications');
     Route::post('/notifications/read-all', [AdminNotificationController::class, 'markAllRead'])->name('notifications.read-all');
 });

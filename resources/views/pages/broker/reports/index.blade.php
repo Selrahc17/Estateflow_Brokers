@@ -9,7 +9,7 @@
         ['Revenue', '₱' . number_format($data['total_revenue'], 2), 'text-green-600'],
         ['Properties', $data['total_properties'], 'text-stone-800'],
         ['Clients', $data['total_clients'], 'text-blue-600'],
-        ['Reservations', $data['total_reservations'], 'text-amber-600'],
+        ['Reservations', $data['total_reservations'], 'text-teal-700'],
         ['Leads', $data['total_leads'], 'text-indigo-600'],
         ['Viewings', $data['total_viewings'], 'text-red-600'],
     ] as [$label, $value, $color])
@@ -58,7 +58,7 @@
             </tr></thead>
             <tbody class="divide-y divide-stone-100">
                 @forelse($agents as $agent)
-                <tr class="hover:bg-stone-50"><td class="px-5 py-3 font-medium text-stone-700">{{ $agent->name }}</td><td class="px-5 py-3 text-indigo-600">{{ $agent->leads_count }}</td><td class="px-5 py-3 text-amber-600">{{ $agent->viewings_count }}</td><td class="px-5 py-3 text-green-600">{{ $agent->sales_count }}</td></tr>
+                <tr class="hover:bg-stone-50"><td class="px-5 py-3 font-medium text-stone-700">{{ $agent->name }}</td><td class="px-5 py-3 text-indigo-600">{{ $agent->leads_count }}</td><td class="px-5 py-3 text-teal-700">{{ $agent->viewings_count }}</td><td class="px-5 py-3 text-green-600">{{ $agent->sales_count }}</td></tr>
                 @empty
                 <tr><td colspan="4" class="px-5 py-8 text-center text-stone-400">No Agents assigned yet.</td></tr>
                 @endforelse

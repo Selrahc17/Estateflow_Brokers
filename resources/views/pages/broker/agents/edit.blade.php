@@ -8,7 +8,7 @@
 
     {{-- Agent Card Preview --}}
     <div class="bg-white rounded-xl border border-stone-200 p-6 text-center">
-        <div class="w-20 h-20 overflow-hidden bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700 font-bold text-3xl mx-auto mb-4">
+        <div class="w-20 h-20 overflow-hidden bg-teal-100 rounded-2xl flex items-center justify-center text-teal-800 font-bold text-3xl mx-auto mb-4">
             @if($agent->avatar)
                 <img src="{{ str_starts_with($agent->avatar, 'http') ? $agent->avatar : asset('storage/' . $agent->avatar) }}" class="w-full h-full object-cover">
             @else

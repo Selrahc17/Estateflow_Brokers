@@ -7,8 +7,8 @@
 
         {{-- Left Panel --}}
         <div class="hidden xl:flex flex-col gap-4">
-            <div class="bg-gradient-to-br from-stone-800 to-amber-900 rounded-2xl p-5 text-white">
-                <div class="w-12 h-12 bg-amber-600 rounded-xl flex items-center justify-center mb-3">
+            <div class="bg-gradient-to-br from-[#112E3B] to-[#1A6B79] rounded-2xl p-5 text-white">
+                <div class="w-12 h-12 bg-teal-700 rounded-xl flex items-center justify-center mb-3">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                 </div>
                 <p class="font-bold text-base mb-1">EstateFlow AI</p>
@@ -30,7 +30,7 @@
                     <form method="POST" action="{{ route('client.account.chat.store') }}">
                         @csrf
                         <input type="hidden" name="message" value="{{ $topic }}">
-                        <button type="submit" class="w-full text-left text-sm text-stone-600 hover:text-amber-600 hover:bg-amber-50 px-3 py-2 rounded-xl transition">
+                        <button type="submit" class="w-full text-left text-sm text-stone-600 hover:text-teal-700 hover:bg-teal-50 px-3 py-2 rounded-xl transition">
                             {{ $topic }}
                         </button>
                     </form>
@@ -45,7 +45,7 @@
             {{-- Header --}}
             <div class="flex items-center justify-between px-5 py-4 border-b border-stone-100 bg-stone-50">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-amber-600 rounded-xl flex items-center justify-center">
+                    <div class="w-10 h-10 bg-teal-700 rounded-xl flex items-center justify-center">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                     </div>
                     <div>
@@ -60,7 +60,7 @@
                     @csrf
                     <input type="hidden" name="message" value="Hello! What can you help me with?">
                     @if($messages->isEmpty())
-                    <button type="submit" class="text-xs text-amber-600 hover:underline">Start conversation</button>
+                    <button type="submit" class="text-xs text-teal-700 hover:underline">Start conversation</button>
                     @endif
                 </form>
             </div>
@@ -70,7 +70,7 @@
 
                 @if($messages->isEmpty())
                 <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-amber-600 rounded-xl flex items-center justify-center shrink-0">
+                    <div class="w-8 h-8 bg-teal-700 rounded-xl flex items-center justify-center shrink-0">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                     </div>
                     <div class="bg-white border border-stone-200 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-sm">
@@ -82,11 +82,11 @@
                 @foreach($messages as $msg)
                 @if($msg->sender_type === 'user')
                 <div class="flex items-start gap-3 flex-row-reverse">
-                    <div class="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center shrink-0 text-amber-700 font-bold text-sm">
+                    <div class="w-8 h-8 bg-teal-100 rounded-xl flex items-center justify-center shrink-0 text-teal-800 font-bold text-sm">
                         {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                     </div>
                     <div class="max-w-sm">
-                        <div class="bg-amber-600 rounded-2xl rounded-tr-none px-4 py-3">
+                        <div class="bg-teal-700 rounded-2xl rounded-tr-none px-4 py-3">
                             <p class="text-sm text-white">{{ $msg->message }}</p>
                         </div>
                         <p class="text-xs text-stone-400 mt-1 text-right">{{ $msg->created_at->format('g:i A') }}</p>
@@ -94,7 +94,7 @@
                 </div>
                 @else
                 <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 bg-amber-600 rounded-xl flex items-center justify-center shrink-0">
+                    <div class="w-8 h-8 bg-teal-700 rounded-xl flex items-center justify-center shrink-0">
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                     </div>
                     <div class="max-w-sm">
@@ -119,7 +119,7 @@
                             class="w-full bg-transparent text-sm outline-none text-stone-700 placeholder:text-stone-400"
                             autocomplete="off" required>
                     </div>
-                    <button type="submit" class="w-11 h-11 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl flex items-center justify-center transition shrink-0 shadow-sm">
+                    <button type="submit" class="w-11 h-11 bg-teal-700 hover:bg-teal-800 text-white rounded-2xl flex items-center justify-center transition shrink-0 shadow-sm">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                     </button>
                 </form>

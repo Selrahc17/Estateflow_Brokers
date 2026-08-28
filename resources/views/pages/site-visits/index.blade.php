@@ -9,12 +9,12 @@
     <div class="flex gap-2">
         @foreach(['all' => 'All', 'pending' => 'Pending', 'confirmed' => 'Confirmed', 'completed' => 'Completed', 'cancelled' => 'Cancelled'] as $key => $label)
             <a href="{{ request()->fullUrlWithQuery(['status' => $key]) }}" 
-               class="px-4 py-2 rounded-lg text-sm font-medium transition {{ request('status') === $key || (request('status') === null && $key === 'all') ? 'bg-amber-600 text-white' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' }}">
+               class="px-4 py-2 rounded-lg text-sm font-medium transition {{ request('status') === $key || (request('status') === null && $key === 'all') ? 'bg-teal-700 text-white' : 'bg-white border border-stone-200 text-stone-600 hover:bg-stone-50' }}">
                 {{ $label }}
             </a>
         @endforeach
     </div>
-    <a href="{{ route('agent.site-visits.create') }}" class="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
+    <a href="{{ route('agent.site-visits.create') }}" class="flex items-center gap-2 px-4 py-2 bg-teal-700 text-white rounded-lg hover:bg-teal-800 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         New Site Visit
     </a>
@@ -51,7 +51,7 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center gap-2 justify-end">
-                                <a href="{{ route('agent.site-visits.show', $visit) }}" class="text-xs text-amber-600 hover:underline">View</a>
+                                <a href="{{ route('agent.site-visits.show', $visit) }}" class="text-xs text-teal-700 hover:underline">View</a>
                                 <a href="{{ route('agent.site-visits.edit', $visit) }}" class="text-xs text-blue-600 hover:underline">Edit</a>
                             </div>
                         </td>

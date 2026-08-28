@@ -10,14 +10,14 @@
     <div>
         <form method="GET" class="flex flex-col gap-2 sm:flex-row sm:items-center">
             <input type="text" name="search" placeholder="Search properties..." value="{{ request('search') }}"
-                   class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 w-full sm:w-64">
-            <select name="type" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
+                   class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 w-full sm:w-64">
+            <select name="type" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
                 <option value="">All Types</option>
                 @foreach(['House and Lot','Condominium','Townhouse','Lot Only','Office Space','Warehouse','Farm','Villa','Apartment'] as $type)
                 <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
                 @endforeach
             </select>
-            <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
+            <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
                 <option value="">All Status</option>
                 <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
                 <option value="sold" {{ request('status') == 'sold' ? 'selected' : '' }}>Sold</option>
@@ -25,7 +25,7 @@
             </select>
         </form>
     </div>
-    <a href="{{ route('agent.properties.create') }}" class="inline-flex bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2 transition">
+    <a href="{{ route('agent.properties.create') }}" class="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add Property
     </a>
@@ -35,12 +35,12 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
     @forelse($properties as $property)
     <div class="bg-white rounded-xl border border-stone-200 overflow-hidden hover:shadow-md transition">
-        <div class="h-36 bg-gradient-to-br from-amber-100 to-stone-200 relative overflow-hidden">
+        <div class="h-48 bg-gradient-to-br from-teal-100 to-teal-50 relative overflow-hidden">
             @if($property->featured_image)
-                <img src="{{ $property->featured_image }}" class="w-full h-full object-cover absolute inset-0" alt="{{ $property->name }}">
+                <img src="{{ $property->featured_image }}" class="w-full h-full object-cover object-center absolute inset-0" alt="{{ $property->name }}">
             @else
                 <div class="w-full h-full flex items-center justify-center">
-                    <svg class="w-16 h-16 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    <svg class="w-16 h-16 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 </div>
             @endif
             <span class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium
@@ -68,7 +68,7 @@
                 @endif
             </div>
             <div class="flex gap-2 mt-3">
-                <a href="{{ route('agent.properties.show', $property) }}" class="flex-1 text-center text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 py-1.5 rounded-lg transition font-medium">View Lots</a>
+                <a href="{{ route('agent.properties.show', $property) }}" class="flex-1 text-center text-xs bg-teal-50 hover:bg-teal-100 text-teal-800 py-1.5 rounded-lg transition font-medium">View Lots</a>
                 <a href="{{ route('agent.properties.edit', $property) }}" class="flex-1 text-center text-xs bg-stone-50 hover:bg-stone-100 text-stone-600 py-1.5 rounded-lg transition font-medium">Edit</a>
                 <form method="POST" action="{{ route('agent.properties.destroy', $property) }}" onsubmit="return confirm('Delete this property?')" class="w-24">
                     @csrf @method('DELETE')
@@ -81,7 +81,7 @@
     <div class="col-span-full text-center py-12 text-stone-400">
         <svg class="w-12 h-12 mx-auto mb-3 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         <p>No properties found.</p>
-        <a href="{{ route('agent.properties.create') }}" class="text-amber-600 hover:underline text-sm mt-1 inline-block">Add your first property</a>
+        <a href="{{ route('agent.properties.create') }}" class="text-teal-700 hover:underline text-sm mt-1 inline-block">Add your first property</a>
     </div>
     @endforelse
 </div>

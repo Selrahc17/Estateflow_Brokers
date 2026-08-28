@@ -8,7 +8,7 @@
 {{-- KPI Summary --}}
 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
     @foreach([
-        ['Total Brokers',      $summary['total_brokers'],                              'text-amber-600',  'border-amber-100'],
+        ['Total Brokers',      $summary['total_brokers'],                              'text-teal-700',  'border-teal-100'],
         ['Total Agents',       $summary['total_agents'],                               'text-blue-600',   'border-blue-100'],
         ['Total Clients',      $summary['total_clients'],                              'text-indigo-600', 'border-indigo-100'],
         ['Total Properties',   $summary['total_properties'],                           'text-green-600',  'border-green-100'],
@@ -33,7 +33,7 @@
             @php
                 $color = match($status) {
                     'confirmed','completed' => ['bg-green-500', 'bg-green-100', 'text-green-700'],
-                    'pending'               => ['bg-amber-500', 'bg-amber-100', 'text-amber-700'],
+                    'pending'               => ['bg-teal-600', 'bg-teal-100', 'text-teal-800'],
                     'cancelled'             => ['bg-red-500',   'bg-red-100',   'text-red-600'],
                     default                 => ['bg-stone-400', 'bg-stone-100', 'text-stone-600'],
                 };
@@ -65,7 +65,7 @@
                     'Active', 'RFO'  => ['bg-green-500', 'bg-green-100', 'text-green-700'],
                     'Pre-Selling'    => ['bg-blue-500',  'bg-blue-100',  'text-blue-700'],
                     'Sold Out'       => ['bg-stone-500', 'bg-stone-100', 'text-stone-600'],
-                    default          => ['bg-amber-500', 'bg-amber-100', 'text-amber-700'],
+                    default          => ['bg-teal-600', 'bg-teal-100', 'text-teal-800'],
                 };
                 $pct = round(($count / $totalProps) * 100);
             @endphp
@@ -115,7 +115,7 @@
                             @if($broker->avatar)
                                 <img src="{{ str_starts_with($broker->avatar, 'http') ? $broker->avatar : asset('storage/' . $broker->avatar) }}" class="w-9 h-9 rounded-full object-cover shrink-0">
                             @else
-                                <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-sm shrink-0">
+                                <div class="w-9 h-9 bg-teal-100 rounded-full flex items-center justify-center text-teal-800 font-bold text-sm shrink-0">
                                     {{ strtoupper(substr($broker->name, 0, 1)) }}
                                 </div>
                             @endif
@@ -141,7 +141,7 @@
                         <span class="inline-block px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">{{ $broker->confirmed_res }}</span>
                     </td>
                     <td class="px-5 py-4 text-center">
-                        <span class="inline-block px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">{{ $broker->pending_res }}</span>
+                        <span class="inline-block px-2 py-0.5 bg-teal-100 text-teal-800 rounded-full text-xs font-medium">{{ $broker->pending_res }}</span>
                     </td>
                     <td class="px-5 py-4 text-right font-bold text-stone-800">
                         ₱{{ number_format($broker->total_sales, 0) }}
@@ -167,7 +167,7 @@
                     <td class="px-5 py-3 text-center text-indigo-600">{{ $brokers->sum('clients_count') }}</td>
                     <td class="px-5 py-3 text-center text-purple-600">{{ $brokers->sum('reservations_count') }}</td>
                     <td class="px-5 py-3 text-center text-green-600">{{ $brokers->sum('confirmed_res') }}</td>
-                    <td class="px-5 py-3 text-center text-amber-600">{{ $brokers->sum('pending_res') }}</td>
+                    <td class="px-5 py-3 text-center text-teal-700">{{ $brokers->sum('pending_res') }}</td>
                     <td class="px-5 py-3 text-right text-stone-800">₱{{ number_format($brokers->sum('total_sales'), 0) }}</td>
                     <td></td>
                 </tr>

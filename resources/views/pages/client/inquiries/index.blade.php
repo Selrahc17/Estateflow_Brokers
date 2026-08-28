@@ -49,7 +49,7 @@
                         <div class="text-right">
                             <p class="text-xs text-stone-400 mb-2">Sent on</p>
                             <p class="text-sm font-medium text-stone-700">{{ $inquiry->created_at->format('M d, Y') }}</p>
-                            <a href="{{ route('client.account.inquiries.show', $inquiry->id) }}" class="text-xs text-amber-600 hover:underline mt-2 inline-block">
+                            <a href="{{ route('client.account.inquiries.show', $inquiry->id) }}" class="text-xs text-teal-700 hover:underline mt-2 inline-block">
                                 View Details →
                             </a>
                         </div>
@@ -67,7 +67,7 @@
             <div class="text-5xl mb-3">📋</div>
             <h3 class="text-xl font-semibold text-stone-700 mb-2">No inquiries yet</h3>
             <p class="text-stone-400 mb-6">Start sending inquiries to properties you're interested in!</p>
-            <a href="{{ route('client.properties') }}" class="inline-block bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-xl font-semibold transition">
+            <a href="{{ route('client.properties') }}" class="inline-block bg-teal-700 hover:bg-teal-800 text-white px-6 py-3 rounded-xl font-semibold transition">
                 Browse Properties
             </a>
         </div>

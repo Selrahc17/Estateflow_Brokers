@@ -11,7 +11,7 @@
             <div class="flex items-start justify-between mb-4">
                 <h2 class="text-lg font-semibold text-stone-800">Property Information</h2>
                 <div class="flex gap-2">
-                    <a href="{{ route('agent.properties.edit', $property) }}" class="text-sm text-amber-600 hover:underline">Edit</a>
+                    <a href="{{ route('agent.properties.edit', $property) }}" class="text-sm text-teal-700 hover:underline">Edit</a>
                     <form method="POST" action="{{ route('agent.properties.destroy', $property) }}" onsubmit="return confirm('Delete this property?')">
                         @csrf @method('DELETE')
                         <button class="text-sm text-red-500 hover:underline">Delete</button>
@@ -45,7 +45,7 @@
             @if($property->latitude && $property->longitude)
             <div class="mt-4 pt-4 border-t border-stone-100">
                 <p class="text-sm font-medium text-stone-700 mb-2 flex items-center gap-1">
-                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Map Location
                 </p>
                 <div id="show-map" class="w-full rounded-lg border border-stone-200 overflow-hidden" style="height:220px"></div>
@@ -58,7 +58,7 @@
         <div class="bg-white rounded-xl border border-stone-200 p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold text-stone-800">Lots</h2>
-                <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="text-sm bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg font-medium transition">Add Lot</a>
+                <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="text-sm bg-teal-700 hover:bg-teal-800 text-white px-3 py-1.5 rounded-lg font-medium transition">Add Lot</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -85,7 +85,7 @@
                                     {{ ucfirst($lot->status) }}
                                 </span>
                             </td>
-                            <td class="py-2.5"><a href="{{ route('agent.lots.edit', $lot) }}" class="text-amber-600 hover:underline text-xs">Edit</a></td>
+                            <td class="py-2.5"><a href="{{ route('agent.lots.edit', $lot) }}" class="text-teal-700 hover:underline text-xs">Edit</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="6" class="py-8 text-center text-stone-400">No lots added yet.</td></tr>
@@ -101,7 +101,7 @@
         <div class="bg-white rounded-xl border border-stone-200 p-4">
             <h3 class="text-sm font-semibold text-stone-700 mb-3">Quick Actions</h3>
             <div class="space-y-2">
-                <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="block text-center text-sm bg-amber-50 hover:bg-amber-100 text-amber-700 py-2 rounded-lg transition font-medium">+ Add Lot</a>
+                <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="block text-center text-sm bg-teal-50 hover:bg-teal-100 text-teal-800 py-2 rounded-lg transition font-medium">+ Add Lot</a>
                 <a href="{{ route('agent.properties.edit', $property) }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">Edit Property</a>
                 <a href="{{ route('agent.reservations.create') }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">+ New Reservation</a>
             </div>

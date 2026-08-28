@@ -19,7 +19,7 @@
     {{-- Profile Card --}}
     <div class="bg-white rounded-xl border border-stone-200 p-6">
         <div class="flex flex-col items-center text-center mb-6">
-            <div class="w-20 h-20 rounded-full overflow-hidden mb-3 bg-amber-600 flex items-center justify-center">
+            <div class="w-20 h-20 rounded-full overflow-hidden mb-3 bg-teal-700 flex items-center justify-center">
                 @if(auth()->user()->avatar)
                     <img src="{{ auth()->user()->avatar }}" class="w-full h-full object-cover">
                 @else
@@ -28,7 +28,7 @@
             </div>
             <h2 class="font-semibold text-stone-800">{{ auth()->user()->name }}</h2>
             <p class="text-sm text-stone-400">{{ auth()->user()->email }}</p>
-            <span class="mt-2 px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">{{ ucfirst(auth()->user()->role) }}</span>
+            <span class="mt-2 px-3 py-1 bg-teal-100 text-teal-800 text-xs rounded-full font-medium">{{ ucfirst(auth()->user()->role) }}</span>
         </div>
         <div class="space-y-2 text-sm text-stone-600">
             <div class="flex justify-between py-2 border-b border-stone-100">
@@ -48,22 +48,22 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Full Name</label>
-                        <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                     </div>
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Email</label>
-                        <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                     </div>
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Phone Number</label>
-                        <input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}" placeholder="+63 912 345 6789" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="text" name="phone" value="{{ old('phone', auth()->user()->phone) }}" placeholder="+63 912 345 6789" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                     </div>
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Profile Photo</label>
-                        <input type="file" name="avatar" accept="image/*" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                        <input type="file" name="avatar" accept="image/*" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                     </div>
                 </div>
-                <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Save Changes</button>
+                <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Save Changes</button>
             </form>
         </div>
 
@@ -74,15 +74,15 @@
                 @csrf
                 <div>
                     <label class="text-xs text-stone-500 mb-1 block">Current Password</label>
-                    <input type="password" name="current_password" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="password" name="current_password" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
                 <div>
                     <label class="text-xs text-stone-500 mb-1 block">New Password</label>
-                    <input type="password" name="password" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="password" name="password" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
                 <div>
                     <label class="text-xs text-stone-500 mb-1 block">Confirm New Password</label>
-                    <input type="password" name="password_confirmation" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <input type="password" name="password_confirmation" required class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
                 <button type="submit" class="bg-stone-800 hover:bg-stone-900 text-white px-5 py-2 rounded-lg text-sm font-medium transition">Update Password</button>
             </form>

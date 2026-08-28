@@ -2,9 +2,9 @@
 @section('title', 'Property Match')
 
 @section('content')
-<div class="bg-gradient-to-r from-stone-900 to-amber-900 text-white">
+<div class="bg-gradient-to-r from-[#112E3B] to-[#1A6B79] text-white">
     <div class="max-w-6xl mx-auto px-6 py-10">
-        <p class="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-1">EstateFlow AI</p>
+        <p class="text-teal-500 text-xs uppercase tracking-widest font-semibold mb-1">EstateFlow AI</p>
         <h1 class="text-2xl font-bold">Find Your Property Match</h1>
     </div>
 </div>
@@ -31,7 +31,7 @@
             <label class="text-xs text-stone-500 mb-1 block">Minimum Bedrooms</label>
             <input type="number" name="bedrooms" value="{{ $preferences['bedrooms'] ?? '' }}" min="0" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm" placeholder="2">
         </div>
-        <button type="submit" class="sm:col-span-2 lg:col-span-5 bg-amber-600 hover:bg-amber-700 text-white px-5 py-3 rounded-xl text-sm font-semibold">Find Matches</button>
+        <button type="submit" class="sm:col-span-2 lg:col-span-5 bg-teal-700 hover:bg-teal-800 text-white px-5 py-3 rounded-xl text-sm font-semibold">Find Matches</button>
     </form>
 
     @if($properties->isNotEmpty())
@@ -46,7 +46,7 @@
             <div class="p-5">
                 <p class="font-semibold text-stone-800">{{ $property->name }}</p>
                 <p class="text-xs text-stone-400 mt-1">{{ $property->type }} · {{ $property->city }}</p>
-                <p class="text-lg font-bold text-amber-600 mt-3">₱{{ number_format($property->price, 0) }}</p>
+                <p class="text-lg font-bold text-teal-700 mt-3">₱{{ number_format($property->price, 0) }}</p>
                 <p class="text-xs text-stone-400 mt-1">{{ $property->available_lots_count }} available lot(s)</p>
             </div>
         </a>

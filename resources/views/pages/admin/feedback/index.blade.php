@@ -9,7 +9,7 @@
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
     @foreach([
         ['Total Reviews','128','text-stone-800'],
-        ['Average Rating','4.8 ★','text-amber-600'],
+        ['Average Rating','4.8 ★','text-teal-700'],
         ['5-Star Reviews','78','text-green-600'],
         ['Flagged','2','text-red-500'],
     ] as $s)
@@ -40,14 +40,14 @@
         <div class="bg-white rounded-xl border {{ $rev[6]==='Flagged' ? 'border-red-200' : 'border-stone-200' }} p-5">
             <div class="flex items-start justify-between mb-3">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold text-sm shrink-0">
+                    <div class="w-9 h-9 bg-teal-100 rounded-full flex items-center justify-center text-teal-800 font-bold text-sm shrink-0">
                         {{ strtoupper(substr($rev[0],0,1)) }}
                     </div>
                     <div>
                         <p class="font-semibold text-stone-800 text-sm">{{ $rev[0] }}</p>
                         <div class="flex items-center gap-1 mt-0.5">
                             @for($s=1;$s<=5;$s++)
-                            <svg class="w-3 h-3 {{ $s<=(int)$rev[1] ? 'text-amber-400' : 'text-stone-200' }}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-3 h-3 {{ $s<=(int)$rev[1] ? 'text-teal-500' : 'text-stone-200' }}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                             @endfor
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                     <button class="text-green-600 hover:underline font-medium">Restore</button>
                     <button class="text-red-500 hover:underline font-medium">Delete</button>
                     @else
-                    <button class="text-amber-600 hover:underline">Flag</button>
+                    <button class="text-teal-700 hover:underline">Flag</button>
                     <button class="text-red-500 hover:underline">Delete</button>
                     @endif
                 </div>
@@ -79,10 +79,10 @@
         <div class="bg-white rounded-xl border border-stone-200 p-5">
             <h3 class="font-semibold text-stone-800 mb-4">Rating Breakdown</h3>
             <div class="text-center mb-4">
-                <p class="text-5xl font-bold text-amber-500">4.8</p>
+                <p class="text-5xl font-bold text-teal-600">4.8</p>
                 <div class="flex justify-center gap-1 my-2">
                     @for($s=1;$s<=5;$s++)
-                    <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-5 h-5 text-teal-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     @endfor
                 </div>
                 <p class="text-xs text-stone-400">128 total reviews</p>
@@ -91,9 +91,9 @@
                 @foreach([[5,78],[4,32],[3,12],[2,4],[1,2]] as $bar)
                 <div class="flex items-center gap-2 text-xs">
                     <span class="text-stone-500 w-3">{{ $bar[0] }}</span>
-                    <svg class="w-3 h-3 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg class="w-3 h-3 text-teal-500 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                     <div class="flex-1 bg-stone-100 rounded-full h-2 overflow-hidden">
-                        <div class="bg-amber-400 h-2 rounded-full" style="width: {{ round($bar[1]/128*100) }}%"></div>
+                        <div class="bg-teal-500 h-2 rounded-full" style="width: {{ round($bar[1]/128*100) }}%"></div>
                     </div>
                     <span class="text-stone-400 w-5 text-right">{{ $bar[1] }}</span>
                 </div>
@@ -115,7 +115,7 @@
                         <p class="text-sm font-medium text-stone-700">{{ $b[0] }}</p>
                         <p class="text-xs text-stone-400">{{ $b[2] }}</p>
                     </div>
-                    <span class="text-sm font-bold text-amber-600">{{ $b[1] }} ★</span>
+                    <span class="text-sm font-bold text-teal-700">{{ $b[1] }} ★</span>
                 </div>
                 @endforeach
             </div>

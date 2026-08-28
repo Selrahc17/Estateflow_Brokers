@@ -45,7 +45,7 @@
             <tr class="hover:bg-stone-50 transition">
                 <td class="px-5 py-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 {{ $user->role === 'agent' ? 'bg-amber-100 text-amber-700' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} rounded-full flex items-center justify-center text-xs font-bold shrink-0">
+                        <div class="w-8 h-8 {{ $user->role === 'agent' ? 'bg-teal-100 text-teal-800' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }} rounded-full flex items-center justify-center text-xs font-bold shrink-0">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
                         <div>
@@ -64,7 +64,7 @@
                     </div>
                 </td>
                 <td class="px-5 py-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ $user->role === 'agent' ? 'bg-amber-100 text-amber-700' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium {{ $user->role === 'agent' ? 'bg-teal-100 text-teal-800' : ($user->role === 'admin' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700') }}">
                         {{ ucfirst($user->role) }}
                     </span>
                 </td>
@@ -72,7 +72,7 @@
                 <td class="px-5 py-3 text-stone-400 text-xs">{{ $user->created_at->format('M d, Y') }}</td>
                 <td class="px-5 py-3">
                     <div class="flex gap-3 flex-wrap">
-                        <a href="{{ route('admin.users.edit', $user) }}" class="text-xs text-amber-600 hover:underline">Edit</a>
+                        <a href="{{ route('admin.users.edit', $user) }}" class="text-xs text-teal-700 hover:underline">Edit</a>
                         @if($user->id !== auth()->id())
                         <form action="{{ route('admin.users.toggle-status', $user) }}" method="POST">
                             @csrf

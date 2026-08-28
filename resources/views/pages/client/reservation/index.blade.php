@@ -3,9 +3,9 @@
 
 @section('content')
 
-<div class="bg-gradient-to-r from-stone-900 to-amber-900 text-white">
+<div class="bg-gradient-to-r from-[#112E3B] to-[#1A6B79] text-white">
     <div class="max-w-6xl mx-auto px-6 py-10">
-        <p class="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-1">My Reservations</p>
+        <p class="text-teal-500 text-xs uppercase tracking-widest font-semibold mb-1">My Reservations</p>
         <h1 class="text-2xl font-bold">Reservation History</h1>
     </div>
 </div>
@@ -41,7 +41,7 @@
     <div class="bg-white rounded-2xl border border-stone-200 py-16 text-center">
         <svg class="w-16 h-16 text-stone-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
         <p class="text-stone-400 font-medium">No reservations yet.</p>
-        <a href="{{ route('client.properties') }}" class="mt-3 inline-block bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition">Browse Properties</a>
+        <a href="{{ route('client.properties') }}" class="mt-3 inline-block bg-teal-700 hover:bg-teal-800 text-white px-5 py-2 rounded-xl text-sm font-medium transition">Browse Properties</a>
     </div>
     @endforelse
 

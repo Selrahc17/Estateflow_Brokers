@@ -20,7 +20,7 @@
         <div class="max-h-[520px] overflow-y-auto p-2">
             @forelse($contacts as $contact)
             <a href="{{ route($indexRoute, ['contact' => $contact->id]) }}" class="flex items-center gap-3 rounded-lg px-3 py-3 transition {{ $selectedContactId === $contact->id ? 'bg-red-50 text-red-700' : 'text-stone-700 hover:bg-white' }}">
-                <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-amber-100 text-center text-sm font-bold leading-9 text-amber-700">
+                <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-teal-100 text-center text-sm font-bold leading-9 text-teal-800">
                     @if($contact->avatar)
                         <img src="{{ $contact->avatar }}" alt="{{ $contact->name }} profile picture" class="h-full w-full object-cover">
                     @else
@@ -41,7 +41,7 @@
     <section class="flex min-h-[620px] flex-col">
         @if($selectedContact)
         <header class="flex items-center gap-3 border-b border-stone-200 px-5 py-4">
-            <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-amber-100 text-center text-sm font-bold leading-9 text-amber-700">
+            <div class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-teal-100 text-center text-sm font-bold leading-9 text-teal-800">
                 @if($selectedContact->avatar)
                     <img src="{{ $selectedContact->avatar }}" alt="{{ $selectedContact->name }} profile picture" class="h-full w-full object-cover">
                 @else

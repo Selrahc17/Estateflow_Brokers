@@ -93,7 +93,9 @@ class PropertyController extends Controller
             $file = $request->file('featured_image');
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             \Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-            $data['featured_image'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
+            $data['featured_image'] = config('filesystems.disks.supabase.endpoint')
+                ? rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/') . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename
+                : null;
         }
 
         if ($request->hasFile('images')) {
@@ -102,7 +104,7 @@ class PropertyController extends Controller
             foreach ($request->file('images') as $img) {
                 $filename = uniqid() . '.' . $img->getClientOriginalExtension();
                 \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
-                $urls[] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
+                $urls[] = rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/') . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
             }
             $data['images'] = $urls;
         }
@@ -156,16 +158,18 @@ class PropertyController extends Controller
             $file = $request->file('featured_image');
             $filename = uniqid() . '.' . $file->getClientOriginalExtension();
             \Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-            $data['featured_image'] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
+            $baseUrl = rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/');
+            $data['featured_image'] = $baseUrl . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
         }
 
         if ($request->hasFile('images')) {
             $request->validate(['images.*' => 'image|max:4096']);
+            $baseUrl = rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/');
             $urls = [];
             foreach ($request->file('images') as $img) {
                 $filename = uniqid() . '.' . $img->getClientOriginalExtension();
                 \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
-                $urls[] = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
+                $urls[] = $baseUrl . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
             }
             $data['images'] = $urls;
         }

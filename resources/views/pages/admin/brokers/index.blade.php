@@ -24,7 +24,7 @@
     @forelse($brokers as $broker)
     <div class="bg-white rounded-xl border border-stone-200 p-5 hover:shadow-md transition">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 overflow-hidden bg-amber-100 rounded-xl flex items-center justify-center text-amber-700 font-bold text-lg shrink-0">
+            <div class="w-12 h-12 overflow-hidden bg-teal-100 rounded-xl flex items-center justify-center text-teal-800 font-bold text-lg shrink-0">
                 @if($broker->avatar)
                     <img src="{{ str_starts_with($broker->avatar, 'http') ? $broker->avatar : asset('storage/' . $broker->avatar) }}" alt="{{ $broker->name }} profile picture" class="w-full h-full object-cover">
                 @else
@@ -46,7 +46,7 @@
         </div>
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('admin.brokers.show', $broker) }}" class="flex-1 text-center border border-stone-200 hover:bg-stone-50 text-stone-600 py-2 rounded-lg text-xs font-medium transition">View Profile</a>
-            <a href="{{ route('admin.users.edit', $broker) }}" class="flex-1 text-center border border-amber-200 hover:bg-amber-50 text-amber-600 py-2 rounded-lg text-xs font-medium transition">Edit</a>
+            <a href="{{ route('admin.users.edit', $broker) }}" class="flex-1 text-center border border-teal-200 hover:bg-teal-50 text-teal-700 py-2 rounded-lg text-xs font-medium transition">Edit</a>
             @if(!$broker->is_approved)
             <form action="{{ route('admin.brokers.approve', $broker) }}" method="POST">
                 @csrf

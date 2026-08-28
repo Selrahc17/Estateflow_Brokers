@@ -6,7 +6,7 @@
     {{-- Header --}}
     <div class="flex items-center justify-between mb-8">
         <div>
-            <a href="{{ route('agent.inquiries.index') }}" class="text-amber-600 hover:text-amber-700 text-sm font-medium mb-2 inline-flex items-center gap-1">
+            <a href="{{ route('agent.inquiries.index') }}" class="text-teal-700 hover:text-teal-800 text-sm font-medium mb-2 inline-flex items-center gap-1">
                 ← Back to Inquiries
             </a>
             <h1 class="text-3xl font-bold text-stone-800">Inquiry from {{ $inquiry->user?->name ?? 'Guest' }}</h1>
@@ -17,7 +17,7 @@
                 @method('PATCH')
                 <div class="flex gap-2">
                     <select name="status" onchange="this.form.submit()" 
-                            class="px-3 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-400 font-medium">
+                            class="px-3 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-400 font-medium">
                         @php
                             $statuses = ['new' => 'New', 'contacted' => 'Contacted', 'site_visit_scheduled' => 'Site Visit Scheduled', 'negotiating' => 'Negotiating', 'closed' => 'Closed', 'lost' => 'Lost'];
                         @endphp
@@ -46,13 +46,13 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase">Email</p>
-                            <a href="mailto:{{ $inquiry->email }}" class="text-amber-600 hover:text-amber-700 font-medium mt-1">
+                            <a href="mailto:{{ $inquiry->email }}" class="text-teal-700 hover:text-teal-800 font-medium mt-1">
                                 {{ $inquiry->email }}
                             </a>
                         </div>
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase">Phone</p>
-                            <a href="tel:{{ $inquiry->phone }}" class="text-amber-600 hover:text-amber-700 font-medium mt-1">
+                            <a href="tel:{{ $inquiry->phone }}" class="text-teal-700 hover:text-teal-800 font-medium mt-1">
                                 {{ $inquiry->phone }}
                             </a>
                         </div>
@@ -66,7 +66,7 @@
                 <div class="space-y-4">
                     <div>
                         <p class="text-xs text-stone-400 font-semibold uppercase">Property Name</p>
-                        <a href="{{ route('agent.properties.show', $inquiry->property->id) }}" class="text-amber-600 hover:text-amber-700 font-semibold text-lg mt-1">
+                        <a href="{{ route('agent.properties.show', $inquiry->property->id) }}" class="text-teal-700 hover:text-teal-800 font-semibold text-lg mt-1">
                             {{ $inquiry->property->name }}
                         </a>
                     </div>
@@ -83,7 +83,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase">Price</p>
-                            <p class="text-lg font-bold text-amber-600 mt-1">₱{{ number_format($inquiry->property->price, 0) }}</p>
+                            <p class="text-lg font-bold text-teal-700 mt-1">₱{{ number_format($inquiry->property->price, 0) }}</p>
                         </div>
                         @if($inquiry->lot)
                         <div>
@@ -107,11 +107,11 @@
             {{-- Quick Actions --}}
             <div class="grid grid-cols-2 gap-4">
                 <a href="mailto:{{ $inquiry->email }}?subject=Re:%20Inquiry%20for%20{{ urlencode($inquiry->property->name) }}" 
-                   class="bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-semibold text-center transition">
+                   class="bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-lg font-semibold text-center transition">
                     Send Email Reply
                 </a>
                 <a href="tel:{{ $inquiry->phone }}"
-                   class="border border-amber-600 text-amber-600 hover:bg-amber-50 py-3 rounded-lg font-semibold text-center transition">
+                   class="border border-teal-700 text-teal-700 hover:bg-teal-50 py-3 rounded-lg font-semibold text-center transition">
                     Call Buyer
                 </a>
             </div>
@@ -164,9 +164,9 @@
             </div>
 
             {{-- Next Steps --}}
-            <div class="bg-amber-50 rounded-lg border border-amber-200 p-4">
-                <p class="text-xs font-semibold text-amber-900 uppercase mb-3">💡 Suggested Next Steps</p>
-                <ul class="text-xs text-amber-900 space-y-2">
+            <div class="bg-teal-50 rounded-lg border border-teal-200 p-4">
+                <p class="text-xs font-semibold text-teal-900 uppercase mb-3">💡 Suggested Next Steps</p>
+                <ul class="text-xs text-teal-900 space-y-2">
                     <li class="flex gap-2">
                         <span class="font-bold">1.</span>
                         <span>Contact the buyer to confirm interest</span>
@@ -190,15 +190,15 @@
             <div class="bg-white rounded-lg border border-stone-200 p-4 space-y-2">
                 <p class="text-xs font-semibold text-stone-500 uppercase mb-3">Contact Options</p>
                 <a href="mailto:{{ $inquiry->email }}" class="flex items-center gap-2 p-2 hover:bg-stone-50 rounded transition text-sm">
-                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                     <span>Send Email</span>
                 </a>
                 <a href="tel:{{ $inquiry->phone }}" class="flex items-center gap-2 p-2 hover:bg-stone-50 rounded transition text-sm">
-                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                    <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                     <span>Call Buyer</span>
                 </a>
                 <a href="{{ route('client.account.chat') }}" class="flex items-center gap-2 p-2 hover:bg-stone-50 rounded transition text-sm">
-                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                     <span>Send Message</span>
                 </a>
             </div>

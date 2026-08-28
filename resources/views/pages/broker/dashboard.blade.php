@@ -8,7 +8,7 @@
     @foreach([
         ['Total Agents', $stats['total_agents'], 'bg-blue-50', 'text-blue-600'],
         ['Active Agents', $stats['active_agents'], 'bg-green-50', 'text-green-600'],
-        ['Pending Approval', $stats['pending_agents'], 'bg-amber-50', 'text-amber-600'],
+        ['Pending Approval', $stats['pending_agents'], 'bg-teal-50', 'text-teal-700'],
         ['Sales This Month', $stats['sales_this_month'], 'bg-red-50', 'text-red-600'],
         ['Leads This Month', $stats['leads_this_month'], 'bg-indigo-50', 'text-indigo-600'],
     ] as $stat)
@@ -35,7 +35,7 @@
             <div class="flex items-center gap-3 text-xs text-stone-500 mr-3">
                 <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-red-500"></span>Sales</span>
                 <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-blue-500"></span>Leads</span>
-                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-amber-500"></span>Viewings</span>
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-teal-600"></span>Viewings</span>
             </div>
             <div class="flex items-center gap-1">
                 <button onclick="setChartType('bar')" id="btn-bar" class="chart-type-btn px-3 py-1 rounded-lg text-xs font-medium bg-red-600 text-white transition">Bar</button>
@@ -177,7 +177,7 @@ function showMonth(index) {
             </div>
             <div class="flex items-center justify-between border-b border-stone-100 pb-3">
                 <span class="text-sm text-stone-600">Pending approval</span>
-                <span class="text-sm font-semibold text-amber-600">{{ $stats['pending_agents'] }}</span>
+                <span class="text-sm font-semibold text-teal-700">{{ $stats['pending_agents'] }}</span>
             </div>
             <div class="flex items-center justify-between">
                 <span class="text-sm text-stone-600">Assigned total</span>

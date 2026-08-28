@@ -42,12 +42,12 @@
             <form action="{{ route('agent.reservations.status', $reservation) }}" method="POST" class="flex gap-2">
                 @csrf
                 @method('PATCH')
-                <select name="status" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
+                <select name="status" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                     @foreach(['pending', 'confirmed', 'cancelled', 'completed'] as $s)
                     <option value="{{ $s }}" {{ $reservation->status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
                     @endforeach
                 </select>
-                <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Update</button>
+                <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Update</button>
             </form>
         </div>
     </div>

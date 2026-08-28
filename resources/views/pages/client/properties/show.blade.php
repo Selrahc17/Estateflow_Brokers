@@ -7,7 +7,7 @@
 
     {{-- Breadcrumb --}}
     <div class="flex items-center gap-2 text-xs text-stone-400 mb-6">
-        <a href="{{ route('client.properties') }}" class="hover:text-amber-600 transition">Properties</a>
+        <a href="{{ route('client.properties') }}" class="hover:text-teal-700 transition">Properties</a>
         <span>/</span>
         <span class="text-stone-600">{{ $property->name }}</span>
     </div>
@@ -37,7 +37,7 @@
                     @endforeach
                     {{-- Badges --}}
                     <div class="absolute top-4 left-4 flex gap-2">
-                        <span class="{{ $property->status === 'sold' ? 'bg-red-500' : ($property->status === 'coming_soon' ? 'bg-blue-500' : 'bg-amber-500') }} text-white text-xs font-semibold px-3 py-1 rounded-full">
+                        <span class="{{ $property->status === 'sold' ? 'bg-red-500' : ($property->status === 'coming_soon' ? 'bg-blue-500' : 'bg-teal-600') }} text-white text-xs font-semibold px-3 py-1 rounded-full">
                             {{ ucfirst(str_replace('_', ' ', $property->status)) }}
                         </span>
                         <span class="bg-white/90 text-stone-700 text-xs font-medium px-3 py-1 rounded-full">{{ $property->type }}</span>
@@ -48,7 +48,7 @@
                 <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
                     @foreach($imgs as $i => $img)
                     <button @click="activeImg = {{ $i }}"
-                            :class="activeImg === {{ $i }} ? 'ring-2 ring-amber-500' : 'opacity-60 hover:opacity-100'"
+                            :class="activeImg === {{ $i }} ? 'ring-2 ring-teal-500' : 'opacity-60 hover:opacity-100'"
                             class="w-20 h-14 rounded-lg overflow-hidden shrink-0 transition">
                         <img src="{{ $img }}" class="w-full h-full object-cover">
                     </button>
@@ -69,7 +69,7 @@
                     </div>
                     <div class="text-right">
                         <p class="text-xs text-stone-400">Starting at</p>
-                        <p class="text-2xl font-bold text-amber-600">{{ $property->price ? '₱' . number_format($property->price, 0) : 'Price on request' }}</p>
+                        <p class="text-2xl font-bold text-teal-700">{{ $property->price ? '₱' . number_format($property->price, 0) : 'Price on request' }}</p>
                     </div>
                 </div>
 
@@ -88,8 +88,8 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         @if($property->bedrooms)
                         <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-stone-400">Bedrooms</p>
@@ -99,8 +99,8 @@
                         @endif
                         @if($property->bathrooms)
                         <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m0 4a2 2 0 100 4m0-4a2 2 0 110 4m-6 4h16M4 15v4a1 1 0 001 1h14a1 1 0 001-1v-4"/></svg>
+                            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m0 4a2 2 0 100 4m0-4a2 2 0 110 4m-6 4h16M4 15v4a1 1 0 001 1h14a1 1 0 001-1v-4"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-stone-400">Bathrooms</p>
@@ -110,8 +110,8 @@
                         @endif
                         @if($property->floor_area)
                         <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-stone-400">Floor Area</p>
@@ -121,8 +121,8 @@
                         @endif
                         @if($property->lot_area)
                         <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-stone-400">Lot Area</p>
@@ -132,8 +132,8 @@
                         @endif
                         @if($property->stories)
                         <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-stone-400">Stories</p>
@@ -143,8 +143,8 @@
                         @endif
                         @if($property->parking_slots)
                         <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3m0 0h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-5a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11a2 2 0 012 2v3m0 0h2a2 2 0 012 2v6a2 2 0 01-2 2h-2m-4-5a2 2 0 100 4 2 2 0 000-4zm6 0a2 2 0 100 4 2 2 0 000-4z"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-stone-400">Parking</p>
@@ -154,8 +154,8 @@
                         @endif
                         @if($property->frontage)
                         <div class="bg-stone-50 rounded-xl p-3 flex items-center gap-3">
-                            <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
+                            <div class="w-9 h-9 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-stone-400">Frontage</p>
@@ -174,7 +174,7 @@
                     <h3 class="font-semibold text-stone-800">Location & Map</h3>
                     @if($property->latitude && $property->longitude)
                     <a href="https://www.google.com/maps?q={{ $property->latitude }},{{ $property->longitude }}" target="_blank"
-                        class="text-xs text-amber-600 hover:underline flex items-center gap-1">
+                        class="text-xs text-teal-700 hover:underline flex items-center gap-1">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                         Open in Google Maps
                     </a>
@@ -184,7 +184,7 @@
                 {{-- Address Info --}}
                 <div class="px-6 py-3 bg-stone-50 border-b border-stone-100 flex flex-wrap gap-4 text-sm">
                     <span class="flex items-center gap-1.5 text-stone-600">
-                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <svg class="w-4 h-4 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         {{ implode(', ', array_filter([$property->address, $property->city, $property->province])) ?: 'Location TBA' }}
                     </span>
                     @if($property->latitude && $property->longitude)
@@ -204,7 +204,7 @@
             <div class="bg-white rounded-2xl border border-stone-200 p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-semibold text-stone-800">More Properties</h3>
-                    <a href="{{ route('client.properties') }}" class="text-sm text-amber-600 hover:underline">Browse all</a>
+                    <a href="{{ route('client.properties') }}" class="text-sm text-teal-700 hover:underline">Browse all</a>
                 </div>
 
                 @if($relatedProperties->isNotEmpty())
@@ -225,14 +225,14 @@
                     <h3 class="font-semibold text-stone-800">Lot Availability</h3>
                     <div class="flex items-center gap-3 text-xs">
                         <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-400 rounded inline-block"></span> Available</span>
-                        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-amber-400 rounded inline-block"></span> Reserved</span>
+                        <span class="flex items-center gap-1"><span class="w-3 h-3 bg-teal-500 rounded inline-block"></span> Reserved</span>
                         <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 rounded inline-block"></span> Sold</span>
                     </div>
                 </div>
                 <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
                     @foreach($property->lots as $lot)
                     <div class="relative group">
-                        <div class="w-full aspect-square {{ $lot->status === 'available' ? 'bg-green-400 hover:bg-green-500 cursor-pointer' : ($lot->status === 'reserved' ? 'bg-amber-400' : 'bg-red-400 opacity-60') }} rounded-lg flex items-center justify-center text-white text-xs font-bold transition">
+                        <div class="w-full aspect-square {{ $lot->status === 'available' ? 'bg-green-400 hover:bg-green-500 cursor-pointer' : ($lot->status === 'reserved' ? 'bg-teal-500' : 'bg-red-400 opacity-60') }} rounded-lg flex items-center justify-center text-white text-xs font-bold transition">
                             {{ $lot->lot_number }}
                         </div>
                         @if($lot->status === 'available')
@@ -242,7 +242,7 @@
                         @auth
                         <form action="{{ route('client.account.reservation.store', $lot) }}" method="POST" class="mt-2">
                             @csrf
-                            <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-lg px-2 py-1.5 transition">Request</button>
+                            <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold rounded-lg px-2 py-1.5 transition">Request</button>
                         </form>
                         @endauth
                         @endif
@@ -271,20 +271,20 @@
                     </div>
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Email *</label>
-                        <input type="email" name="email" placeholder="juan@email.com" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 @error('email') ring-2 ring-red-400 @enderror">
+                        <input type="email" name="email" placeholder="juan@email.com" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('email') ring-2 ring-red-400 @enderror">
                         @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Phone *</label>
-                        <input type="text" name="phone" placeholder="+63 912 345 6789" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 @error('phone') ring-2 ring-red-400 @enderror">
+                        <input type="text" name="phone" placeholder="+63 912 345 6789" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('phone') ring-2 ring-red-400 @enderror">
                         @error('phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Message *</label>
-                        <textarea name="message" rows="3" placeholder="I'm interested in this property..." required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none @error('message') ring-2 ring-red-400 @enderror"></textarea>
+                        <textarea name="message" rows="3" placeholder="I'm interested in this property..." required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none @error('message') ring-2 ring-red-400 @enderror"></textarea>
                         @error('message') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl text-sm font-semibold transition">
+                    <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl text-sm font-semibold transition">
                         Send Inquiry
                     </button>
                 </form>
@@ -294,7 +294,7 @@
                         @endphp
                         <form action="{{ route('client.account.favorites.toggle', $property->id) }}" method="POST" class="flex-1">
                             @csrf
-                            <button type="submit" class="w-full border {{ $isFavorited ? 'border-amber-600 bg-amber-50' : 'border-stone-200 hover:bg-stone-50' }} {{ $isFavorited ? 'text-amber-600' : 'text-stone-600' }} py-2 rounded-xl text-sm font-medium transition">
+                            <button type="submit" class="w-full border {{ $isFavorited ? 'border-teal-700 bg-teal-50' : 'border-stone-200 hover:bg-stone-50' }} {{ $isFavorited ? 'text-teal-700' : 'text-stone-600' }} py-2 rounded-xl text-sm font-medium transition">
                                 {{ $isFavorited ? '❤️ Saved' : '🤍 Save' }}
                             </button>
                         </form>
@@ -302,19 +302,19 @@
                 <form action="{{ route('client.account.site-visits.store', $property) }}" method="POST" class="space-y-3 mt-4 pt-4 border-t border-stone-100">
                     @csrf
                     <p class="text-sm font-semibold text-stone-700">Request a site visit</p>
-                    <input type="datetime-local" name="scheduled_at" required min="{{ now()->format('Y-m-d\\TH:i') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    <textarea name="notes" rows="2" placeholder="Optional note for the broker" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 resize-none"></textarea>
-                    <button type="submit" class="w-full border border-amber-600 text-amber-700 hover:bg-amber-50 py-2.5 rounded-xl text-sm font-semibold transition">Request Site Visit</button>
+                    <input type="datetime-local" name="scheduled_at" required min="{{ now()->format('Y-m-d\\TH:i') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    <textarea name="notes" rows="2" placeholder="Optional note for the broker" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"></textarea>
+                    <button type="submit" class="w-full border border-teal-700 text-teal-800 hover:bg-teal-50 py-2.5 rounded-xl text-sm font-semibold transition">Request Site Visit</button>
                 </form>
                 @else
                 <div class="space-y-3">
-                    <div class="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                        <p class="text-xs text-amber-800">Please log in to send an inquiry</p>
+                    <div class="p-3 bg-teal-50 rounded-lg border border-teal-200">
+                        <p class="text-xs text-teal-800">Please log in to send an inquiry</p>
                     </div>
-                    <a href="{{ route('auth.login') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl text-sm font-semibold transition">
+                    <a href="{{ route('auth.login') }}" class="block w-full text-center bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl text-sm font-semibold transition">
                         Login to Inquire
                     </a>
-                    <a href="{{ route('auth.register') }}" class="block w-full text-center border border-amber-600 text-amber-600 hover:bg-amber-50 py-3 rounded-xl text-sm font-semibold transition">
+                    <a href="{{ route('auth.register') }}" class="block w-full text-center border border-teal-700 text-teal-700 hover:bg-teal-50 py-3 rounded-xl text-sm font-semibold transition">
                         Create Account
                     </a>
                 </div>
@@ -325,7 +325,7 @@
             <div class="bg-white rounded-2xl border border-stone-200 p-5">
                 <h3 class="font-semibold text-stone-800 mb-4">Listed by</h3>
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-14 h-14 rounded-full overflow-hidden bg-amber-600 flex items-center justify-center shrink-0">
+                    <div class="w-14 h-14 rounded-full overflow-hidden bg-teal-700 flex items-center justify-center shrink-0">
                         @if($property->broker->avatar)
                             <img src="{{ $property->broker->avatar }}" class="w-full h-full object-cover">
                         @else
@@ -334,19 +334,19 @@
                     </div>
                     <div>
                         <p class="font-semibold text-stone-800">{{ $property->broker->name }}</p>
-                        <p class="text-xs text-amber-600 font-medium">Licensed Real Estate Broker</p>
+                        <p class="text-xs text-teal-700 font-medium">Trusted Agent</p>
                     </div>
                 </div>
                 @auth
                 <div class="space-y-2 mb-4">
-                    <a href="mailto:{{ $property->broker->email }}" class="flex items-center gap-2.5 text-sm text-stone-600 hover:text-amber-600 transition">
+                    <a href="mailto:{{ $property->broker->email }}" class="flex items-center gap-2.5 text-sm text-stone-600 hover:text-teal-700 transition">
                         <span class="w-7 h-7 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
                             <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </span>
                         <span class="truncate">{{ $property->broker->email }}</span>
                     </a>
                     @if($property->broker->phone)
-                    <a href="tel:{{ $property->broker->phone }}" class="flex items-center gap-2.5 text-sm text-stone-600 hover:text-amber-600 transition">
+                    <a href="tel:{{ $property->broker->phone }}" class="flex items-center gap-2.5 text-sm text-stone-600 hover:text-teal-700 transition">
                         <span class="w-7 h-7 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
                             <svg class="w-3.5 h-3.5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                         </span>
@@ -354,7 +354,7 @@
                     </a>
                     @endif
                 </div>
-                <a href="mailto:{{ $property->broker->email }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl text-sm font-medium transition">
+                <a href="mailto:{{ $property->broker->email }}" class="block w-full text-center bg-teal-700 hover:bg-teal-800 text-white py-2.5 rounded-xl text-sm font-medium transition">
                     Contact Broker
                 </a>
                 @else
@@ -379,20 +379,20 @@
                     </div>
                     @endif
                 </div>
-                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl mb-3">
-                    <p class="text-xs text-amber-800 text-center">🔒 Log in to see full contact details</p>
+                <div class="p-3 bg-teal-50 border border-teal-200 rounded-xl mb-3">
+                    <p class="text-xs text-teal-800 text-center">🔒 Log in to see full contact details</p>
                 </div>
-                <a href="{{ route('auth.login') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 text-white py-2.5 rounded-xl text-sm font-medium transition">
-                    Login to Contact Broker
+                <a href="{{ route('auth.login') }}" class="block w-full text-center bg-teal-700 hover:bg-teal-800 text-white py-2.5 rounded-xl text-sm font-medium transition">
+                    Login to Contact Agent
                 </a>
                 @endauth
             </div>
 
             {{-- AI Assistant CTA --}}
-            <div class="bg-gradient-to-br from-stone-800 to-amber-900 rounded-2xl p-5 text-white">
+            <div class="bg-gradient-to-br from-[#112E3B] to-[#1A6B79] rounded-2xl p-5 text-white">
                 <p class="font-semibold mb-1">Have questions?</p>
                 <p class="text-stone-300 text-xs mb-3">Our AI Assistant can answer your inquiries instantly.</p>
-                <a href="{{ route('client.account.chat') }}" class="block w-full text-center bg-amber-600 hover:bg-amber-700 py-2.5 rounded-xl text-sm font-medium transition">
+                <a href="{{ route('client.account.chat') }}" class="block w-full text-center bg-teal-700 hover:bg-teal-800 py-2.5 rounded-xl text-sm font-medium transition">
                     Ask AI Assistant
                 </a>
             </div>

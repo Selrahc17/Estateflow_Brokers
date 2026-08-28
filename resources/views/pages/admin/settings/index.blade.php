@@ -28,6 +28,129 @@
     {{-- Right: Settings Content --}}
     <div class="xl:col-span-2 space-y-5" x-data="{ tab: 'general' }">
 
+        {{-- Admin Profile Settings --}}
+        <div class="bg-white rounded-2xl border border-stone-200 p-6">
+            <h2 class="font-semibold text-stone-800 mb-5 flex items-center gap-2">
+                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Admin Profile
+            </h2>
+            <form action="{{ route('admin.settings.profile') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                <div class="flex items-center gap-4">
+                    <div class="w-16 h-16 rounded-full overflow-hidden bg-teal-700 flex items-center justify-center shrink-0">
+                        @if(auth()->user()->avatar)
+                            <img src="{{ auth()->user()->avatar }}" class="w-full h-full object-cover">
+                        @else
+                            <span class="text-white text-2xl font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</span>
+                        @endif
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Profile Photo</label>
+                        <input type="file" name="avatar" accept="image/*" class="w-full text-sm text-stone-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Full Name</label>
+                        <input type="text" name="name" value="{{ auth()->user()->name }}" required class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('name') ring-2 ring-red-400 @enderror">
+                        @error('name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Email</label>
+                        <input type="email" name="email" value="{{ auth()->user()->email }}" required class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('email') ring-2 ring-red-400 @enderror">
+                        @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Phone</label>
+                        <input type="text" name="phone" value="{{ auth()->user()->phone }}" class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    </div>
+                </div>
+                <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition">Save Profile</button>
+            </form>
+        </div>
+
+        {{-- Change Password --}}
+        <div class="bg-white rounded-2xl border border-stone-200 p-6">
+            <h2 class="font-semibold text-stone-800 mb-5 flex items-center gap-2">
+                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Change Password
+            </h2>
+            <form action="{{ route('admin.settings.password') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Current Password</label>
+                    <input type="password" name="current_password" required class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('current_password') ring-2 ring-red-400 @enderror">
+                    @error('current_password') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">New Password</label>
+                        <input type="password" name="password" required class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('password') ring-2 ring-red-400 @enderror">
+                        @error('password') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Confirm Password</label>
+                        <input type="password" name="password_confirmation" required class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    </div>
+                </div>
+                <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition">Update Password</button>
+            </form>
+        </div>
+
+        {{-- Logo Upload --}}
+        <div class="bg-white rounded-2xl border border-stone-200 p-6">
+            <h2 class="font-semibold text-stone-800 mb-5 flex items-center gap-2">
+                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                System Logo
+            </h2>
+            <div class="flex items-center gap-5 mb-5">
+@php $currentLogo = \App\Models\Setting::get('logo_url'); @endphp
+                <div class="w-16 h-16 rounded-xl bg-teal-700 flex items-center justify-center overflow-hidden shrink-0">
+                    @if($currentLogo)
+                        <img src="{{ $currentLogo }}" class="w-full h-full object-cover">
+                    @else
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    @endif
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-stone-700">Current Logo</p>
+                    <p class="text-xs text-stone-400 mt-0.5">Appears on all sidebars and the public navbar. Recommended: square image, at least 128×128px.</p>
+                </div>
+            </div>
+            <form action="{{ route('admin.settings.logo') }}" method="POST" enctype="multipart/form-data" class="flex items-center gap-3">
+                @csrf
+                <input type="file" name="logo" accept="image/*" required class="flex-1 text-sm text-stone-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shrink-0">Upload</button>
+            </form>
+        </div>
+
+        {{-- Chatbot Logo --}}
+        <div class="bg-white rounded-2xl border border-stone-200 p-6">
+            <h2 class="font-semibold text-stone-800 mb-5 flex items-center gap-2">
+                <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+                AI Chatbot Logo
+            </h2>
+            @php $currentChatbotLogo = \App\Models\Setting::get('chatbot_logo'); @endphp
+            <div class="flex items-center gap-5 mb-5">
+                <div class="w-16 h-16 rounded-xl bg-teal-500 flex items-center justify-center overflow-hidden shrink-0">
+                    @if($currentChatbotLogo)
+                        <img src="{{ $currentChatbotLogo }}" class="w-full h-full object-cover">
+                    @else
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
+                    @endif
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-stone-700">Current Chatbot Logo</p>
+                    <p class="text-xs text-stone-400 mt-0.5">Appears in the floating chatbot widget header and message bubbles on the public site.</p>
+                </div>
+            </div>
+            <form action="{{ route('admin.settings.chatbot-logo') }}" method="POST" enctype="multipart/form-data" class="flex items-center gap-3">
+                @csrf
+                <input type="file" name="chatbot_logo" accept="image/*" required class="flex-1 text-sm text-stone-500 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shrink-0">Upload</button>
+            </form>
+        </div>
+
         {{-- General Settings --}}
         <div class="bg-white rounded-2xl border border-stone-200 p-6">
             <h2 class="font-semibold text-stone-800 mb-5 flex items-center gap-2">

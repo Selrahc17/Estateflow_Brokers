@@ -3,9 +3,9 @@
 
 @section('content')
 
-<div class="bg-gradient-to-r from-stone-900 to-amber-900 text-white">
+<div class="bg-gradient-to-r from-[#112E3B] to-[#1A6B79] text-white">
     <div class="max-w-4xl mx-auto px-6 py-12">
-        <p class="text-amber-400 text-xs uppercase tracking-widest font-semibold mb-2">Legal</p>
+        <p class="text-teal-500 text-xs uppercase tracking-widest font-semibold mb-2">Legal</p>
         <h1 class="text-3xl font-bold mb-2">Terms of Use</h1>
         <p class="text-stone-300 text-sm">Last updated: July 1, 2025</p>
     </div>
@@ -30,7 +30,7 @@
                         ['#termination','Termination'],
                         ['#changes','Changes'],
                     ] as $item)
-                    <a href="{{ $item[0] }}" class="block text-stone-500 hover:text-amber-600 transition py-0.5">{{ $item[1] }}</a>
+                    <a href="{{ $item[0] }}" class="block text-stone-500 hover:text-teal-700 transition py-0.5">{{ $item[1] }}</a>
                     @endforeach
                 </nav>
             </div>
@@ -56,7 +56,7 @@
             @foreach($sections as $s)
             <div id="{{ $s[0] }}" class="bg-white rounded-2xl border border-stone-200 p-6">
                 <h2 class="text-lg font-bold text-stone-800 mb-3 flex items-center gap-2">
-                    <span class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 text-xs font-bold">{{ $s[1] }}</span>
+                    <span class="w-7 h-7 bg-teal-100 rounded-lg flex items-center justify-center text-teal-700 text-xs font-bold">{{ $s[1] }}</span>
                     {{ $s[2] }}
                 </h2>
                 <p class="text-sm text-stone-500 leading-relaxed">{{ $s[3] }}</p>
@@ -64,12 +64,12 @@
             @endforeach
 
             {{-- Agreement --}}
-            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
-                <p class="text-sm text-amber-800 font-semibold mb-1">By using EstateFlow, you agree to these Terms of Use.</p>
-                <p class="text-xs text-amber-600 mb-4">If you have questions, please contact our support team.</p>
+            <div class="bg-teal-50 border border-teal-200 rounded-2xl p-6 text-center">
+                <p class="text-sm text-teal-800 font-semibold mb-1">By using EstateFlow, you agree to these Terms of Use.</p>
+                <p class="text-xs text-teal-700 mb-4">If you have questions, please contact our support team.</p>
                 <div class="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="{{ route('client.contact') }}" class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition">Contact Support</a>
-                    <a href="{{ route('client.legal.privacy') }}" class="border border-amber-600 text-amber-600 hover:bg-amber-50 px-6 py-2.5 rounded-xl text-sm font-semibold transition">Privacy Policy</a>
+                    <a href="{{ route('client.contact') }}" class="bg-teal-700 hover:bg-teal-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition">Contact Support</a>
+                    <a href="{{ route('client.legal.privacy') }}" class="border border-teal-700 text-teal-700 hover:bg-teal-50 px-6 py-2.5 rounded-xl text-sm font-semibold transition">Privacy Policy</a>
                 </div>
             </div>
 

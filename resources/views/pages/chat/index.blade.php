@@ -17,7 +17,7 @@
                 ['Anonymous','What properties are available?','Yesterday',false],
                 ['Ana Lim','How do I submit documents?','2 days ago',false],
             ] as $c)
-            <div class="p-3 rounded-lg cursor-pointer {{ $c[3] ? 'bg-amber-50 border border-amber-200' : 'hover:bg-stone-50' }} transition">
+            <div class="p-3 rounded-lg cursor-pointer {{ $c[3] ? 'bg-teal-50 border border-teal-200' : 'hover:bg-stone-50' }} transition">
                 <div class="flex items-center justify-between mb-1">
                     <p class="text-sm font-medium text-stone-700">{{ $c[0] }}</p>
                     <span class="text-xs text-stone-400">{{ $c[2] }}</span>
@@ -33,7 +33,7 @@
 
         {{-- Chat Header --}}
         <div class="flex items-center gap-3 px-5 py-4 border-b border-stone-100">
-            <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-bold">J</div>
+            <div class="w-9 h-9 bg-teal-100 rounded-full flex items-center justify-center text-teal-800 font-bold">J</div>
             <div>
                 <p class="font-semibold text-stone-800 text-sm">Juan dela Cruz</p>
                 <p class="text-xs text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span> Active now</p>
@@ -45,7 +45,7 @@
 
             {{-- AI Message --}}
             <div class="flex items-start gap-3">
-                <div class="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center shrink-0">
+                <div class="w-8 h-8 bg-teal-700 rounded-full flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                 </div>
                 <div class="bg-stone-100 rounded-2xl rounded-tl-none px-4 py-3 max-w-md">
@@ -56,16 +56,16 @@
 
             {{-- Client Message --}}
             <div class="flex items-start gap-3 flex-row-reverse">
-                <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center shrink-0 text-amber-700 font-bold text-sm">J</div>
-                <div class="bg-amber-600 rounded-2xl rounded-tr-none px-4 py-3 max-w-md">
+                <div class="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center shrink-0 text-teal-800 font-bold text-sm">J</div>
+                <div class="bg-teal-700 rounded-2xl rounded-tr-none px-4 py-3 max-w-md">
                     <p class="text-sm text-white">What is the price of Lot 12-B in Palm Residences?</p>
-                    <p class="text-xs text-amber-200 mt-1">9:01 AM</p>
+                    <p class="text-xs text-teal-300 mt-1">9:01 AM</p>
                 </div>
             </div>
 
             {{-- AI Response --}}
             <div class="flex items-start gap-3">
-                <div class="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center shrink-0">
+                <div class="w-8 h-8 bg-teal-700 rounded-full flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                 </div>
                 <div class="bg-stone-100 rounded-2xl rounded-tl-none px-4 py-3 max-w-md">
@@ -81,7 +81,7 @@
             <p class="text-xs text-stone-400 mb-2">Suggested questions:</p>
             <div class="flex flex-wrap gap-2">
                 @foreach(['What lots are available?','How to submit documents?','What are the requirements?'] as $q)
-                <button class="text-xs bg-stone-100 hover:bg-amber-50 hover:text-amber-700 text-stone-600 px-3 py-1.5 rounded-full transition">{{ $q }}</button>
+                <button class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-800 text-stone-600 px-3 py-1.5 rounded-full transition">{{ $q }}</button>
                 @endforeach
             </div>
         </div>
@@ -89,8 +89,8 @@
         {{-- Input --}}
         <div class="p-4 border-t border-stone-100">
             <div class="flex gap-3">
-                <input x-model="message" type="text" placeholder="Type your message..." class="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-                <button class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2.5 rounded-xl transition">
+                <input x-model="message" type="text" placeholder="Type your message..." class="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                <button class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2.5 rounded-xl transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 </button>
             </div>

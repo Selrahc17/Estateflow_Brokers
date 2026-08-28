@@ -28,8 +28,8 @@
             <div>
                 <label class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-1.5 block">Profile Photo</label>
                 <div class="flex items-center gap-3">
-                    <div class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center text-amber-700 font-bold text-xl shrink-0" id="avatar-preview-container">
-                        <svg class="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    <div class="w-14 h-14 bg-teal-100 rounded-xl flex items-center justify-center text-teal-800 font-bold text-xl shrink-0" id="avatar-preview-container">
+                        <svg class="w-6 h-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                     </div>
                     <input type="file" name="avatar" id="avatar-input" accept="image/*" class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-red-50 file:text-red-600 hover:file:bg-red-100">
                 </div>
@@ -74,7 +74,7 @@
             @forelse($agents as $agent)
             <div class="bg-white rounded-xl border border-stone-200 p-5 hover:shadow-md transition">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 overflow-hidden bg-amber-100 rounded-xl flex items-center justify-center text-amber-700 font-bold text-lg shrink-0">
+                    <div class="w-12 h-12 overflow-hidden bg-teal-100 rounded-xl flex items-center justify-center text-teal-800 font-bold text-lg shrink-0">
                         @if($agent->avatar)
                             <img src="{{ str_starts_with($agent->avatar, 'http') ? $agent->avatar : asset('storage/' . $agent->avatar) }}" alt="{{ $agent->name }}" class="w-full h-full object-cover">
                         @else
@@ -97,7 +97,7 @@
                     <span class="text-stone-400">{{ $agent->properties_count ?? 0 }} propert(ies)</span>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <a href="{{ route('broker.agents.edit', $agent) }}" class="flex-1 text-center border border-amber-200 hover:bg-amber-50 text-amber-600 py-2 rounded-lg text-xs font-medium transition">Edit</a>
+                    <a href="{{ route('broker.agents.edit', $agent) }}" class="flex-1 text-center border border-teal-200 hover:bg-teal-50 text-teal-700 py-2 rounded-lg text-xs font-medium transition">Edit</a>
                     <form action="{{ route('broker.agents.toggle-status', $agent) }}" method="POST">
                         @csrf @method('PATCH')
                         <button type="submit" class="px-3 py-2 rounded-lg text-xs font-medium border transition {{ $agent->is_active ? 'border-red-200 text-red-500 hover:bg-red-50' : 'border-green-200 text-green-600 hover:bg-green-50' }}">

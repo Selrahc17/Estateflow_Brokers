@@ -6,20 +6,20 @@
 @section('content')
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <form method="GET" class="flex gap-2">
-        <select name="property_id" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
+        <select name="property_id" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
             <option value="">All Properties</option>
             @foreach($properties as $p)
                 <option value="{{ $p->id }}" {{ request('property_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
             @endforeach
         </select>
-        <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" onchange="this.form.submit()">
+        <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
             <option value="">All Status</option>
             <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
             <option value="reserved" {{ request('status') == 'reserved' ? 'selected' : '' }}>Reserved</option>
             <option value="sold" {{ request('status') == 'sold' ? 'selected' : '' }}>Sold</option>
         </select>
     </form>
-    <a href="{{ route('agent.lots.create') }}" class="inline-flex bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2 transition">
+    <a href="{{ route('agent.lots.create') }}" class="inline-flex bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2 transition">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Add Lot
     </a>
@@ -53,7 +53,7 @@
                             {{ ucfirst($lot->status) }}
                         </span>
                     </td>
-                    <td class="px-4 py-3"><a href="{{ route('agent.lots.edit', $lot) }}" class="text-amber-600 hover:underline text-xs">Edit</a></td>
+                    <td class="px-4 py-3"><a href="{{ route('agent.lots.edit', $lot) }}" class="text-teal-700 hover:underline text-xs">Edit</a></td>
                 </tr>
             @empty
                 <tr><td colspan="7" class="px-4 py-8 text-center text-stone-400">No lots found.</td></tr>

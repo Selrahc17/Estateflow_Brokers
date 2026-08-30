@@ -19,7 +19,7 @@
 
             {{-- Image Gallery --}}
             <div class="rounded-2xl overflow-hidden">
-                <div class="relative h-72 sm:h-96 bg-stone-100">
+                <div class="relative bg-stone-100 aspect-video">
                     @php
                         $imgs = [];
                         if ($property->featured_image) { $imgs[] = $property->featured_image; }
@@ -33,7 +33,7 @@
                     @foreach($imgs as $i => $img)
                     <img src="{{ $img }}" alt="{{ $property->name }}"
                          x-show="activeImg === {{ $i }}"
-                         class="absolute inset-0 w-full h-full object-cover">
+                         class="absolute inset-0 w-full h-full object-contain" loading="eager" decoding="async">
                     @endforeach
                     {{-- Badges --}}
                     <div class="absolute top-4 left-4 flex gap-2">

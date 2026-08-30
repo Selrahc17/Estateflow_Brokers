@@ -2,10 +2,11 @@
    class="group bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 block">
 
     {{-- Image --}}
-    <div class="relative overflow-hidden h-48 bg-stone-100 dark:bg-stone-800">
+    <div class="relative bg-stone-100 dark:bg-stone-800 aspect-[4/3]">
         @if($property->featured_image)
         <img src="{{ $property->featured_image }}" alt="{{ $property->name }}"
-             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+             class="w-full h-full object-contain"
+             loading="lazy" decoding="async">
         @else
         <div class="w-full h-full flex items-center justify-center">
             <svg class="w-12 h-12 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>

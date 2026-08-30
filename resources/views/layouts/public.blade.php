@@ -92,7 +92,7 @@
                 <div class="hidden sm:flex items-center gap-2">
                     @guest
                     <a href="{{ route('auth.login') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-teal-600 transition px-3 py-2">Sign In</a>
-                    <a href="{{ route('auth.register') }}" class="bg-teal-700 hover:bg-teal-800 text-white text-sm font-medium px-4 py-2 rounded-xl transition">Register</a>
+                    <a href="{{ route('auth.register') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-teal-600 transition px-3 py-2">Register</a>
                     @endguest
 
                     @auth

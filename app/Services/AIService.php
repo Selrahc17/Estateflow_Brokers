@@ -15,7 +15,7 @@ class AIService
 
     public function __construct()
     {
-        $this->apiKey = config('services.openai.key', '');
+        $this->apiKey = config('services.openai.key') ?? '';
     }
 
     public function chat(string $userMessage, int $userId, string $role = 'client'): string

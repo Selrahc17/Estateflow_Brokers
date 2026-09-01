@@ -26,7 +26,7 @@
 
             {{-- Logo --}}
             <a href="{{ route('client.properties') }}" class="flex items-center gap-2 shrink-0">
-                <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center overflow-hidden">
+                <div class="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center overflow-hidden">
                     @if($appLogo)
                         <img src="{{ $appLogo }}" class="w-full h-full object-cover">
                     @else
@@ -35,7 +35,7 @@
                         </svg>
                     @endif
                 </div>
-                <span class="text-lg font-bold text-stone-800 dark:text-white">Estate<span class="text-teal-600">Flow</span></span>
+                <span class="text-lg font-bold text-stone-800 dark:text-white">Estate<span class="text-[var(--color-primary)]">Flow</span></span>
             </a>
 
             {{-- Search Bar (Desktop) --}}
@@ -67,7 +67,7 @@
                             </select>
                         </div>
                     </div>
-                    <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-4 flex items-center justify-center transition shrink-0">
+                    <button type="submit" class="bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white px-4 flex items-center justify-center transition shrink-0">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
                     </button>
                 </form>
@@ -91,8 +91,8 @@
                 {{-- Desktop Nav --}}
                 <div class="hidden sm:flex items-center gap-2">
                     @guest
-                    <a href="{{ route('auth.login') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-teal-600 transition px-3 py-2">Sign In</a>
-                    <a href="{{ route('auth.register') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-teal-600 transition px-3 py-2">Register</a>
+                    <a href="{{ route('auth.login') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] transition px-3 py-2">Sign In</a>
+                    <a href="{{ route('auth.register') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] transition px-3 py-2">Register</a>
                     @endguest
 
                     @auth
@@ -103,7 +103,7 @@
                             @if(auth()->user()->avatar)
                                 <img src="{{ str_starts_with(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar) }}" class="w-7 h-7 rounded-full object-cover">
                             @else
-                                <div class="w-7 h-7 bg-teal-700 rounded-full flex items-center justify-center text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                                <div class="w-7 h-7 bg-[var(--color-primary)] rounded-full flex items-center justify-center text-white text-xs font-bold">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
                             @endif
                             <span class="text-sm font-medium text-stone-700 dark:text-stone-200">{{ explode(' ', auth()->user()->name)[0] }}</span>
                             <svg class="w-4 h-4 text-stone-400 transition" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -120,34 +120,34 @@
                             <div class="px-4 py-3 border-b border-stone-100 dark:border-stone-800 bg-stone-50 dark:bg-stone-800">
                                 <p class="text-sm font-semibold text-stone-800 dark:text-white">{{ auth()->user()->name }}</p>
                                 <p class="text-xs text-stone-400">{{ auth()->user()->email }}</p>
-                                <a href="{{ route('client.account.profile') }}" class="text-xs text-teal-600 hover:underline mt-0.5 inline-block">Edit Profile →</a>
+                                <a href="{{ route('client.account.profile') }}" class="text-xs text-[var(--color-primary)] hover:underline mt-0.5 inline-block">Edit Profile →</a>
                             </div>
 
                             {{-- Nav Links --}}
                             <div class="py-1 dark:[&_a]:text-stone-300 dark:[&_a:hover]:bg-stone-800 dark:[&_a:hover]:text-amber-400">
-                                <a href="{{ route('client.account.reservation') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.reservation') ? 'bg-teal-50 text-teal-700' : '' }}">
+                                <a href="{{ route('client.account.reservation') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.reservation') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     My Reservation
                                 </a>
-                                <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.documents') ? 'bg-teal-50 text-teal-700' : '' }}">
+                                <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.documents') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     My Documents
                                 </a>
                                 @php
                                     $unreadCount = \App\Models\AppNotification::where('user_id', auth()->id())->where('is_read', false)->count();
                                 @endphp
-                                <a href="{{ route('client.account.notifications') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.notifications') ? 'bg-teal-50 text-teal-700' : '' }}">
+                                <a href="{{ route('client.account.notifications') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.notifications') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                                     Notifications
                                     @if($unreadCount > 0)
                                         <span class="ml-auto bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">{{ $unreadCount }}</span>
                                     @endif
                                 </a>
-                                <a href="{{ route('client.account.feedback') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.feedback') ? 'bg-teal-50 text-teal-700' : '' }}">
+                                <a href="{{ route('client.account.feedback') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.feedback') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                                     Feedback & Ratings
                                 </a>
-                                <a href="{{ route('client.account.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-teal-50 hover:text-teal-700 transition {{ request()->routeIs('client.account.profile') ? 'bg-teal-50 text-teal-700' : '' }}">
+                                <a href="{{ route('client.account.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.profile') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     My Profile
                                 </a>
@@ -187,10 +187,10 @@
         {{-- Mobile Menu --}}
         <div x-show="mobileMenu" x-transition class="sm:hidden border-t border-stone-100 dark:border-stone-800 px-4 py-4 bg-white dark:bg-stone-900 space-y-1">
             <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-1">Browse</p>
-            <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1 font-medium">All Properties</a>
-            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-teal-600 py-2 px-1">House and Lot</a>
-            <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-teal-600 py-2 px-1">Lot Only</a>
-            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-teal-600 py-2 px-1">Condominium</a>
+            <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] py-2 px-1 font-medium">All Properties</a>
+            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">House and Lot</a>
+            <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">Lot Only</a>
+            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">Condominium</a>
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2">
                 <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-2">My Account</p>
                 <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Reservation</a>

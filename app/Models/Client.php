@@ -13,6 +13,7 @@ class Client extends Authenticatable
     protected $fillable = [
         'user_id',
         'broker_id',
+        'agent_id',
         'first_name',
         'last_name',
         'email',
@@ -76,6 +77,11 @@ class Client extends Authenticatable
     public function broker()
     {
         return $this->belongsTo(User::class, 'broker_id');
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
     }
 
     public function siteVisits()

@@ -49,6 +49,7 @@ class ReservationController extends Controller
 
             $reservation = Reservation::create([
                 'client_id' => $client->id,
+                'agent_id' => $client->agent_id,
                 'lot_id' => $lot->id,
                 'broker_id' => $lot->property->broker_id,
                 'reservation_code' => 'RES-' . strtoupper(Str::random(8)),

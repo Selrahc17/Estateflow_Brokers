@@ -55,6 +55,7 @@ class ReservationController extends Controller
         ]);
 
         $data['broker_id'] = auth()->id();
+        $data['agent_id'] = auth()->id();
         $data['reservation_code'] = 'RES-' . strtoupper(Str::random(8));
         $data['status'] = 'pending';
         $data['reserved_at'] = now();

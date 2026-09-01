@@ -11,7 +11,7 @@ class Reservation extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'client_id', 'lot_id', 'broker_id', 'reservation_code',
+        'client_id', 'agent_id', 'lot_id', 'broker_id', 'reservation_code',
         'status', 'total_price', 'down_payment', 'payment_schedule',
         'payment_terms_months', 'notes', 'reserved_at', 'expires_at',
     ];
@@ -40,5 +40,10 @@ class Reservation extends Model
     public function broker()
     {
         return $this->belongsTo(User::class, 'broker_id');
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
     }
 }

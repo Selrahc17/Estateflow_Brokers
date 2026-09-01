@@ -19,9 +19,11 @@ use App\Http\Controllers\Broker\DashboardController as BrokerDashboardController
 use App\Http\Controllers\Broker\AgentController as BrokerAgentController;
 use App\Http\Controllers\Broker\SettingController as BrokerSettingController;
 use App\Http\Controllers\Broker\AuditController as BrokerAuditController;
+use App\Http\Controllers\Broker\CommissionController as BrokerCommissionController;
 use App\Http\Controllers\Broker\NotificationController as BrokerNotificationController;
 use App\Http\Controllers\Broker\ReportController as BrokerReportController;
 use App\Http\Controllers\Agent\ChatController as BrokerChatController;
+use App\Http\Controllers\Agent\CommissionController as AgentCommissionController;
 use App\Http\Controllers\Agent\ClientController as BrokerClientController;
 use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
 use App\Http\Controllers\Agent\DocumentController as BrokerDocumentController;
@@ -162,6 +164,9 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'au
     Route::get('/performance', [BrokerDashboardController::class, 'performance'])->name('performance');
     Route::get('/property-lists', [BrokerDashboardController::class, 'propertyLists'])->name('property-lists');
     Route::patch('/property-lists/{property}/terms', [BrokerDashboardController::class, 'updatePropertyTerms'])->name('property-lists.terms');
+    Route::get('/commissions', [BrokerCommissionController::class, 'index'])->name('commissions.index');
+    Route::get('/commissions/create', [BrokerCommissionController::class, 'create'])->name('commissions.create');
+    Route::post('/commissions', [BrokerCommissionController::class, 'store'])->name('commissions.store');
     Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
@@ -207,7 +212,7 @@ Route::get('/api/geocode/reverse', function () {
 // ===================== BROKER ROUTES =====================
 Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit'])->group(function () {
     Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/commission', [PropertyController::class, 'commission'])->name('commission');
+    Route::get('/commission', [AgentCommissionController::class, 'index'])->name('commission');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');

@@ -17,9 +17,9 @@
 <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
     @forelse($properties as $property)
     <article class="flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md">
-        <div class="relative h-48 shrink-0 bg-stone-200">
+        <div class="relative h-44 shrink-0 overflow-hidden bg-stone-200 sm:h-48">
             @if($property->featured_image)
-                <img src="{{ $property->featured_image }}" alt="{{ $property->name }}" class="h-full w-full object-cover">
+                <img src="{{ $property->featured_image }}" alt="{{ $property->name }}" class="h-full w-full object-cover object-center">
             @else
                 <div class="flex h-full items-center justify-center bg-stone-100 text-stone-400">
                     <svg class="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16l5-5 4 4 3-3 6 6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
@@ -30,20 +30,20 @@
             </span>
         </div>
 
-        <div class="flex flex-1 flex-col p-5">
+        <div class="flex flex-1 flex-col p-4 sm:p-5">
             <div class="flex items-start justify-between gap-3">
-                <h3 class="max-w-[70%] break-words text-base font-semibold text-stone-800">{{ $property->name }}</h3>
-                <span class="shrink-0 text-sm font-semibold text-green-600">{{ $property->price ? '₱' . number_format($property->price, 2) : 'Price not set' }}</span>
+                <h3 class="min-h-[2.8rem] flex-1 break-words text-base font-semibold leading-6 text-stone-800">{{ $property->name }}</h3>
+                <span class="shrink-0 max-w-[38%] text-right text-sm font-semibold text-green-600">{{ $property->price ? '₱' . number_format($property->price, 2) : 'Price not set' }}</span>
             </div>
 
-            <div class="mt-3 space-y-1 text-xs text-stone-500">
-                <p><span class="font-medium text-stone-400">Agent:</span> {{ $property->broker?->name ?? 'Unassigned' }}</p>
+            <div class="mt-3 min-h-[2.5rem] space-y-1 text-xs text-stone-500">
+                <p class="break-words"><span class="font-medium text-stone-400">Agent:</span> {{ $property->broker?->name ?? 'Unassigned' }}</p>
                 @if(!empty($property->city) || !empty($property->province))
-                    <p><span class="font-medium text-stone-400">Location:</span> {{ trim(($property->city ?? '') . ' ' . ($property->province ?? '')) ?: 'Not specified' }}</p>
+                    <p class="break-words"><span class="font-medium text-stone-400">Location:</span> {{ trim(($property->city ?? '') . ' ' . ($property->province ?? '')) ?: 'Not specified' }}</p>
                 @endif
             </div>
 
-            <form action="{{ route('broker.property-lists.terms', $property) }}" method="POST" class="mt-5 space-y-3 border-t border-stone-100 pt-4">
+            <form action="{{ route('broker.property-lists.terms', $property) }}" method="POST" class="mt-4 space-y-3 border-t border-stone-100 pt-4">
                 @csrf
                 @method('PATCH')
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">

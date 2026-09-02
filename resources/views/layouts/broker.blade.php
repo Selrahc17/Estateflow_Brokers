@@ -21,23 +21,27 @@
             </div>
             <p class="mt-1 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary-light)]">Broker Portal</p>
         </div>
-        <nav class="flex-1 px-3 py-5">
-            <a href="{{ route('broker.dashboard') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.dashboard') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Dashboard
-            </a>
-            <a href="{{ route('broker.performance') }}" class="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.performance') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2"/></svg>
-                Agent Performance
-            </a>
-            <a href="{{ route('broker.commissions.index') }}" class="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.commissions.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.12-4 2.5s1.79 2.5 4 2.5 4 1.12 4 2.5-1.79 2.5-4 2.5m0-10V5m0 13v1m8-7a8 8 0 11-16 0 8 8 0 0116 0z"/></svg>
-                Commission
-            </a>
-            <a href="{{ route('broker.property-lists') }}" class="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.property-lists') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm4 2h8m-8 4h8m-8 4h5"/></svg>
-                Agent Property Lists
-            </a>
+
+        <nav class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 py-5">
+            <div class="space-y-1">
+                <a href="{{ route('broker.dashboard') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.dashboard') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Dashboard
+                </a>
+                <a href="{{ route('broker.performance') }}" class="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.performance') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2"/></svg>
+                    Agent Performance
+                </a>
+                <a href="{{ route('broker.commissions.index') }}" class="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.commissions.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.12-4 2.5s1.79 2.5 4 2.5 4 1.12 4 2.5-1.79 2.5-4 2.5m0-10V5m0 13v1m8-7a8 8 0 11-16 0 8 8 0 0116 0z"/></svg>
+                    Commission
+                </a>
+                <a href="{{ route('broker.property-lists') }}" class="mt-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.property-lists') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a2 2 0 012-2h12a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm4 2h8m-8 4h8m-8 4h5"/></svg>
+                    Agent Property Lists
+                </a>
+            </div>
+
             <div class="mt-6 space-y-1">
                 <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary-light)]">Management</p>
                 <a href="{{ route('broker.agents.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.agents.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
@@ -49,6 +53,7 @@
                     Reports and Analytics
                 </a>
             </div>
+
             <div class="mt-6 space-y-1">
                 <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary-light)]">Messages</p>
                 <a href="{{ route('broker.messages.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.messages.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
@@ -60,6 +65,7 @@
                     Notification
                 </a>
             </div>
+
             <div class="mt-6 space-y-1">
                 <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-widest text-[var(--color-primary-light)]">Oversight</p>
                 <a href="{{ route('broker.audit.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.audit.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
@@ -72,15 +78,24 @@
                 </a>
             </div>
         </nav>
-        <div class="border-t border-[var(--color-primary-dark)] p-4">
-            <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
-            <p class="truncate text-xs text-stone-400">{{ auth()->user()->email }}</p>
+
+        <div class="mt-auto border-t border-[var(--color-primary-dark)] p-4">
+            <div class="flex items-center gap-3 rounded-lg px-2 py-2 text-left">
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-primary)] text-sm font-semibold text-white">
+                    {{ strtoupper(substr(auth()->user()->name ?? 'B', 0, 1)) }}
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>
+                    <p class="truncate text-xs text-stone-400">{{ auth()->user()->email }}</p>
+                </div>
+            </div>
+
             <form action="{{ route('auth.logout') }}" method="POST" class="mt-3">
                 @csrf
-                    <button type="submit" class="flex w-full items-center gap-2 rounded-lg bg-[var(--color-primary)] px-3 py-2.5 text-left text-sm font-medium text-white transition hover:bg-[var(--color-primary-dark)]">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        Sign Out
-                    </button>
+                <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-3 py-2.5 text-sm font-medium text-white transition hover:bg-[var(--color-primary-dark)]">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sign Out
+                </button>
             </form>
         </div>
     </aside>

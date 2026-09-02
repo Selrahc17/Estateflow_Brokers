@@ -15,6 +15,7 @@ class CommissionAgreement extends Model
         'broker_id',
         'agent_id',
         'property_id',
+        'reservation_id',
         'commission_rate',
         'broker_share',
         'agent_share',
@@ -52,6 +53,11 @@ class CommissionAgreement extends Model
         return $this->belongsTo(Property::class);
     }
 
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class);
+    }
+
     public function payments()
     {
         return $this->hasMany(CommissionPayment::class);
@@ -59,7 +65,7 @@ class CommissionAgreement extends Model
 
     public function generateScheduledPayments(): Collection
     {
-        $baseAmount = (float) ($this->property?->price ?? 0);
+        $baseAmount = (float) ($this->reservation?->total_price ?? $this->property?->price ?? 0);
         $totalCommission = $baseAmount * ((float) $this->commission_rate / 100);
         $agentAmount = $totalCommission * ((float) $this->agent_share / 100);
         $brokerAmount = $totalCommission * ((float) $this->broker_share / 100);

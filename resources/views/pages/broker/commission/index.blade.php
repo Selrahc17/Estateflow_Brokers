@@ -39,6 +39,7 @@
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-stone-500">Rate</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-stone-500">Schedule</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-stone-500">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-stone-500">Action</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-stone-200">
@@ -52,6 +53,9 @@
                         <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-medium {{ $agreement->status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-600' }}">
                             {{ ucfirst($agreement->status) }}
                         </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm">
+                        <a href="{{ route('broker.commissions.show', $agreement) }}" class="font-medium text-teal-700 hover:text-teal-900">View</a>
                     </td>
                 </tr>
             @empty

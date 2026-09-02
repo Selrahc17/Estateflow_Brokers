@@ -167,6 +167,8 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'au
     Route::get('/commissions', [BrokerCommissionController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/create', [BrokerCommissionController::class, 'create'])->name('commissions.create');
     Route::post('/commissions', [BrokerCommissionController::class, 'store'])->name('commissions.store');
+    Route::get('/commissions/{agreement}', [BrokerCommissionController::class, 'show'])->name('commissions.show');
+    Route::post('/commissions/{agreement}/payment', [BrokerCommissionController::class, 'updatePayment'])->name('commissions.update-payment');
     Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
@@ -213,6 +215,7 @@ Route::get('/api/geocode/reverse', function () {
 Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit'])->group(function () {
     Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/commission', [AgentCommissionController::class, 'index'])->name('commission');
+    Route::get('/commission/{agreement}', [AgentCommissionController::class, 'show'])->name('commission.show');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');

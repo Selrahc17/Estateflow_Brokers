@@ -59,6 +59,11 @@
                     </div>
 
                     <div>
+                        <label class="mb-1 block text-sm font-medium text-stone-700">Dispute Reason</label>
+                        <textarea name="dispute_reason" rows="3" class="w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="Explain why this payment is disputed...">{{ old('dispute_reason', $payment->dispute_reason) }}</textarea>
+                    </div>
+
+                    <div>
                         <label class="mb-1 block text-sm font-medium text-stone-700">Upload Proof</label>
                         <input type="file" name="proof" class="block w-full text-sm text-stone-500 file:mr-4 file:rounded-full file:border-0 file:bg-[var(--color-primary)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[var(--color-primary-dark)]">
                     </div>

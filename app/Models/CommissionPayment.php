@@ -20,6 +20,7 @@ class CommissionPayment extends Model
         'payment_status',
         'proof_path',
         'payment_message',
+        'dispute_reason',
         'paid_at',
     ];
 

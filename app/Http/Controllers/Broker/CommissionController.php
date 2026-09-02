@@ -75,6 +75,7 @@ class CommissionController extends Controller
         $data = $request->validate([
             'payment_status' => ['required', 'in:pending,scheduled,sent,confirmed,disputed,paid'],
             'payment_message' => ['nullable', 'string', 'max:1000'],
+            'dispute_reason' => ['nullable', 'string', 'max:1000'],
             'proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
         ]);
 
@@ -99,6 +100,7 @@ class CommissionController extends Controller
         $payment->update([
             'payment_status' => $data['payment_status'],
             'payment_message' => $data['payment_message'] ?? $payment->payment_message,
+            'dispute_reason' => $data['payment_status'] === 'disputed' ? ($data['dispute_reason'] ?? $payment->dispute_reason) : null,
             'paid_at' => $data['payment_status'] === 'paid' ? now() : $payment->paid_at,
         ]);
 

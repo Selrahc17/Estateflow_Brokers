@@ -55,17 +55,7 @@ class CommissionController extends Controller
         $data['status'] = 'active';
 
         $agreement = CommissionAgreement::create($data);
-
-        $propertyPrice = optional($agreement->property)->price ?? 0;
-        $agreement->payments()->create([
-            'reservation_id' => null,
-            'due_date' => $agreement->start_date ?? now()->toDateString(),
-            'amount_due' => $propertyPrice,
-            'agent_amount' => $propertyPrice * ($agreement->agent_share / 100),
-            'broker_amount' => $propertyPrice * ($agreement->broker_share / 100),
-            'amount_paid' => 0,
-            'payment_status' => 'pending',
-        ]);
+        $agreement->generateScheduledPayments();
 
         return redirect()->route('broker.commissions.index')->with('success', 'Commission agreement created successfully.');
     }

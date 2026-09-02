@@ -51,9 +51,17 @@ class CommissionController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $brokerId = auth()->id();
+        $agentIds = User::where('role', 'agent')
+            ->where('broker_id', $brokerId)
+            ->pluck('id');
+
         $data = $request->validate([
-            'agent_id' => ['required', Rule::exists('users', 'id')->where(fn($query) => $query->where('role', 'agent')->where('broker_id', auth()->id()))],
-            'property_id' => ['nullable', Rule::exists('properties', 'id')->where('broker_id', auth()->id())],
+            'agent_id' => ['required', Rule::exists('users', 'id')->where(fn($query) => $query->where('role', 'agent')->where('broker_id', $brokerId))],
+            'property_id' => ['nullable', Rule::exists('properties', 'id')->where(function ($query) use ($brokerId, $agentIds) {
+                $query->where('broker_id', $brokerId)
+                    ->orWhereIn('broker_id', $agentIds);
+            })],
             'commission_rate' => ['required', 'numeric', 'min:0', 'max:100'],
             'agent_share' => ['required', 'numeric', 'min:0', 'max:100'],
             'broker_share' => ['required', 'numeric', 'min:0', 'max:100'],

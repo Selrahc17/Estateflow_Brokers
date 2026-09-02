@@ -105,4 +105,53 @@ class CommissionSummaryMetricsTest extends TestCase
             ->assertOk()
             ->assertSee('Agent Posted Villa');
     }
+
+    public function test_broker_can_save_commission_agreement_for_agent_posted_property(): void
+    {
+        $broker = User::factory()->create(['role' => 'broker', 'is_active' => true, 'is_approved' => true]);
+        $agent = User::factory()->create([
+            'role' => 'agent',
+            'broker_id' => $broker->id,
+            'is_active' => true,
+            'is_approved' => true,
+        ]);
+
+        $property = Property::create([
+            'broker_id' => $agent->id,
+            'name' => 'Agent Posted Villa 2',
+            'slug' => 'agent-posted-villa-2',
+            'description' => 'Property posted by agent',
+            'address' => 'Bacolod',
+            'city' => 'Bacolod',
+            'province' => 'Negros Occidental',
+            'price' => 4200000,
+            'status' => 'available',
+        ]);
+
+        $payload = [
+            'agent_id' => $agent->id,
+            'property_id' => $property->id,
+            'commission_rate' => 5,
+            'agent_share' => 60,
+            'broker_share' => 40,
+            'payment_schedule' => 'monthly',
+            'payment_day' => 15,
+            'start_date' => '2026-09-01',
+            'end_date' => '2026-12-31',
+        ];
+
+        $this->actingAs($broker)
+            ->post(route('broker.commissions.store'), $payload)
+            ->assertRedirect(route('broker.commissions.index'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('commission_agreements', [
+            'broker_id' => $broker->id,
+            'agent_id' => $agent->id,
+            'property_id' => $property->id,
+            'commission_rate' => 5.00,
+            'agent_share' => 60.00,
+            'broker_share' => 40.00,
+        ]);
+    }
 }

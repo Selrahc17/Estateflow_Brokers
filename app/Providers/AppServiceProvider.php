@@ -26,11 +26,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer(['layouts.app', 'layouts.broker', 'layouts.client', 'layouts.public'], function ($view) {
-            $view->with('appLogo', Setting::get('logo_url'));
+            $view->with('appLogo', Setting::get('logo_url', null));
         });
 
         View::composer('layouts.admin', function ($view) {
-            $appLogo = Setting::get('logo_url');
+            $appLogo = Setting::get('logo_url', null);
             if (Auth::check() && Auth::user()->role === 'admin') {
                 $pendingReservations = Reservation::where('status', 'pending')->count();
                 $pendingDocuments = Document::where('status', 'pending')->count();

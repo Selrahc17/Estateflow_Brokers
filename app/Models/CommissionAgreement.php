@@ -76,12 +76,16 @@ class CommissionAgreement extends Model
 
         $dates = collect();
         $current = $startDate->copy();
+        $iterations = 0;
+        $maxIterations = 120;
 
-        while ($current->lte($endDate)) {
+        while ($current->lte($endDate) && $iterations < $maxIterations) {
+            $iterations++;
+
             $dueDate = match ($scheduleType) {
                 'every_15th' => $current->copy()->day($this->payment_day ?: 15),
                 'quarterly' => $current->copy()->day($this->payment_day ?: 15)->month($current->month + 2),
-                'annual' => $current->copy()->day($this->payment_day ?: 15)->month($this->payment_day ? 12 : 12),
+                'annual' => $current->copy()->day($this->payment_day ?: 15)->month(12),
                 default => $current->copy()->day($this->payment_day ?: 15),
             };
 

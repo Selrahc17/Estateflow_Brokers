@@ -19,11 +19,15 @@ class CommissionController extends Controller
     public function index(): View
     {
         $agreements = CommissionAgreement::where('broker_id', auth()->id())
-            ->with(['agent', 'property'])
+            ->with(['agent', 'property', 'payments'])
             ->latest()
             ->paginate(10);
 
-        return view('pages.broker.commission.index', compact('agreements'));
+        $totalExpected = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->sum('amount_due'));
+        $totalPaid = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'paid')->sum('amount_paid'));
+        $totalDisputed = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'disputed')->sum('amount_due'));
+
+        return view('pages.broker.commission.index', compact('agreements', 'totalExpected', 'totalPaid', 'totalDisputed'));
     }
 
     public function create(): View

@@ -15,18 +15,22 @@
     </a>
 </div>
 
-<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
     <div class="rounded-xl border border-stone-200 bg-white p-4">
         <p class="text-xs uppercase tracking-wide text-stone-400">Active Agreements</p>
         <p class="mt-2 text-2xl font-bold text-stone-800">{{ $agreements->where('status', 'active')->count() }}</p>
     </div>
     <div class="rounded-xl border border-stone-200 bg-white p-4">
-        <p class="text-xs uppercase tracking-wide text-stone-400">Pending Payouts</p>
-        <p class="mt-2 text-2xl font-bold text-amber-600">{{ $agreements->where('status', 'active')->count() }}</p>
+        <p class="text-xs uppercase tracking-wide text-stone-400">Total Expected</p>
+        <p class="mt-2 text-2xl font-bold text-amber-600">₱{{ number_format($totalExpected ?? 0, 2) }}</p>
     </div>
     <div class="rounded-xl border border-stone-200 bg-white p-4">
-        <p class="text-xs uppercase tracking-wide text-stone-400">Total Agent Share</p>
-        <p class="mt-2 text-2xl font-bold text-emerald-600">{{ number_format($agreements->sum('agent_share'), 2) }}%</p>
+        <p class="text-xs uppercase tracking-wide text-stone-400">Paid</p>
+        <p class="mt-2 text-2xl font-bold text-emerald-600">₱{{ number_format($totalPaid ?? 0, 2) }}</p>
+    </div>
+    <div class="rounded-xl border border-stone-200 bg-white p-4">
+        <p class="text-xs uppercase tracking-wide text-stone-400">Disputed</p>
+        <p class="mt-2 text-2xl font-bold text-rose-600">₱{{ number_format($totalDisputed ?? 0, 2) }}</p>
     </div>
 </div>
 

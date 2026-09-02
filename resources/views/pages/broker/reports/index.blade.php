@@ -10,14 +10,19 @@
         ['Properties', $data['total_properties'], 'text-stone-800'],
         ['Clients', $data['total_clients'], 'text-blue-600'],
         ['Reservations', $data['total_reservations'], 'text-teal-700'],
-        ['Leads', $data['total_leads'], 'text-indigo-600'],
-        ['Viewings', $data['total_viewings'], 'text-red-600'],
+        ['Commission Expected', '₱' . number_format($data['commission_expected'] ?? 0, 2), 'text-amber-600'],
+        ['Commission Paid', '₱' . number_format($data['commission_paid'] ?? 0, 2), 'text-emerald-600'],
     ] as [$label, $value, $color])
     <div class="rounded-xl border border-stone-200 bg-white p-4">
         <p class="text-xs text-stone-500">{{ $label }}</p>
         <p class="mt-1 text-lg font-bold {{ $color }} truncate">{{ $value }}</p>
     </div>
     @endforeach
+
+    <div class="rounded-xl border border-stone-200 bg-white p-4">
+        <p class="text-xs text-stone-500">Commission Disputed</p>
+        <p class="mt-1 text-lg font-bold text-rose-600 truncate">₱{{ number_format($data['commission_disputed'] ?? 0, 2) }}</p>
+    </div>
 </div>
 
 <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">

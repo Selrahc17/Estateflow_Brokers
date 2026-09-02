@@ -17,6 +17,10 @@ class ReportController extends Controller
     public function index(): View
     {
         $agentIds = auth()->user()->agents()->pluck('users.id');
+        $agreements = \App\Models\CommissionAgreement::where('broker_id', auth()->id())
+            ->with('payments')
+            ->get();
+
         $data = [
             'total_properties' => Property::whereIn('broker_id', $agentIds)->count(),
             'total_clients' => Client::whereIn('broker_id', $agentIds)->count(),
@@ -24,6 +28,9 @@ class ReportController extends Controller
             'total_revenue' => Payment::whereIn('broker_id', $agentIds)->where('status', 'verified')->sum('amount'),
             'total_leads' => Inquiry::whereIn('broker_id', $agentIds)->count(),
             'total_viewings' => SiteVisit::whereIn('broker_id', $agentIds)->count(),
+            'commission_expected' => $agreements->sum(fn ($agreement) => $agreement->payments->sum('amount_due')),
+            'commission_paid' => $agreements->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'paid')->sum('amount_paid')),
+            'commission_disputed' => $agreements->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'disputed')->sum('amount_due')),
             'reservations_by_status' => Reservation::whereIn('broker_id', $agentIds)
                 ->selectRaw('status, COUNT(*) as count')->groupBy('status')->pluck('count', 'status'),
             'monthly_revenue' => $this->monthlyRevenue($agentIds),

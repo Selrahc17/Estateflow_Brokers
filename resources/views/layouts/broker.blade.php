@@ -82,7 +82,11 @@
         <div class="mt-auto border-t border-[var(--color-primary-dark)] p-4">
             <div class="flex items-center gap-3 rounded-lg px-2 py-2 text-left">
                 <div class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-primary)] text-sm font-semibold text-white">
-                    {{ strtoupper(substr(auth()->user()->name ?? 'B', 0, 1)) }}
+                    @if(auth()->user()->avatar)
+                        <img src="{{ str_starts_with(auth()->user()->avatar, 'http') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="h-full w-full object-cover">
+                    @else
+                        {{ strtoupper(substr(auth()->user()->name ?? 'B', 0, 1)) }}
+                    @endif
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="truncate text-sm font-medium text-white">{{ auth()->user()->name }}</p>

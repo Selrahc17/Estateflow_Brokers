@@ -77,4 +77,32 @@ class CommissionSummaryMetricsTest extends TestCase
             ->assertSee('Disputed')
             ->assertSee('₱300,000.00');
     }
+
+    public function test_broker_commission_create_page_shows_agent_listed_properties(): void
+    {
+        $broker = User::factory()->create(['role' => 'broker', 'is_active' => true, 'is_approved' => true]);
+        $agent = User::factory()->create([
+            'role' => 'agent',
+            'broker_id' => $broker->id,
+            'is_active' => true,
+            'is_approved' => true,
+        ]);
+
+        Property::create([
+            'broker_id' => $agent->id,
+            'name' => 'Agent Posted Villa',
+            'slug' => 'agent-posted-villa',
+            'description' => 'Property posted by agent',
+            'address' => 'Dumaguete',
+            'city' => 'Dumaguete',
+            'province' => 'Negros Oriental',
+            'price' => 3500000,
+            'status' => 'available',
+        ]);
+
+        $this->actingAs($broker)
+            ->get(route('broker.commissions.create'))
+            ->assertOk()
+            ->assertSee('Agent Posted Villa');
+    }
 }

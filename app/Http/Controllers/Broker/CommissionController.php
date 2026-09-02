@@ -32,11 +32,19 @@ class CommissionController extends Controller
 
     public function create(): View
     {
-        $agents = User::where('role', 'agent')
-            ->where('broker_id', auth()->id())
-            ->get();
+        $brokerId = auth()->id();
+        $agentIds = User::where('role', 'agent')
+            ->where('broker_id', $brokerId)
+            ->pluck('id');
 
-        $properties = Property::where('broker_id', auth()->id())->get();
+        $properties = Property::where(function ($query) use ($brokerId, $agentIds) {
+            $query->where('broker_id', $brokerId)
+                ->orWhereIn('broker_id', $agentIds);
+        })->get();
+
+        $agents = User::where('role', 'agent')
+            ->where('broker_id', $brokerId)
+            ->get();
 
         return view('pages.broker.commission.create', compact('agents', 'properties'));
     }

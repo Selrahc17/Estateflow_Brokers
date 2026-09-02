@@ -50,21 +50,57 @@
         </div>
     </div>
 
-    <div class="rounded-2xl border border-stone-200 bg-white p-5">
-        <h2 class="text-lg font-semibold text-stone-800">Broker Notes</h2>
-        @php $payment = $agreement->payments->first(); @endphp
-        @if($payment && $payment->notes->count())
-            <ul class="mt-4 space-y-3">
-                @foreach($payment->notes as $note)
-                    <li class="rounded-lg bg-stone-50 p-3 text-sm text-stone-600">
-                        <p class="font-medium text-stone-700">{{ $note->sender_type === 'broker' ? 'Broker' : 'Agent' }}</p>
-                        <p class="mt-1">{{ $note->message }}</p>
-                    </li>
-                @endforeach
-            </ul>
-        @else
-            <p class="mt-3 text-sm text-stone-500">No broker note available yet.</p>
-        @endif
+    <div class="space-y-6">
+        <div class="rounded-2xl border border-stone-200 bg-white p-5">
+            <h2 class="text-lg font-semibold text-stone-800">Confirm Payment</h2>
+            @php $payment = $agreement->payments->first(); @endphp
+            @if($payment)
+                <form action="{{ route('agent.commission.update-payment', $agreement) }}" method="POST" enctype="multipart/form-data" class="mt-4 space-y-4">
+                    @csrf
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-stone-700">Payment Status</label>
+                        <select name="payment_status" class="w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                            @foreach(['pending','scheduled','sent','confirmed','disputed','paid'] as $status)
+                                <option value="{{ $status }}" {{ $payment->payment_status === $status ? 'selected' : '' }}>{{ ucfirst($status) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-stone-700">Message</label>
+                        <textarea name="payment_message" rows="3" class="w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="Confirm the transfer or send a note to the broker...">{{ old('payment_message', $payment->payment_message) }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-stone-700">Upload Proof</label>
+                        <input type="file" name="proof" class="block w-full text-sm text-stone-500 file:mr-4 file:rounded-full file:border-0 file:bg-teal-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-teal-700">
+                    </div>
+
+                    <div class="flex items-center justify-end">
+                        <button type="submit" class="rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-700">Save Update</button>
+                    </div>
+                </form>
+            @else
+                <p class="mt-3 text-sm text-stone-500">No payment record is available for confirmation yet.</p>
+            @endif
+        </div>
+
+        <div class="rounded-2xl border border-stone-200 bg-white p-5">
+            <h2 class="text-lg font-semibold text-stone-800">Broker Notes</h2>
+            @php $payment = $agreement->payments->first(); @endphp
+            @if($payment && $payment->notes->count())
+                <ul class="mt-4 space-y-3">
+                    @foreach($payment->notes as $note)
+                        <li class="rounded-lg bg-stone-50 p-3 text-sm text-stone-600">
+                            <p class="font-medium text-stone-700">{{ $note->sender_type === 'broker' ? 'Broker' : 'Agent' }}</p>
+                            <p class="mt-1">{{ $note->message }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+            @else
+                <p class="mt-3 text-sm text-stone-500">No broker note available yet.</p>
+            @endif
+        </div>
     </div>
 </div>
 @endsection

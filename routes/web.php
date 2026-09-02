@@ -216,6 +216,7 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/commission', [AgentCommissionController::class, 'index'])->name('commission');
     Route::get('/commission/{agreement}', [AgentCommissionController::class, 'show'])->name('commission.show');
+    Route::post('/commission/{agreement}/payment', [AgentCommissionController::class, 'updatePayment'])->name('commission.update-payment');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');

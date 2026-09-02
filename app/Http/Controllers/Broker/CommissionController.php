@@ -8,6 +8,7 @@ use App\Models\CommissionPayment;
 use App\Models\CommissionPaymentNote;
 use App\Models\Property;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -18,7 +19,12 @@ class CommissionController extends Controller
 {
     public function index(): View
     {
-        $agreements = CommissionAgreement::where('broker_id', auth()->id())
+        $agreementIds = CommissionAgreement::where('broker_id', auth()->id())
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('property_id')
+            ->pluck('id');
+
+        $agreements = CommissionAgreement::whereIn('id', $agreementIds)
             ->with(['agent', 'property', 'payments'])
             ->latest()
             ->paginate(10);
@@ -84,8 +90,18 @@ class CommissionController extends Controller
     {
         $this->ensureOwnership($agreement);
         $agreement->load(['agent', 'broker', 'property', 'payments.notes']);
+        $currentPayment = $this->currentPayment($agreement);
 
-        return view('pages.broker.commission.show', compact('agreement'));
+        return view('pages.broker.commission.show', compact('agreement', 'currentPayment'))->with('paymentMode', false);
+    }
+
+    public function pay(CommissionAgreement $agreement): View
+    {
+        $this->ensureOwnership($agreement);
+        $agreement->load(['agent', 'broker', 'property', 'payments.notes']);
+        $currentPayment = $this->currentPayment($agreement);
+
+        return view('pages.broker.commission.pay', compact('agreement', 'currentPayment'));
     }
 
     public function updatePayment(Request $request, CommissionAgreement $agreement): RedirectResponse
@@ -93,35 +109,36 @@ class CommissionController extends Controller
         $this->ensureOwnership($agreement);
 
         $data = $request->validate([
-            'payment_status' => ['required', 'in:pending,scheduled,sent,confirmed,disputed,paid'],
+            'payment_id' => ['required', 'integer', Rule::exists('commission_payments', 'id')->where(fn ($query) => $query->where('commission_agreement_id', $agreement->id))],
+            'amount_paid' => ['required', 'numeric', 'gt:0'],
+            'payment_method' => ['required', 'in:cash,bank_transfer,gcash,maya,check,other'],
             'payment_message' => ['nullable', 'string', 'max:1000'],
-            'dispute_reason' => ['nullable', 'string', 'max:1000'],
-            'proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
+            'proof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
         ]);
 
-        $payment = $agreement->payments()->latest()->first();
+        $payment = $agreement->payments()->findOrFail($data['payment_id']);
 
-        if (!$payment) {
-            $payment = $agreement->payments()->create([
-                'due_date' => now()->toDateString(),
-                'amount_due' => 0,
-                'agent_amount' => 0,
-                'broker_amount' => 0,
-                'amount_paid' => 0,
-                'payment_status' => 'pending',
-            ]);
+        if ($payment->payment_status === 'paid') {
+            return back()->withErrors(['payment' => 'This payment has already been recorded.']);
         }
 
-        if ($request->hasFile('proof')) {
-            $path = $request->file('proof')->store('commission-proof', 'public');
-            $payment->update(['proof_path' => $path]);
+        if (!$payment->due_date || !Carbon::parse($payment->due_date)->isSameMonth(now())) {
+            return back()->withErrors(['payment' => 'This payment can only be submitted during its due month.']);
         }
+
+        if ((float) $data['amount_paid'] !== (float) $payment->amount_due) {
+            return back()->withErrors(['amount_paid' => 'The amount paid must match the monthly amount due.'])->withInput();
+        }
+
+        $path = $request->file('proof')->store('commission-proof', 'public');
 
         $payment->update([
-            'payment_status' => $data['payment_status'],
+            'payment_status' => 'paid',
+            'amount_paid' => $data['amount_paid'],
+            'payment_method' => $data['payment_method'],
+            'proof_path' => $path,
             'payment_message' => $data['payment_message'] ?? $payment->payment_message,
-            'dispute_reason' => $data['payment_status'] === 'disputed' ? ($data['dispute_reason'] ?? $payment->dispute_reason) : null,
-            'paid_at' => $data['payment_status'] === 'paid' ? now() : $payment->paid_at,
+            'paid_at' => now(),
         ]);
 
         if (!empty($data['payment_message'])) {
@@ -140,5 +157,13 @@ class CommissionController extends Controller
     private function ensureOwnership(CommissionAgreement $agreement): void
     {
         abort_unless((int) $agreement->broker_id === (int) auth()->id(), 403);
+    }
+
+    private function currentPayment(CommissionAgreement $agreement): ?CommissionPayment
+    {
+        return $agreement->payments
+            ->where('payment_status', '!=', 'paid')
+            ->filter(fn ($payment) => $payment->due_date && Carbon::parse($payment->due_date)->isSameMonth(now()))
+            ->first();
     }
 }

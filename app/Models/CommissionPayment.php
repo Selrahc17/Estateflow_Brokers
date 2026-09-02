@@ -17,6 +17,7 @@ class CommissionPayment extends Model
         'agent_amount',
         'broker_amount',
         'amount_paid',
+        'payment_method',
         'payment_status',
         'proof_path',
         'payment_message',

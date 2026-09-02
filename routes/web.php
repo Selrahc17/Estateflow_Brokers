@@ -167,6 +167,7 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'au
     Route::get('/commissions', [BrokerCommissionController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/create', [BrokerCommissionController::class, 'create'])->name('commissions.create');
     Route::post('/commissions', [BrokerCommissionController::class, 'store'])->name('commissions.store');
+    Route::get('/commissions/{agreement}/pay', [BrokerCommissionController::class, 'pay'])->name('commissions.pay');
     Route::get('/commissions/{agreement}', [BrokerCommissionController::class, 'show'])->name('commissions.show');
     Route::post('/commissions/{agreement}/payment', [BrokerCommissionController::class, 'updatePayment'])->name('commissions.update-payment');
     Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');

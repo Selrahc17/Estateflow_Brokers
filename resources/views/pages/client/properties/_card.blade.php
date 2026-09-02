@@ -5,7 +5,8 @@
     <div class="relative bg-stone-100 dark:bg-stone-800 aspect-[4/3]">
         @if($property->featured_image)
         <img src="{{ $property->featured_image }}" alt="{{ $property->name }}"
-             class="w-full h-full object-contain"
+                         class="property-card-image object-cover object-center"
+                         style="width: 100%; height: 100%; object-fit: cover; object-position: center;"
              loading="lazy" decoding="async">
         @else
         <div class="w-full h-full flex items-center justify-center">

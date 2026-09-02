@@ -7,8 +7,9 @@ use App\Models\CommissionAgreement;
 use App\Models\CommissionPaymentNote;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 class CommissionController extends Controller
 {
@@ -35,12 +36,13 @@ class CommissionController extends Controller
         abort_unless((int) $agreement->agent_id === (int) auth()->id(), 403);
 
         $data = $request->validate([
+            'payment_id' => ['nullable', 'integer', Rule::exists('commission_payments', 'id')->where(fn ($query) => $query->where('commission_agreement_id', $agreement->id))],
             'payment_status' => ['required', 'in:pending,scheduled,sent,confirmed,disputed,paid'],
             'payment_message' => ['nullable', 'string', 'max:1000'],
             'proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
         ]);
 
-        $payment = $agreement->payments()->latest()->first();
+        $payment = $agreement->payments()->find($data['payment_id'] ?? null) ?? $agreement->payments()->latest()->first();
 
         if (!$payment) {
             $payment = $agreement->payments()->create([

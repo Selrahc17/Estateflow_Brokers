@@ -106,6 +106,62 @@ class CommissionSummaryMetricsTest extends TestCase
             ->assertSee('Agent Posted Villa');
     }
 
+    public function test_broker_commission_index_does_not_duplicate_same_property_entries(): void
+    {
+        $broker = User::factory()->create(['role' => 'broker', 'is_active' => true, 'is_approved' => true]);
+        $agent = User::factory()->create([
+            'role' => 'agent',
+            'broker_id' => $broker->id,
+            'is_active' => true,
+            'is_approved' => true,
+        ]);
+
+        $property = Property::create([
+            'broker_id' => $broker->id,
+            'name' => 'Bay View',
+            'slug' => 'bay-view-duplicate',
+            'description' => 'Test property',
+            'address' => 'Iloilo',
+            'city' => 'Iloilo',
+            'province' => 'Iloilo',
+            'price' => 6000000,
+            'status' => 'available',
+        ]);
+
+        CommissionAgreement::create([
+            'broker_id' => $broker->id,
+            'agent_id' => $agent->id,
+            'property_id' => $property->id,
+            'commission_rate' => 5,
+            'broker_share' => 40,
+            'agent_share' => 60,
+            'payment_schedule' => 'monthly',
+            'payment_day' => 15,
+            'start_date' => '2026-01-01',
+            'status' => 'active',
+        ]);
+
+        CommissionAgreement::create([
+            'broker_id' => $broker->id,
+            'agent_id' => $agent->id,
+            'property_id' => $property->id,
+            'commission_rate' => 7,
+            'broker_share' => 35,
+            'agent_share' => 65,
+            'payment_schedule' => 'monthly',
+            'payment_day' => 15,
+            'start_date' => '2026-02-01',
+            'status' => 'active',
+        ]);
+
+        $response = $this->actingAs($broker)
+            ->get(route('broker.commissions.index'));
+
+        $response->assertOk();
+        $this->assertSame(1, substr_count($response->getContent(), 'Bay View'));
+    }
+
+
     public function test_broker_can_save_commission_agreement_for_agent_posted_property(): void
     {
         $broker = User::factory()->create(['role' => 'broker', 'is_active' => true, 'is_approved' => true]);

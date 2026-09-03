@@ -79,6 +79,12 @@ class ClientInquiryCreatesBrokerClientTest extends TestCase
             'user_id' => $clientUser->id,
             'email' => $clientUser->email,
         ]);
+        $this->assertDatabaseHas('chat_messages', [
+            'sender_id' => $clientUser->id,
+            'receiver_id' => $broker->id,
+            'message' => 'I would like more information about this listing.',
+            'sender_type' => 'user',
+        ]);
         $this->assertDatabaseMissing('clients', ['email' => 'someone-else@example.com']);
     }
 }

@@ -258,7 +258,7 @@
         <div class="space-y-5">
 
             {{-- Inquiry / Reserve CTA --}}
-            <div class="bg-white rounded-2xl border border-stone-200 p-5 sticky top-28">
+            <div class="bg-white rounded-2xl border border-stone-200 p-5">
                 <h3 class="font-semibold text-stone-800 mb-1">Interested in this property?</h3>
                 <p class="text-xs text-stone-400 mb-4">Send an inquiry or reserve a lot today.</p>
 
@@ -355,7 +355,7 @@
                     @endif
                 </div>
                 <a href="mailto:{{ $property->broker->email }}" class="block w-full text-center bg-teal-700 hover:bg-teal-800 text-white py-2.5 rounded-xl text-sm font-medium transition">
-                    Contact Broker
+                    Contact Agent
                 </a>
                 @else
                 {{-- Faded contact for guests --}}

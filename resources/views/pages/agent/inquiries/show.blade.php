@@ -105,7 +105,7 @@
             </div>
 
             {{-- Quick Actions --}}
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <a href="mailto:{{ $inquiry->email }}?subject=Re:%20Inquiry%20for%20{{ urlencode($inquiry->property->name) }}" 
                    class="bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-lg font-semibold text-center transition">
                     Send Email Reply
@@ -114,6 +114,12 @@
                    class="border border-teal-700 text-teal-700 hover:bg-teal-50 py-3 rounded-lg font-semibold text-center transition">
                     Call Buyer
                 </a>
+                @if($inquiry->user)
+                <a href="{{ route('agent.messages.index', ['contact' => $inquiry->user->id]) }}"
+                   class="border border-teal-700 text-teal-700 hover:bg-teal-50 py-3 rounded-lg font-semibold text-center transition">
+                    Message Buyer
+                </a>
+                @endif
             </div>
         </div>
 
@@ -197,10 +203,12 @@
                     <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                     <span>Call Buyer</span>
                 </a>
-                <a href="{{ route('client.account.chat') }}" class="flex items-center gap-2 p-2 hover:bg-stone-50 rounded transition text-sm">
+                @if($inquiry->user)
+                <a href="{{ route('agent.messages.index', ['contact' => $inquiry->user->id]) }}" class="flex items-center gap-2 p-2 hover:bg-stone-50 rounded transition text-sm">
                     <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                    <span>Send Message</span>
+                    <span>Message Buyer</span>
                 </a>
+                @endif
             </div>
         </div>
     </div>

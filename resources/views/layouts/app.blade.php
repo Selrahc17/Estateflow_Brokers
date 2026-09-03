@@ -61,6 +61,11 @@
                 <span x-show="sidebarOpen" class="text-sm font-medium">Reservations</span>
             </a>
 
+                <a href="{{ route('agent.inquiries.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('agent.inquiries.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15a4 4 0 01-4 4H7l-4 4V7a4 4 0 014-4h10a4 4 0 014 4v8z"/></svg>
+                    <span x-show="sidebarOpen" class="text-sm font-medium">Inquiries</span>
+                </a>
+
             <a href="{{ route('agent.site-visits.index') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('agent.site-visits.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0L6.343 16.657C5.481 15.795 5 14.563 5 13.234V7a2 2 0 012-2h10a2 2 0 012 2v6.234c0 1.329-.481 2.561-1.343 3.423z"/></svg>
                 <span x-show="sidebarOpen" class="text-sm font-medium">Site Visits</span>

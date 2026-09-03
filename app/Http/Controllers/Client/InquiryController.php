@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChatMessage;
 use App\Models\Client;
 use App\Models\Inquiry;
 use App\Models\Property;
@@ -64,6 +65,15 @@ class InquiryController extends Controller
             'email' => $contactEmail,
             'status' => 'new',
         ]);
+
+        if ($user) {
+            ChatMessage::create([
+                'sender_id' => $user->id,
+                'receiver_id' => $property->broker_id,
+                'message' => $validated['message'],
+                'sender_type' => 'user',
+            ]);
+        }
 
         return redirect()->route('client.property.show', $property->slug)
             ->with('success', 'Inquiry sent successfully! The broker will contact you soon.');

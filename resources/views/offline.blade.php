@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#d97706">
+    <meta name="theme-color" content="#1A6B79">
     <title>EstateFlow — You're Offline</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Inter, sans-serif; background: #fff7ed; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; }
+        body { font-family: Inter, sans-serif; background: #f5f5f4; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1.5rem; }
         .card { background: white; border-radius: 1.5rem; padding: 2.5rem 2rem; text-align: center; max-width: 380px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
         .icon { width: 64px; height: 64px; background: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; }
         h1 { font-size: 1.25rem; font-weight: 700; color: #1c1917; margin-bottom: .5rem; }
         p { font-size: .875rem; color: #78716c; line-height: 1.6; margin-bottom: 1.5rem; }
-        a { display: inline-block; background: #d97706; color: white; font-size: .875rem; font-weight: 600; padding: .625rem 1.5rem; border-radius: .75rem; text-decoration: none; }
-        a:hover { background: #b45309; }
+        a { display: inline-block; background: #1a6b79; color: white; font-size: .875rem; font-weight: 600; padding: .625rem 1.5rem; border-radius: .75rem; text-decoration: none; }
+        a:hover { background: #0c4c55; }
         .brand { display: flex; align-items: center; justify-content: center; gap: .5rem; margin-bottom: 1.5rem; }
-        .brand-icon { width: 32px; height: 32px; background: #d97706; border-radius: .5rem; display: flex; align-items: center; justify-content: center; }
+        .brand-icon { width: 32px; height: 32px; background: #1a6b79; border-radius: .5rem; display: flex; align-items: center; justify-content: center; }
         .brand span { font-size: 1rem; font-weight: 700; color: #1c1917; }
-        .brand span em { color: #d97706; font-style: normal; }
+        .brand span em { color: #1a6b79; font-style: normal; }
     </style>
 </head>
 <body>

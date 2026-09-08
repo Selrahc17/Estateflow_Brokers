@@ -1,4 +1,4 @@
-const CACHE_NAME = 'estateflow-v2';
+const CACHE_NAME = 'estateflow-v3';
 const OFFLINE_URL = '/offline';
 const PRECACHE = ['/', '/manifest.json', '/favicon.ico', OFFLINE_URL];
 
@@ -42,16 +42,10 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // Network-first for HTML pages
+    // Never cache HTML pages because authenticated responses may contain private data.
     e.respondWith(
         fetch(e.request)
-            .then((res) => {
-                if (res.ok) {
-                    const copy = res.clone();
-                    caches.open(CACHE_NAME).then((c) => c.put(e.request, copy));
-                }
-                return res;
-            })
+            .then((res) => res)
             .catch(() =>
                 caches.match(e.request).then((cached) => cached || caches.match(OFFLINE_URL))
             )

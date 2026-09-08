@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#dc2626">
+    <meta name="theme-color" content="#1A6B79">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="EstateFlow Admin">
@@ -13,11 +13,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: true }" @resize.window="sidebarOpen = window.innerWidth >= 1024">
+<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: window.innerWidth >= 1024 }" @resize.window="if (window.innerWidth < 1024) sidebarOpen = false">
 
     {{-- Sidebar --}}
-    <aside :class="sidebarOpen ? 'w-64' : 'w-16'"
-           class="fixed top-0 left-0 h-screen bg-stone-900 text-white transition-all duration-300 z-50 flex flex-col">
+        <div x-show="sidebarOpen && window.innerWidth < 1024" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-40 lg:hidden" aria-hidden="true"></div>
+        <aside class="fixed top-0 left-0 h-screen bg-stone-900 text-white transition-all duration-300 z-50 flex flex-col"
+            :class="window.innerWidth < 1024 ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64') : (sidebarOpen ? 'w-64' : 'w-16')">
 
         {{-- Logo --}}
         <div class="flex items-center gap-3 px-4 py-5 border-b border-stone-700">
@@ -123,12 +124,12 @@
     </aside>
 
     {{-- Main Content --}}
-    <div :class="sidebarOpen ? 'ml-64' : 'ml-16'" class="transition-all duration-300 min-h-screen flex flex-col">
+    <div :class="window.innerWidth < 1024 ? 'ml-0' : (sidebarOpen ? 'ml-64' : 'ml-16')" class="transition-all duration-300 min-h-screen flex flex-col">
 
         {{-- Top Header --}}
         <header class="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
             <div class="flex items-center gap-4">
-                <button @click="sidebarOpen = !sidebarOpen" class="text-stone-500 hover:text-red-600 transition">
+                <button @click="sidebarOpen = !sidebarOpen" aria-label="Toggle navigation menu" class="text-stone-500 hover:text-red-600 transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div>

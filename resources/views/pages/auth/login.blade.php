@@ -7,10 +7,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(251,191,36,0.14),_transparent_28%),linear-gradient(135deg,_#f8fafc_0%,_#f5f5f4_100%)] font-sans flex">
+<body class="bg-stone-100 font-sans min-h-screen flex items-center justify-center p-6">
 
     {{-- Left Panel --}}
-    <div class="hidden lg:flex lg:w-1/2 bg-stone-900 flex-col justify-between p-12 relative overflow-hidden">
+    <div class="hidden">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(245,158,11,0.25),_transparent_30%),linear-gradient(135deg,_rgba(120,53,15,0.7),_rgba(28,25,23,0.95))]"></div>
         <div class="relative z-10">
             <div class="flex items-center gap-3 mb-16">
@@ -48,11 +48,10 @@
     </div>
 
     {{-- Right Panel --}}
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 lg:p-12">
-        <div class="w-full max-w-md rounded-3xl border border-stone-200/80 bg-white/80 p-8 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.25)] backdrop-blur">
+    <div class="w-full max-w-lg bg-white rounded-2xl border border-stone-200 p-8 shadow-sm">
 
             {{-- Mobile Logo --}}
-            <div class="flex items-center justify-between gap-2 mb-8 lg:hidden">
+            <div class="flex items-center justify-between gap-2 mb-6">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-teal-700 rounded-lg flex items-center justify-center">
                         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -64,19 +63,18 @@
                 </a>
             </div>
 
-            <div class="mb-8">
-                <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-sm font-medium text-stone-500 hover:text-teal-700 transition mb-4">
+            <div class="mb-6">
+                <a href="{{ url('/') }}" class="hidden">
                     <span>←</span>
                     <span>Back to Home</span>
                 </a>
-                <p class="text-sm font-semibold uppercase tracking-[0.25em] text-teal-700 mb-2">Welcome back</p>
-                <h2 class="text-3xl font-bold text-stone-800">Sign in to your account</h2>
-                <p class="text-stone-500 text-sm mt-2">Access your dashboard and manage your real estate work.</p>
+                <h2 class="text-2xl font-bold text-stone-800 mb-1">Welcome Back</h2>
+                <p class="text-stone-400 text-sm">Sign in to manage your real estate work</p>
             </div>
 
             {{-- Error --}}
             @if($errors->any())
-            <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+            <div class="bg-red-50 border border-red-200 rounded-xl p-3 mb-5">
                 {{ $errors->first() }}
             </div>
             @endif
@@ -87,13 +85,13 @@
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">Email Address</label>
                     <input type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required
-                        class="w-full border border-stone-200 rounded-2xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-500 bg-white shadow-sm">
+                        class="w-full border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
                 <div>
                     <label class="text-sm text-stone-600 font-medium mb-1 block">Password</label>
                     <div class="relative">
                         <input id="password" type="password" name="password" placeholder="••••••••" required
-                            class="w-full border border-stone-200 rounded-2xl px-4 py-3 text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-500 bg-white shadow-sm pr-11">
+                            class="w-full border border-stone-200 rounded-xl px-4 py-2.5 pr-11 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                         <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-teal-700 transition">
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -125,14 +123,14 @@
                 </div>
 
                 <button type="submit"
-                    class="block w-full bg-teal-700 hover:bg-teal-800 text-white text-center py-3 rounded-2xl font-semibold transition shadow-lg shadow-amber-600/20">
+                    class="w-full bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl font-medium transition">
                     Sign In
                 </button>
             </form>
 
             <p class="text-center text-sm text-stone-400 mt-6">
                 Don't have an account?
-                <a href="{{ route('auth.register') }}" class="text-teal-700 hover:underline font-medium">Register here</a>
+                <a href="{{ route('auth.register') }}" class="text-teal-700 hover:underline font-medium">Create an account</a>
             </p>
 
         </div>

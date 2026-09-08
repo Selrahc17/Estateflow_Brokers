@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer(['layouts.app', 'layouts.broker', 'layouts.client', 'layouts.public'], function ($view) {
+        View::composer(['layouts.app', 'layouts.broker', 'layouts.client', 'layouts.public', 'pages.auth.login'], function ($view) {
             $view->with('appLogo', Setting::get('logo_url', null));
         });
 

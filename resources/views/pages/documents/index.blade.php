@@ -42,6 +42,22 @@
                 </td>
                 <td class="px-5 py-3 text-stone-400 text-xs">{{ $doc->created_at->format('M d, Y') }}</td>
                 <td class="px-5 py-3">
+                    <div class="mb-2">
+                        @if($doc->checked_at)
+                            <span class="text-xs font-medium {{ $doc->check_status === 'passed' ? 'text-green-700' : ($doc->check_status === 'failed' ? 'text-red-600' : 'text-amber-700') }}">
+                                Check: {{ ucfirst(str_replace('_', ' ', $doc->check_status)) }} ({{ $doc->check_score }}%)
+                            </span>
+                            @foreach($doc->check_findings ?? [] as $finding)
+                                <p class="text-xs text-stone-400">{{ $finding }}</p>
+                            @endforeach
+                        @else
+                            <span class="text-xs text-stone-400">Not checked</span>
+                        @endif
+                    </div>
+                    <form action="{{ route('agent.documents.check', $doc) }}" method="POST" class="mb-2">
+                        @csrf
+                        <button type="submit" class="text-xs text-teal-700 hover:underline">Run document check</button>
+                    </form>
                     @if($doc->status === 'pending')
                     <div class="flex gap-2">
                         <form action="{{ route('agent.documents.verify', $doc) }}" method="POST">

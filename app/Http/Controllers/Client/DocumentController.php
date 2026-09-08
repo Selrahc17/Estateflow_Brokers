@@ -7,6 +7,7 @@ use App\Models\Document;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\DocumentCheckService;
 use Illuminate\View\View;
 
 class DocumentController extends Controller
@@ -42,7 +43,8 @@ class DocumentController extends Controller
         $data['client_id'] = $client->id;
         $data['status'] = 'pending';
 
-        Document::create($data);
+        $document = Document::create($data);
+        app(DocumentCheckService::class)->checkAndStore($document);
 
         return redirect()->route('client.account.documents')->with('success', 'Document uploaded successfully.');
     }

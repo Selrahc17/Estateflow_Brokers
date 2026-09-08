@@ -7,6 +7,7 @@ use App\Models\Document;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\DocumentCheckService;
 use Illuminate\View\View;
 
 class DocumentController extends Controller
@@ -31,6 +32,14 @@ class DocumentController extends Controller
         ]);
 
         return redirect()->route('agent.documents.index')->with('success', 'Document verified successfully.');
+    }
+
+    public function check(Document $document, DocumentCheckService $checker): RedirectResponse
+    {
+        $this->ensureOwnership($document);
+        $checker->checkAndStore($document);
+
+        return redirect()->route('agent.documents.index')->with('success', 'Document check completed.');
     }
 
     public function reject(Request $request, Document $document): RedirectResponse

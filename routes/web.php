@@ -255,6 +255,7 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::get('/clients/{client}/edit', [BrokerClientController::class, 'edit'])->name('clients.edit');
     Route::put('/clients/{client}', [BrokerClientController::class, 'update'])->name('clients.update');
     Route::get('/documents', [BrokerDocumentController::class, 'index'])->name('documents.index');
+    Route::post('/documents/{document}/check', [BrokerDocumentController::class, 'check'])->name('documents.check');
     Route::get('/documents/{document}/download', [BrokerDocumentController::class, 'download'])->name('documents.download');
     Route::post('/documents/{document}/verify', [BrokerDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [BrokerDocumentController::class, 'reject'])->name('documents.reject');

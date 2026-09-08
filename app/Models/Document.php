@@ -12,13 +12,16 @@ class Document extends Model
 
     protected $fillable = [
         'client_id', 'broker_id', 'uploaded_by', 'name', 'type', 'file_path',
-        'file_size', 'status', 'notes', 'verified_at',
+        'file_size', 'status', 'notes', 'verified_at', 'check_status',
+        'check_score', 'check_findings', 'checked_at',
     ];
 
     protected function casts(): array
     {
         return [
             'verified_at' => 'datetime',
+            'check_findings' => 'array',
+            'checked_at' => 'datetime',
         ];
     }
 

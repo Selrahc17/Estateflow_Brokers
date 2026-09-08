@@ -13,8 +13,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: false }">
-    <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 z-40 bg-black/40 lg:hidden" aria-hidden="true"></div>
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-[var(--color-sidebar)] text-white transition-transform duration-300 lg:translate-x-0">
+    <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 z-[9998] bg-black/40 lg:hidden" aria-hidden="true"></div>
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-[9999] flex w-64 flex-col bg-[var(--color-sidebar)] text-white transition-transform duration-300 lg:translate-x-0">
         <div class="border-b border-[var(--color-primary-dark)] px-5 py-5">
             <div class="mb-1 flex items-center gap-2">
                 <div class="h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-[var(--color-primary)] flex items-center justify-center">

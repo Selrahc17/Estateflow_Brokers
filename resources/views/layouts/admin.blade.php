@@ -16,8 +16,8 @@
 <body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: window.innerWidth >= 1024 }" @resize.window="if (window.innerWidth < 1024) sidebarOpen = false">
 
     {{-- Sidebar --}}
-        <div x-show="sidebarOpen && window.innerWidth < 1024" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-40 lg:hidden" aria-hidden="true"></div>
-        <aside class="fixed top-0 left-0 h-screen bg-stone-900 text-white transition-all duration-300 z-50 flex flex-col"
+        <div x-show="sidebarOpen && window.innerWidth < 1024" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-[9998] lg:hidden" aria-hidden="true"></div>
+        <aside class="fixed top-0 left-0 h-screen bg-stone-900 text-white transition-all duration-300 z-[9999] flex flex-col"
             :class="window.innerWidth < 1024 ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64') : (sidebarOpen ? 'w-64' : 'w-16')">
 
         {{-- Logo --}}
@@ -34,7 +34,7 @@
         </div>
 
         {{-- Navigation --}}
-        <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+        <nav class="min-h-0 flex-1 overflow-y-auto py-4 px-2 space-y-1">
 
             <p x-show="sidebarOpen" class="text-xs text-stone-500 uppercase tracking-widest px-3 pb-2">Overview</p>
 
@@ -105,7 +105,7 @@
         </nav>
 
         {{-- Admin Profile --}}
-        <div class="border-t border-stone-700 p-3">
+        <div class="shrink-0 border-t border-stone-700 p-3 pb-[env(safe-area-inset-bottom)]">
             <div class="flex items-center gap-3 px-2 py-2 rounded-lg text-stone-300 hover:bg-stone-800 transition cursor-pointer">
                 <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-white">{{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}</div>
                 <div x-show="sidebarOpen">

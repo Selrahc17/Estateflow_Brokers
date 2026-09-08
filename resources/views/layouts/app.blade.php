@@ -16,8 +16,8 @@
 <body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: window.innerWidth >= 1024 }" @resize.window="if (window.innerWidth < 1024) sidebarOpen = false">
 
     {{-- Sidebar --}}
-        <div x-show="sidebarOpen && window.innerWidth < 1024" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-40 lg:hidden" aria-hidden="true"></div>
-            <aside class="fixed top-0 left-0 h-screen bg-[var(--color-sidebar)] text-white transition-all duration-300 z-50 flex flex-col"
+        <div x-show="sidebarOpen && window.innerWidth < 1024" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-[9998] lg:hidden" aria-hidden="true"></div>
+            <aside class="fixed top-0 left-0 h-screen bg-[var(--color-sidebar)] text-white transition-all duration-300 z-[9999] flex flex-col"
                 :class="window.innerWidth < 1024 ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64') : (sidebarOpen ? 'w-64' : 'w-16')">
 
         {{-- Logo --}}
@@ -33,7 +33,7 @@
         </div>
 
         {{-- Navigation --}}
-        <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+        <nav class="min-h-0 flex-1 overflow-y-auto py-4 px-2 space-y-1">
 
             <p x-show="sidebarOpen" class="text-xs text-[var(--color-primary-light)] uppercase tracking-widest px-3 pb-2">Main</p>
 
@@ -106,7 +106,7 @@
         </nav>
 
         {{-- Profile --}}
-        <div class="border-t border-[var(--color-primary-dark)] p-3">
+        <div class="shrink-0 border-t border-[var(--color-primary-dark)] p-3 pb-[env(safe-area-inset-bottom)]">
             <a href="{{ route('agent.settings.index') }}" class="flex items-center gap-3 px-2 py-2 rounded-lg text-teal-100 hover:bg-[var(--color-sidebar-hover)] transition">
                 <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 bg-[var(--color-primary)] flex items-center justify-center text-sm font-bold text-white">
                         @if(auth()->user()->avatar)

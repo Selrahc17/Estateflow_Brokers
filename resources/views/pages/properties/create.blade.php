@@ -77,8 +77,8 @@
                 </div>
             </div>
 
-            <div class="border border-stone-200 rounded-xl p-4 bg-stone-50">
-                <p class="text-sm font-semibold text-stone-700 mb-3">Property Specifications</p>
+            <div class="border border-stone-200 rounded-xl p-4 bg-stone-50" x-show="selectedType !== 'Lot Only'" x-cloak>
+                <p class="text-sm font-semibold text-stone-700 mb-3">House / Building Specifications</p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Bedrooms</label>
@@ -97,16 +97,23 @@
                         <input type="number" step="0.01" name="floor_area" min="0" value="{{ old('floor_area') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Lot Area (sqm)</label>
-                        <input type="number" step="0.01" name="lot_area" min="0" value="{{ old('lot_area') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Frontage (m)</label>
-                        <input type="number" step="0.01" name="frontage" min="0" value="{{ old('frontage') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    </div>
-                    <div>
                         <label class="block text-xs font-medium text-stone-500 mb-1">Parking Slots</label>
                         <input type="number" name="parking_slots" min="0" value="{{ old('parking_slots') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    </div>
+                </div>
+            </div>
+
+            <div class="border border-teal-200 rounded-xl p-4 bg-teal-50" x-show="selectedType === 'Lot Only'" x-cloak>
+                <p class="text-sm font-semibold text-teal-900 mb-1">Lot Specifications</p>
+                <p class="text-xs text-teal-700 mb-3">Use the separate Lots screen for individual lot inventory under a development.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-teal-800 mb-1">Lot Area (sqm)</label>
+                        <input type="number" step="0.01" name="lot_area" min="0" value="{{ old('lot_area') }}" placeholder="—" class="w-full border border-teal-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-teal-800 mb-1">Frontage (m)</label>
+                        <input type="number" step="0.01" name="frontage" min="0" value="{{ old('frontage') }}" placeholder="—" class="w-full border border-teal-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                     </div>
                 </div>
             </div>

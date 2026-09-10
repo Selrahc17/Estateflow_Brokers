@@ -15,12 +15,21 @@ class CommissionController extends Controller
 {
     public function index(): View
     {
-        $agreements = CommissionAgreement::where('agent_id', auth()->id())
-            ->with(['broker', 'property'])
+        $agreementIds = CommissionAgreement::where('agent_id', auth()->id())
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('property_id')
+            ->pluck('id');
+
+        $agreements = CommissionAgreement::whereIn('id', $agreementIds)
+            ->with(['broker', 'property', 'payments'])
             ->latest()
             ->paginate(10);
 
-        return view('pages.agent.commission.index', compact('agreements'));
+        $totalExpected = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->sum('agent_amount'));
+        $totalPaid = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'paid')->sum('agent_amount'));
+        $totalDisputed = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'disputed')->sum('agent_amount'));
+
+        return view('pages.agent.commission.index', compact('agreements', 'totalExpected', 'totalPaid', 'totalDisputed'));
     }
 
     public function show(CommissionAgreement $agreement): View

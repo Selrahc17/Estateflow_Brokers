@@ -16,10 +16,10 @@
         <div class="absolute top-3 left-3">
             <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500 text-white">Available</span>
         </div>
-        @if($property->lots_count > 0)
+        @if($property->type !== 'House and Lot' && $property->lots_count > 0)
         <div class="absolute top-3 right-3 space-y-1 text-right">
             <span class="px-2.5 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-medium text-stone-700 block">
-                {{ $property->lots_count }} lot{{ $property->lots_count > 1 ? 's' : '' }} available
+            {{ $property->lots_count }} {{ $property->type === 'Condominium' ? 'unit' : 'lot' }}{{ $property->lots_count > 1 ? 's' : '' }} available
             </span>
             <span class="px-2.5 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-medium text-stone-700 block">
                 {{ $property->type ?? 'Property' }}

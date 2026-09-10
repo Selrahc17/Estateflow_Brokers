@@ -47,7 +47,11 @@
                 <p class="font-semibold text-stone-800">{{ $property->name }}</p>
                 <p class="text-xs text-stone-400 mt-1">{{ $property->type }} · {{ $property->city }}</p>
                 <p class="text-lg font-bold text-teal-700 mt-3">₱{{ number_format($property->price, 0) }}</p>
-                <p class="text-xs text-stone-400 mt-1">{{ $property->available_lots_count }} available lot(s)</p>
+                @if($property->type !== 'House and Lot')
+                <p class="text-xs text-stone-400 mt-1">{{ $property->available_lots_count }} available {{ $property->type === 'Condominium' ? 'unit(s)' : 'lot(s)' }}</p>
+                @else
+                <p class="text-xs text-stone-400 mt-1">Whole property</p>
+                @endif
             </div>
         </a>
         @endforeach

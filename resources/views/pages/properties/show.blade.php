@@ -34,7 +34,11 @@
                 </dd></div>
                 <div><dt class="text-stone-400">Price</dt><dd class="font-medium">₱{{ number_format($property->price, 2) }}</dd></div>
                 <div><dt class="text-stone-400">Location</dt><dd class="font-medium">{{ $property->city }}, {{ $property->province }}</dd></div>
-                <div><dt class="text-stone-400">Lots</dt><dd class="font-medium">{{ $property->lots->count() }} total</dd></div>
+                @if($property->type === 'Condominium')
+                    <div><dt class="text-stone-400">Units</dt><dd class="font-medium">{{ $property->lots->count() }} total</dd></div>
+                @elseif($property->type !== 'House and Lot')
+                    <div><dt class="text-stone-400">Lots</dt><dd class="font-medium">{{ $property->lots->count() }} total</dd></div>
+                @endif
             </dl>
             @if($property->description)
                 <div class="mt-4 pt-4 border-t border-stone-100">
@@ -54,10 +58,11 @@
             @endif
         </div>
 
-        {{-- Lots Table --}}
+        @if($property->type !== 'House and Lot')
+        {{-- Lot or unit inventory table --}}
         <div class="bg-white rounded-xl border border-stone-200 p-6">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-stone-800">Lots</h2>
+            <h2 class="text-lg font-semibold text-stone-800">{{ $property->type === 'Condominium' ? 'Units' : 'Lots' }}</h2>
                 <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="text-sm bg-teal-700 hover:bg-teal-800 text-white px-3 py-1.5 rounded-lg font-medium transition">Add Lot</a>
             </div>
             <div class="overflow-x-auto">
@@ -94,6 +99,7 @@
                 </table>
             </div>
         </div>
+        @endif
     </div>
 
     {{-- Sidebar --}}
@@ -101,7 +107,9 @@
         <div class="bg-white rounded-xl border border-stone-200 p-4">
             <h3 class="text-sm font-semibold text-stone-700 mb-3">Quick Actions</h3>
             <div class="space-y-2">
-                <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="block text-center text-sm bg-teal-50 hover:bg-teal-100 text-teal-800 py-2 rounded-lg transition font-medium">+ Add Lot</a>
+                @if($property->type !== 'House and Lot')
+                    <a href="{{ route('agent.lots.create') }}?property_id={{ $property->id }}" class="block text-center text-sm bg-teal-50 hover:bg-teal-100 text-teal-800 py-2 rounded-lg transition font-medium">+ Add {{ $property->type === 'Condominium' ? 'Unit' : 'Lot' }}</a>
+                @endif
                 <a href="{{ route('agent.properties.edit', $property) }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">Edit Property</a>
                 <a href="{{ route('agent.reservations.create') }}" class="block text-center text-sm bg-stone-50 hover:bg-stone-100 text-stone-600 py-2 rounded-lg transition font-medium">+ New Reservation</a>
             </div>

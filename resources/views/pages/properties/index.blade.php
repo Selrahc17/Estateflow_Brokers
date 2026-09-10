@@ -62,13 +62,19 @@
                 </div>
             </div>
             <div class="flex items-center justify-between text-xs text-stone-500 mt-3 pt-3 border-t border-stone-100">
-                <span>{{ $property->available_lots_count }} available / {{ $property->lots_count }} total units</span>
+                @if($property->type === 'House and Lot')
+                    <span>Whole property</span>
+                @elseif($property->type === 'Condominium')
+                    <span>{{ $property->available_lots_count }} available / {{ $property->lots_count }} total units</span>
+                @else
+                    <span>{{ $property->available_lots_count }} available / {{ $property->lots_count }} total lots</span>
+                @endif
                 @if($property->price)
                     <span class="text-green-600 font-medium">₱{{ number_format($property->price, 2) }}</span>
                 @endif
             </div>
             <div class="flex gap-2 mt-3">
-                <a href="{{ route('agent.properties.show', $property) }}" class="flex-1 text-center text-xs bg-teal-50 hover:bg-teal-100 text-teal-800 py-1.5 rounded-lg transition font-medium">View Lots</a>
+                <a href="{{ route('agent.properties.show', $property) }}" class="flex-1 text-center text-xs bg-teal-50 hover:bg-teal-100 text-teal-800 py-1.5 rounded-lg transition font-medium">View Property</a>
                 <a href="{{ route('agent.properties.edit', $property) }}" class="flex-1 text-center text-xs bg-stone-50 hover:bg-stone-100 text-stone-600 py-1.5 rounded-lg transition font-medium">Edit</a>
                 <form method="POST" action="{{ route('agent.properties.destroy', $property) }}" onsubmit="return confirm('Delete this property?')" class="w-24">
                     @csrf @method('DELETE')

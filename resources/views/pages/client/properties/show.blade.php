@@ -218,11 +218,11 @@
                 @endif
             </div>
 
-            {{-- Lot Availability Map --}}
-            @if($property->lots->count())
+            {{-- Lot or unit availability map --}}
+            @if($property->type !== 'House and Lot' && $property->lots->count())
             <div class="bg-white rounded-2xl border border-stone-200 p-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-stone-800">Lot Availability</h3>
+                    <h3 class="font-semibold text-stone-800">{{ $property->type === 'Condominium' ? 'Unit Availability' : 'Lot Availability' }}</h3>
                     <div class="flex items-center gap-3 text-xs">
                         <span class="flex items-center gap-1"><span class="w-3 h-3 bg-green-400 rounded inline-block"></span> Available</span>
                         <span class="flex items-center gap-1"><span class="w-3 h-3 bg-teal-500 rounded inline-block"></span> Reserved</span>
@@ -260,7 +260,7 @@
             {{-- Inquiry / Reserve CTA --}}
             <div class="bg-white rounded-2xl border border-stone-200 p-5">
                 <h3 class="font-semibold text-stone-800 mb-1">Interested in this property?</h3>
-                <p class="text-xs text-stone-400 mb-4">Send an inquiry or reserve a lot today.</p>
+                <p class="text-xs text-stone-400 mb-4">Send an inquiry or {{ $property->type === 'House and Lot' ? 'request this property' : ($property->type === 'Condominium' ? 'reserve a unit' : 'reserve a lot') }} today.</p>
 
                 @auth
                 <form action="{{ route('client.account.inquiries.store', $property->id) }}" method="POST" class="space-y-3">

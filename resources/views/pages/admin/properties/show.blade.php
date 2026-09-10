@@ -33,8 +33,9 @@
             </div>
         </div>
 
+        @if($property->type !== 'House and Lot')
         <div class="bg-white rounded-xl border border-stone-200 p-5">
-            <h3 class="font-semibold text-stone-800 mb-4">Lots</h3>
+            <h3 class="font-semibold text-stone-800 mb-4">{{ $property->type === 'Condominium' ? 'Units' : 'Lots' }}</h3>
             @if($property->lots->count() > 0)
             <table class="w-full text-sm">
                 <thead class="bg-stone-50 border-b border-stone-100">
@@ -64,9 +65,10 @@
                 </tbody>
             </table>
             @else
-            <p class="text-stone-400 text-center py-4">No lots available.</p>
+            <p class="text-stone-400 text-center py-4">No {{ $property->type === 'Condominium' ? 'units' : 'lots' }} available.</p>
             @endif
         </div>
+        @endif
     </div>
 
     <div>

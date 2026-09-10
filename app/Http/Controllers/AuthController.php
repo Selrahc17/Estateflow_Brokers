@@ -96,7 +96,7 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
-            return redirect()->intended($this->redirectForRole($user));
+            return redirect($this->redirectForRole($user));
         }
 
         return back()->withErrors([

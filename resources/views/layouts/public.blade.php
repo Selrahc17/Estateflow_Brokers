@@ -96,6 +96,7 @@
                     @endguest
 
                     @auth
+                    @if(auth()->user()->role === 'client')
                     {{-- Logged-in Account Dropdown --}}
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" @click.outside="open = false"
@@ -165,6 +166,11 @@
                             </div>
                         </div>
                     </div>
+                    @else
+                        <a href="{{ $userRoleDashboard ?? route(auth()->user()->role . '.dashboard') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] transition px-3 py-2">
+                            Go to Dashboard
+                        </a>
+                    @endif
                     @endauth
                 </div>
 
@@ -192,12 +198,16 @@
             <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">Lot Only</a>
             <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">Condominium</a>
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2">
+                @if(auth()->check() && auth()->user()->role === 'client')
                 <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-2">My Account</p>
                 <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Reservation</a>
                 <a href="{{ route('client.account.documents') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Documents</a>
                 <a href="{{ route('client.account.notifications') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">Notifications</a>
                 <a href="{{ route('client.account.feedback') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">Feedback & Ratings</a>
                 <a href="{{ route('client.account.profile') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Profile</a>
+                @elseif(auth()->check())
+                <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">Go to Dashboard</a>
+                @endif
             </div>
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2 flex gap-2">
                 <a href="{{ route('auth.login') }}" class="flex-1 text-center border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 text-sm py-2 rounded-xl">Sign In</a>

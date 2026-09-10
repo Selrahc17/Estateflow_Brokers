@@ -100,4 +100,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reservation::class, 'broker_id');
     }
+
+    public function agentDocuments()
+    {
+        return $this->hasMany(Document::class, 'agent_id');
+    }
 }

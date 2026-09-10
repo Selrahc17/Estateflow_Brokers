@@ -1,7 +1,7 @@
 @extends('layouts.broker')
 @section('title', 'Edit Agent')
 @section('page-title', 'Edit Agent')
-@section('page-subtitle', 'Update {{ $agent->name }}')
+@section('page-subtitle', 'Update ' . $agent->name)
 
 @section('content')
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -75,6 +75,42 @@
                 <a href="{{ route('broker.agents.index') }}" class="border border-stone-200 hover:bg-stone-50 text-stone-600 px-6 py-2.5 rounded-lg text-sm font-medium transition">Cancel</a>
             </div>
         </form>
+
+        <div class="mt-8 border-t border-stone-100 pt-6">
+            <h2 class="font-semibold text-stone-800 mb-1">Supporting Identification</h2>
+            <p class="text-xs text-stone-400 mb-4">Upload the ID submitted by this agent.</p>
+            @if(session('success'))
+                <p class="mb-3 text-sm text-green-700">{{ session('success') }}</p>
+            @endif
+            <form action="{{ route('broker.agents.documents.store', $agent) }}" method="POST" enctype="multipart/form-data" class="space-y-3">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <select name="type" required class="border border-stone-200 rounded-lg px-3 py-2.5 text-sm">
+                        <option value="">Select ID type</option>
+                        <option value="drivers_license">Driver's License</option>
+                        <option value="physical_id">Physical ID</option>
+                        <option value="postal_id">Postal ID</option>
+                        <option value="national_id">National ID</option>
+                        <option value="other">Other ID</option>
+                    </select>
+                    <input type="file" name="file" required accept=".jpg,.jpeg,.png,.pdf" class="border border-stone-200 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <button type="submit" class="bg-stone-800 hover:bg-stone-900 text-white px-4 py-2 rounded-lg text-sm font-medium">Upload ID</button>
+            </form>
+            <div class="mt-4 space-y-2">
+                @forelse($agent->agentDocuments as $document)
+                    <div class="flex items-center justify-between gap-3 border border-stone-100 rounded-lg px-3 py-2 text-sm">
+                        <div>
+                            <p class="font-medium text-stone-700">{{ ucfirst(str_replace('_', ' ', $document->type)) }}</p>
+                            <p class="text-xs text-stone-400">{{ number_format($document->file_size / 1024, 1) }} KB · {{ ucfirst($document->status) }}</p>
+                        </div>
+                        <a href="{{ route('broker.agents.documents.download', [$agent, $document]) }}" class="text-xs text-teal-700 hover:underline">Download</a>
+                    </div>
+                @empty
+                    <p class="text-sm text-stone-400">No supporting ID uploaded yet.</p>
+                @endforelse
+            </div>
+        </div>
     </div>
 
 </div>

@@ -11,7 +11,7 @@ class Document extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'client_id', 'broker_id', 'uploaded_by', 'name', 'type', 'file_path',
+        'client_id', 'agent_id', 'broker_id', 'uploaded_by', 'name', 'type', 'file_path',
         'file_size', 'status', 'notes', 'verified_at', 'check_status',
         'check_score', 'check_findings', 'checked_at',
     ];
@@ -33,6 +33,11 @@ class Document extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(User::class, 'agent_id');
     }
 
     public function uploader()

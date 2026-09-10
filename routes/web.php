@@ -185,6 +185,8 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'au
     Route::get('/agents/create', [BrokerAgentController::class, 'create'])->name('agents.create');
     Route::post('/agents', [BrokerAgentController::class, 'store'])->name('agents.store');
     Route::get('/agents/{agent}/edit', [BrokerAgentController::class, 'edit'])->name('agents.edit');
+    Route::post('/agents/{agent}/documents', [BrokerAgentController::class, 'uploadDocument'])->name('agents.documents.store');
+    Route::get('/agents/{agent}/documents/{document}/download', [BrokerAgentController::class, 'downloadDocument'])->name('agents.documents.download');
     Route::put('/agents/{agent}', [BrokerAgentController::class, 'update'])->name('agents.update');
     Route::delete('/agents/{agent}', [BrokerAgentController::class, 'destroy'])->name('agents.destroy');
     Route::patch('/agents/{agent}/toggle-status', [BrokerAgentController::class, 'toggleStatus'])->name('agents.toggle-status');

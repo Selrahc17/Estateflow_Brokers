@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Broker;
 
 use App\Http\Controllers\Controller;
+use App\Models\Document;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -40,6 +41,8 @@ class AgentController extends Controller
             'phone'    => ['nullable', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'avatar'   => ['nullable', 'image', 'max:2048'],
+            'document_type' => ['nullable', 'required_with:document_file', 'in:drivers_license,physical_id,postal_id,national_id,other'],
+            'document_file' => ['nullable', 'required_with:document_type', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
         ]);
 
         $avatarUrl = null;
@@ -50,7 +53,7 @@ class AgentController extends Controller
             $avatarUrl = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
         }
 
-        User::create([
+        $agent = User::create([
             'name'        => $data['name'],
             'email'       => $data['email'],
             'phone'       => $data['phone'] ?? null,
@@ -62,13 +65,63 @@ class AgentController extends Controller
             'is_approved' => true,
         ]);
 
+        if ($request->hasFile('document_file')) {
+            $file = $request->file('document_file');
+            Document::create([
+                'agent_id' => $agent->id,
+                'broker_id' => auth()->id(),
+                'uploaded_by' => auth()->id(),
+                'name' => ucfirst(str_replace('_', ' ', $data['document_type'])),
+                'type' => $data['document_type'],
+                'file_path' => $file->store('agent-documents/'.$agent->id, 'local'),
+                'file_size' => $file->getSize(),
+                'status' => 'pending',
+            ]);
+        }
+
         return redirect()->route('broker.agents.index')->with('success', 'Agent added successfully.');
     }
 
     public function edit(User $agent): View
     {
         $this->ensureOwnedAgent($agent);
+        $agent->load(['agentDocuments' => fn ($query) => $query->where('broker_id', auth()->id())->latest()]);
         return view('pages.broker.agents.edit', compact('agent'));
+    }
+
+    public function uploadDocument(Request $request, User $agent): RedirectResponse
+    {
+        $this->ensureOwnedAgent($agent);
+
+        $data = $request->validate([
+            'type' => ['required', 'in:drivers_license,physical_id,postal_id,national_id,other'],
+            'file' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store('agent-documents/'.$agent->id, 'local');
+
+        Document::create([
+            'agent_id' => $agent->id,
+            'broker_id' => auth()->id(),
+            'uploaded_by' => auth()->id(),
+            'name' => ucfirst(str_replace('_', ' ', $data['type'])),
+            'type' => $data['type'],
+            'file_path' => $path,
+            'file_size' => $file->getSize(),
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', 'Agent identification document uploaded successfully.');
+    }
+
+    public function downloadDocument(User $agent, Document $document)
+    {
+        $this->ensureOwnedAgent($agent);
+        abort_unless((int) $document->agent_id === (int) $agent->id && (int) $document->broker_id === (int) auth()->id(), 404);
+        abort_unless(Storage::disk('local')->exists($document->file_path), 404);
+
+        return Storage::disk('local')->download($document->file_path, $document->name.'.'.pathinfo($document->file_path, PATHINFO_EXTENSION));
     }
 
     public function update(Request $request, User $agent): RedirectResponse

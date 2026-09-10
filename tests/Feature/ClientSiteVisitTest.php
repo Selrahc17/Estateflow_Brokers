@@ -24,6 +24,7 @@ class ClientSiteVisitTest extends TestCase
             'last_name' => 'Dela Cruz',
             'email' => $clientUser->email,
             'password' => 'password',
+            'qualification_status' => 'under_review',
         ]);
         $property = Property::create([
             'broker_id' => $broker->id,

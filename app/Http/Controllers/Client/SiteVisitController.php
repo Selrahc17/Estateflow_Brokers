@@ -31,6 +31,12 @@ class SiteVisitController extends Controller
             ]);
         }
 
+        if ($client->qualification_status !== 'under_review') {
+            return back()->withErrors([
+                'site_visit' => 'A site visit can be requested after the agent starts reviewing your requirements.',
+            ]);
+        }
+
         $data = $request->validate([
             'scheduled_at' => 'required|date|after:now',
             'notes' => 'nullable|string|max:1000',

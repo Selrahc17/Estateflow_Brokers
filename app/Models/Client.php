@@ -24,6 +24,7 @@ class Client extends Authenticatable
         'address',
         'profile_photo',
         'status',
+        'qualification_status',
         'email_verified',
         'email_verification_token',
     ];

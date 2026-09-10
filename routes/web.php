@@ -254,6 +254,7 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::get('/clients/{client}', [BrokerClientController::class, 'show'])->name('clients.show');
     Route::get('/clients/{client}/edit', [BrokerClientController::class, 'edit'])->name('clients.edit');
     Route::put('/clients/{client}', [BrokerClientController::class, 'update'])->name('clients.update');
+    Route::patch('/clients/{client}/qualification-status', [BrokerClientController::class, 'updateQualificationStatus'])->name('clients.qualification-status');
     Route::get('/documents', [BrokerDocumentController::class, 'index'])->name('documents.index');
     Route::post('/documents/{document}/check', [BrokerDocumentController::class, 'check'])->name('documents.check');
     Route::get('/documents/{document}/download', [BrokerDocumentController::class, 'download'])->name('documents.download');

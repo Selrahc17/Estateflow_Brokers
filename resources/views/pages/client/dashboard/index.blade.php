@@ -32,6 +32,24 @@
 </div>
 
 <div class="max-w-6xl mx-auto px-6 py-8">
+    @if($client)
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <p class="text-xs uppercase tracking-widest text-stone-400 font-semibold">Requirements Review</p>
+            <p class="text-lg font-semibold text-stone-800 mt-1">{{ ucfirst(str_replace('_', ' ', $client->qualification_status)) }}</p>
+            <p class="text-sm text-stone-500 mt-1">
+                @switch($client->qualification_status)
+                    @case('pending') Submit your requirements for the agent to review. @break
+                    @case('under_review') Your requirements are being reviewed. A site visit may be scheduled. @break
+                    @case('approved') You are approved to proceed with a reservation. @break
+                    @case('rejected') Please contact your agent for more information. @break
+                @endswitch
+            </p>
+        </div>
+        <a href="{{ route('client.account.documents') }}" class="text-sm text-teal-700 hover:underline">View documents</a>
+    </div>
+    @endif
+
     <h2 class="font-semibold text-stone-800 mb-4">Quick Access</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         @foreach([

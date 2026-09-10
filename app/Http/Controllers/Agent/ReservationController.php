@@ -27,7 +27,7 @@ class ReservationController extends Controller
 
     public function create(): View
     {
-        $clients = Client::where('broker_id', auth()->id())->get();
+        $clients = Client::where('broker_id', auth()->id())->where('qualification_status', 'approved')->get();
         $lots = Lot::whereHas('property', fn($q) => $q->where('broker_id', auth()->id()))
             ->where('status', 'available')
             ->with('property')
@@ -53,6 +53,16 @@ class ReservationController extends Controller
             'payment_terms_months' => 'required|integer|min:1|max:360',
             'notes'              => 'nullable|string',
         ]);
+
+        $client = Client::whereKey($data['client_id'])
+            ->where('broker_id', auth()->id())
+            ->where('qualification_status', 'approved')
+            ->first();
+        if (!$client) {
+            return back()->withErrors([
+                'client_id' => 'The client must be approved before creating a reservation.',
+            ])->withInput();
+        }
 
         $data['broker_id'] = auth()->id();
         $data['agent_id'] = auth()->id();

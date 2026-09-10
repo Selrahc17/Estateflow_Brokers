@@ -120,6 +120,25 @@ class ClientController extends Controller
         return redirect()->route('agent.clients.index')->with('success', 'Client updated successfully.');
     }
 
+    public function updateQualificationStatus(Request $request, Client $client): RedirectResponse
+    {
+        $this->ensureOwnership($client);
+
+        $data = $request->validate([
+            'qualification_status' => 'required|in:pending,under_review,approved,rejected',
+        ]);
+
+        if ($data['qualification_status'] === 'approved' && ! $client->siteVisits()->where('status', 'completed')->exists()) {
+            return back()->withErrors([
+                'qualification_status' => 'Complete a site visit before approving this client.',
+            ]);
+        }
+
+        $client->update($data);
+
+        return back()->with('success', 'Client qualification status updated successfully.');
+    }
+
     public function aiLeadScore(Request $request): JsonResponse
     {
         $data = $request->validate([

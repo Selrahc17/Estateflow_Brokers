@@ -45,6 +45,15 @@ class SiteVisitController extends Controller
             'status'       => 'required|in:pending,confirmed,completed,cancelled',
         ]);
 
+        $client = Client::whereKey($data['client_id'])
+            ->where('broker_id', auth()->id())
+            ->firstOrFail();
+        if ($client->qualification_status !== 'under_review') {
+            return back()->withErrors([
+                'client_id' => 'The client must be under review before a site visit can be scheduled.',
+            ])->withInput();
+        }
+
         $data['broker_id'] = auth()->id();
 
         SiteVisit::create($data);

@@ -25,11 +25,26 @@
                     {{ ucfirst($client->status) }}
                 </span>
             </div>
+            <div class="flex justify-between items-center gap-3"><span class="text-stone-400">Qualification</span>
+                <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">
+                    {{ ucfirst(str_replace('_', ' ', $client->qualification_status)) }}
+                </span>
+            </div>
             <div class="flex justify-between"><span class="text-stone-400">Address</span><span class="text-stone-700 text-right max-w-[60%]">{{ $client->address ?? '—' }}</span></div>
             <div class="flex justify-between"><span class="text-stone-400">Joined</span><span class="text-stone-700">{{ $client->created_at->format('M d, Y') }}</span></div>
         </div>
         <div class="mt-5 pt-4 border-t border-stone-100">
             <a href="{{ route('agent.clients.edit', $client) }}" class="block text-center bg-teal-700 hover:bg-teal-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition">Edit Client</a>
+            <form action="{{ route('agent.clients.qualification-status', $client) }}" method="POST" class="mt-3 flex gap-2">
+                @csrf
+                @method('PATCH')
+                <select name="qualification_status" class="min-w-0 flex-1 border border-stone-200 rounded-lg px-2 py-2 text-xs">
+                    @foreach(['pending', 'under_review', 'approved', 'rejected'] as $qualificationStatus)
+                    <option value="{{ $qualificationStatus }}" @selected($client->qualification_status === $qualificationStatus)>{{ ucfirst(str_replace('_', ' ', $qualificationStatus)) }}</option>
+                    @endforeach
+                </select>
+                <button type="submit" class="bg-stone-800 hover:bg-stone-900 text-white px-3 py-2 rounded-lg text-xs font-medium">Update</button>
+            </form>
         </div>
     </div>
 

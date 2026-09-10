@@ -36,6 +36,12 @@ class ReservationController extends Controller
             ]);
         }
 
+        if ($client->qualification_status !== 'approved') {
+            return back()->withErrors([
+                'reservation' => 'Your requirements must be approved before requesting a reservation.',
+            ]);
+        }
+
         $reservation = DB::transaction(function () use ($lot, $client, $request) {
             $lot = Lot::with('property')
                 ->whereKey($lot->id)

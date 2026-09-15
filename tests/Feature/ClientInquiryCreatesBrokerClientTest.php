@@ -87,4 +87,43 @@ class ClientInquiryCreatesBrokerClientTest extends TestCase
         ]);
         $this->assertDatabaseMissing('clients', ['email' => 'someone-else@example.com']);
     }
+
+    public function test_guest_can_submit_a_property_inquiry_and_agent_receives_notification(): void
+    {
+        $broker = User::factory()->create(['role' => 'broker', 'is_active' => true, 'is_approved' => true]);
+        $property = Property::create([
+            'broker_id' => $broker->id,
+            'name' => 'Guest Inquiry Listing',
+            'slug' => 'guest-inquiry-listing',
+            'type' => 'House and Lot',
+            'status' => 'available',
+        ]);
+
+        $response = $this->post(route('client.property.inquire', $property), [
+            'name' => 'Jane Guest',
+            'message' => 'I would like to know more about the property.',
+            'phone' => '09181234567',
+            'email' => 'jane.guest@example.com',
+        ]);
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('inquiries', [
+            'property_id' => $property->id,
+            'broker_id' => $broker->id,
+            'email' => 'jane.guest@example.com',
+            'user_id' => null,
+        ]);
+        $this->assertDatabaseHas('clients', [
+            'broker_id' => $broker->id,
+            'email' => 'jane.guest@example.com',
+            'first_name' => 'Jane',
+            'last_name' => 'Guest',
+        ]);
+        $this->assertDatabaseHas('app_notifications', [
+            'user_id' => $broker->id,
+            'type' => 'inquiry',
+            'title' => 'New property inquiry',
+        ]);
+    }
 }

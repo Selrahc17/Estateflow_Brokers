@@ -87,11 +87,12 @@ class AuthController extends Controller
                 ])->onlyInput('email');
             }
 
-            // Check if agent is approved
-            if ($user->role === 'agent' && !$user->is_approved) {
+            // Check if staff account is approved
+            if (in_array($user->role, ['agent', 'broker'], true) && !$user->is_approved) {
                 Auth::logout();
+                $roleLabel = $user->role === 'broker' ? 'broker' : 'agent';
                 return back()->withErrors([
-                    'email' => 'Your agent account is pending approval.',
+                    'email' => "Your {$roleLabel} account is pending approval.",
                 ])->onlyInput('email');
             }
 

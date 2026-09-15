@@ -307,16 +307,34 @@
                     <button type="submit" class="w-full border border-teal-700 text-teal-800 hover:bg-teal-50 py-2.5 rounded-xl text-sm font-semibold transition">Request Site Visit</button>
                 </form>
                 @else
-                <div class="space-y-3">
-                    <div class="p-3 bg-teal-50 rounded-lg border border-teal-200">
-                        <p class="text-xs text-teal-800">Please log in to send an inquiry</p>
+                <form action="{{ route('client.property.inquire', $property) }}" method="POST" class="space-y-3">
+                    @csrf
+                    <div>
+                        <label class="text-xs text-stone-500 mb-1 block">Full Name *</label>
+                        <input type="text" name="name" placeholder="Jane Doe" required value="{{ old('name') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('name') ring-2 ring-red-400 @enderror">
+                        @error('name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
-                    <a href="{{ route('auth.login') }}" class="block w-full text-center bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl text-sm font-semibold transition">
-                        Login to Inquire
-                    </a>
-                    <a href="{{ route('auth.register') }}" class="block w-full text-center border border-teal-700 text-teal-700 hover:bg-teal-50 py-3 rounded-xl text-sm font-semibold transition">
-                        Create Account
-                    </a>
+                    <div>
+                        <label class="text-xs text-stone-500 mb-1 block">Email *</label>
+                        <input type="email" name="email" placeholder="juan@email.com" required value="{{ old('email') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('email') ring-2 ring-red-400 @enderror">
+                        @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="text-xs text-stone-500 mb-1 block">Phone *</label>
+                        <input type="text" name="phone" placeholder="+63 912 345 6789" required value="{{ old('phone') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('phone') ring-2 ring-red-400 @enderror">
+                        @error('phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="text-xs text-stone-500 mb-1 block">Message *</label>
+                        <textarea name="message" rows="3" placeholder="I'm interested in this property..." required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none @error('message') ring-2 ring-red-400 @enderror">{{ old('message') }}</textarea>
+                        @error('message') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl text-sm font-semibold transition">
+                        Send Inquiry
+                    </button>
+                </form>
+                <div class="mt-3 text-center">
+                    <a href="{{ route('auth.login') }}" class="text-xs text-teal-700 hover:underline">Already have an account? Login</a>
                 </div>
                 @endauth
             </div>

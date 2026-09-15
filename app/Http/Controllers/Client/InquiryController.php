@@ -28,6 +28,7 @@ class InquiryController extends Controller
     public function store(Request $request, Property $property): RedirectResponse
     {
         $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
             'message' => 'required|string|min:10|max:1000',
             'phone' => 'required|string|min:7|max:20',
             'email' => 'required|email',
@@ -35,6 +36,8 @@ class InquiryController extends Controller
 
         $user = auth()->user();
         $contactEmail = $user?->email ?? $validated['email'];
+        $fullName = trim((string) ($validated['name'] ?? ($user?->name ?? '')));
+
         $client = $user
             ? Client::where('user_id', $user->id)->first()
             : Client::where('email', $validated['email'])->first();
@@ -43,11 +46,13 @@ class InquiryController extends Controller
             $client = new Client();
         }
 
+        $nameParts = $this->parseName($fullName, $contactEmail);
+
         $client->fill([
             'user_id' => $user?->id ?? $client->user_id,
             'broker_id' => $property->broker_id,
-            'first_name' => $client->first_name ?: $this->extractFirstName($contactEmail),
-            'last_name' => $client->last_name ?: $this->extractLastName($contactEmail),
+            'first_name' => $client->first_name ?: $nameParts['first_name'],
+            'last_name' => $client->last_name ?: $nameParts['last_name'],
             'email' => $contactEmail,
             'phone' => $validated['phone'],
             'status' => 'active',
@@ -66,6 +71,15 @@ class InquiryController extends Controller
             'status' => 'new',
         ]);
 
+        \App\Models\AppNotification::create([
+            'user_id' => $property->broker_id,
+            'type' => 'inquiry',
+            'title' => 'New property inquiry',
+            'message' => ($user?->name ?? $nameParts['first_name'] . ' ' . $nameParts['last_name']) . ' submitted an inquiry for ' . $property->name . '.',
+            'link' => route('agent.inquiries.index'),
+            'is_read' => false,
+        ]);
+
         if ($user) {
             ChatMessage::create([
                 'sender_id' => $user->id,
@@ -76,7 +90,7 @@ class InquiryController extends Controller
         }
 
         return redirect()->route('client.property.show', $property->slug)
-            ->with('success', 'Inquiry sent successfully! The broker will contact you soon.');
+            ->with('success', 'Inquiry sent successfully! The agent will contact you soon.');
     }
 
     public function show(Inquiry $inquiry): View
@@ -101,5 +115,21 @@ class InquiryController extends Controller
         $parts = preg_split('/\s+/', trim($localPart)) ?: [''];
 
         return ucfirst($parts[1] ?? '');
+    }
+
+    private function parseName(string $fullName, string $email): array
+    {
+        if (trim($fullName) !== '') {
+            $parts = preg_split('/\s+/', trim($fullName), 2) ?: [''];
+            $firstName = ucfirst($parts[0] ?? 'Client');
+            $lastName = isset($parts[1]) ? ucfirst($parts[1]) : '';
+
+            return ['first_name' => $firstName, 'last_name' => $lastName];
+        }
+
+        return [
+            'first_name' => $this->extractFirstName($email),
+            'last_name' => $this->extractLastName($email),
+        ];
     }
 }

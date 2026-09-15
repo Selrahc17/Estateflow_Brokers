@@ -43,11 +43,15 @@
             </div>
         </div>
     </div>
-    <div class="flex flex-wrap gap-1.5 px-5 pt-4">
-        <button onclick="showMonth(null)" id="btn-all" class="month-btn px-3 py-1 rounded-full text-xs font-medium bg-red-600 text-white transition">All</button>
-        @foreach($chart['labels'] as $i => $label)
-        <button onclick="showMonth({{ $i }})" id="btn-month-{{ $i }}" class="month-btn px-3 py-1 rounded-full text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200 transition">{{ $label }}</button>
-        @endforeach
+    <div class="flex items-center gap-3 px-5 pt-4">
+        <label for="activity-month" class="text-xs font-semibold text-stone-500">Through month</label>
+        <select id="activity-month" onchange="showMonth(this.value === '' ? null : Number(this.value))"
+                class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+            @foreach($chart['labels'] as $i => $label)
+            <option value="{{ $i }}" {{ $i === count($chart['labels']) - 1 ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+            <option value="">All months</option>
+        </select>
     </div>
     <div class="px-5 py-4">
         <canvas id="teamActivityChart" height="100"></canvas>
@@ -63,12 +67,12 @@ const allLeads    = {!! $chartLeads !!};
 const allViewings = {!! $chartViewings !!};
 
 let currentType = 'bar';
-let currentMonth = null;
+let currentMonth = allLabels.length - 1;
 
 const ctx = document.getElementById('teamActivityChart').getContext('2d');
 const chart = new Chart(ctx, {
     type: 'bar',
-    data: buildData(null),
+    data: buildData(currentMonth),
     options: {
         responsive: true,
         plugins: {
@@ -83,10 +87,12 @@ const chart = new Chart(ctx, {
 });
 
 function buildData(monthIndex) {
-    const labels   = monthIndex !== null ? [allLabels[monthIndex]]   : allLabels;
-    const sales    = monthIndex !== null ? [allSales[monthIndex]]    : allSales;
-    const leads    = monthIndex !== null ? [allLeads[monthIndex]]    : allLeads;
-    const viewings = monthIndex !== null ? [allViewings[monthIndex]] : allViewings;
+    const start = monthIndex !== null ? Math.max(0, monthIndex - 4) : 0;
+    const end = monthIndex !== null ? monthIndex + 1 : allLabels.length;
+    const labels   = allLabels.slice(start, end);
+    const sales    = allSales.slice(start, end);
+    const leads    = allLeads.slice(start, end);
+    const viewings = allViewings.slice(start, end);
     return {
         labels,
         datasets: [
@@ -113,13 +119,6 @@ function showMonth(index) {
     currentMonth = index;
     chart.data = buildData(index);
     chart.update();
-    document.querySelectorAll('.month-btn').forEach(b => {
-        const active = (index === null && b.id === 'btn-all') || b.id === 'btn-month-' + index;
-        b.classList.toggle('bg-red-600', active);
-        b.classList.toggle('text-white', active);
-        b.classList.toggle('bg-stone-100', !active);
-        b.classList.toggle('text-stone-600', !active);
-    });
 }
 </script>
 @endpush

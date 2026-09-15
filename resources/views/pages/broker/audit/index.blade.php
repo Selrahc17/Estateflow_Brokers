@@ -20,7 +20,6 @@
                     <th class="px-5 py-3 font-medium">Agent</th>
                     <th class="px-5 py-3 font-medium">Action</th>
                     <th class="px-5 py-3 font-medium">Details</th>
-                    <th class="px-5 py-3 font-medium">Status</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-stone-100">
@@ -30,7 +29,6 @@
                     <td class="px-5 py-3 text-xs font-medium text-stone-700">{{ $log->actor?->name ?? 'Agent' }}</td>
                     <td class="px-5 py-3"><span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">{{ $log->action }}</span></td>
                     <td class="max-w-md truncate px-5 py-3 text-xs text-stone-500">{{ ucfirst($log->description) }} ({{ $log->method }})</td>
-                    <td class="px-5 py-3"><span class="rounded-full px-2 py-0.5 text-xs font-medium {{ $log->status_code < 400 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600' }}">{{ $log->status_code }}</span></td>
                 </tr>
                 @empty
                 <tr><td colspan="5" class="px-5 py-10 text-center text-stone-400">No Agent activity recorded yet.</td></tr>

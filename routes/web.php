@@ -52,9 +52,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 // ===================== AUTH ROUTES =====================
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('auth.login');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('role.redirect')->name('auth.login');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login.post');
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('auth.register');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->middleware('role.redirect')->name('auth.register');
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('auth.forgot');
@@ -63,8 +63,6 @@ Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])-
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset.post');
 
 // ===================== PUBLIC CLIENT ROUTES =====================
-Route::get('/', [ClientPropertyController::class, 'index'])->name('home');
-
 Route::post('/api/chatbot', function (Request $request, AIService $ai) {
     $data = $request->validate(['message' => 'required|string|max:1000']);
 
@@ -73,6 +71,8 @@ Route::post('/api/chatbot', function (Request $request, AIService $ai) {
     ]);
 })->middleware('throttle:30,1')->name('api.chatbot');
 
+Route::middleware('role.redirect')->group(function () {
+Route::get('/', [ClientPropertyController::class, 'index'])->name('home');
 Route::get('/properties', [ClientPropertyController::class, 'index'])->name('client.properties');
 Route::get('/recommendations', [ClientPropertyController::class, 'recommendations'])->name('client.recommendations');
 Route::get('/properties/{slug}', [ClientPropertyController::class, 'show'])->name('client.property.show');
@@ -83,6 +83,8 @@ Route::post('/contact', [ContactController::class, 'store'])->name('client.conta
 Route::view('/privacy-policy', 'pages.client.legal.privacy')->name('client.legal.privacy');
 Route::view('/terms-of-use', 'pages.client.legal.terms')->name('client.legal.terms');
 Route::view('/inquiry/success', 'pages.client.inquiry.success')->name('client.inquiry.success');
+});
+
 Route::view('/offline', 'offline')->name('offline');
 
 // ===================== AUTHENTICATED CLIENT ROUTES =====================

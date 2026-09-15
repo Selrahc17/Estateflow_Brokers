@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
             'audit' => \App\Http\Middleware\RecordAuditLog::class,
+            'role.redirect' => \App\Http\Middleware\RedirectAuthenticatedRole::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('auth.login'));
     })

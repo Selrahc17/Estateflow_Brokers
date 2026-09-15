@@ -1,4 +1,4 @@
-const CACHE_NAME = 'estateflow-v3';
+const CACHE_NAME = 'estateflow-v4';
 const OFFLINE_URL = '/offline';
 const PRECACHE = ['/', '/manifest.json', '/favicon.ico', OFFLINE_URL];
 
@@ -21,23 +21,22 @@ self.addEventListener('fetch', (e) => {
 
     const url = new URL(e.request.url);
 
-    // Cache-first for static assets (CSS, JS, fonts, images)
+    // Prefer current static assets so different devices do not keep stale UI bundles.
     if (
         url.pathname.match(/\.(css|js|woff2?|ttf|png|jpg|jpeg|svg|ico|webp)$/) ||
         url.hostname === 'fonts.googleapis.com' ||
         url.hostname === 'fonts.gstatic.com'
     ) {
         e.respondWith(
-            caches.match(e.request).then((cached) => {
-                if (cached) return cached;
-                return fetch(e.request).then((res) => {
+            fetch(e.request)
+                .then((res) => {
                     if (res.ok) {
                         const copy = res.clone();
                         caches.open(CACHE_NAME).then((c) => c.put(e.request, copy));
                     }
                     return res;
-                });
-            })
+                })
+                .catch(() => caches.match(e.request))
         );
         return;
     }

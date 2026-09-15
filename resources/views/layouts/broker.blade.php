@@ -12,9 +12,9 @@
     <title>EstateFlow Broker - @yield('title', 'Dashboard')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: false }">
-    <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 z-[9998] bg-black/40 lg:hidden" aria-hidden="true"></div>
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-[9999] flex w-64 flex-col bg-[var(--color-sidebar)] text-white transition-transform duration-300 lg:translate-x-0">
+<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: window.innerWidth >= 1024, isDesktop: window.innerWidth >= 1024 }" x-init="isDesktop = window.innerWidth >= 1024; sidebarOpen = isDesktop" @resize.window="isDesktop = window.innerWidth >= 1024; sidebarOpen = isDesktop ? true : false">
+    <div x-show="sidebarOpen && !isDesktop" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 z-[9998] bg-black/40 lg:hidden" aria-hidden="true"></div>
+    <aside :class="!isDesktop ? (sidebarOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'" class="fixed inset-y-0 left-0 z-[9999] flex w-64 flex-col bg-[var(--color-sidebar)] text-white transition-transform duration-300">
         <div class="border-b border-[var(--color-primary-dark)] px-5 py-5">
             <div class="mb-1 flex items-center gap-2">
                 <div class="h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
@@ -80,7 +80,7 @@
                     Audit Logs
                 </a>
                 <a href="{{ route('broker.settings.index') }}" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs('broker.settings.*') ? 'bg-[var(--color-primary)] text-white' : 'text-teal-100 hover:bg-[var(--color-sidebar-hover)]' }} transition">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 2.924 1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94-3.31 2.37-2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 2.924-2.37 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94-3.31 2.37-2.37 2.37a1.724 1.724 0 001.065 2.572c1.756-.426 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c.94-.608 2.296-.07 2.572 1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Profile Settings
                 </a>
             </div>
@@ -111,9 +111,9 @@
         </div>
     </aside>
 
-    <main class="min-h-screen lg:ml-64">
+    <main class="min-h-screen transition-all duration-300" :class="isDesktop ? 'ml-64' : 'ml-0'">
         <header class="flex items-center gap-4 border-b border-stone-200 bg-white px-4 py-5 sm:px-8">
-            <button @click="sidebarOpen = true" aria-label="Open navigation menu" class="text-stone-500 transition hover:text-[var(--color-primary)] lg:hidden">
+            <button @click="sidebarOpen = true" x-show="!isDesktop" aria-label="Open navigation menu" class="text-stone-500 transition hover:text-[var(--color-primary)]">
                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
             <h1 class="text-xl font-bold text-stone-800">@yield('page-title', 'Broker Dashboard')</h1>

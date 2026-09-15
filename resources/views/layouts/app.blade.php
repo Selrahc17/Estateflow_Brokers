@@ -13,12 +13,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: window.innerWidth >= 1024 }" @resize.window="if (window.innerWidth < 1024) sidebarOpen = false">
+<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: window.innerWidth >= 1024, isDesktop: window.innerWidth >= 1024 }" @resize.window="isDesktop = window.innerWidth >= 1024; sidebarOpen = isDesktop ? true : false">
 
     {{-- Sidebar --}}
-        <div x-show="sidebarOpen && window.innerWidth < 1024" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-[9998] lg:hidden" aria-hidden="true"></div>
+        <div x-show="sidebarOpen && !isDesktop" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-[9998] lg:hidden" aria-hidden="true"></div>
             <aside class="fixed top-0 left-0 h-screen bg-[var(--color-sidebar)] text-white transition-all duration-300 z-[9999] flex flex-col"
-                :class="window.innerWidth < 1024 ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64') : (sidebarOpen ? 'w-64' : 'w-16')">
+            :class="!isDesktop ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64') : (sidebarOpen ? 'w-64' : 'w-16')">
 
         {{-- Logo --}}
         <div class="flex items-center gap-3 px-4 py-5 border-b border-[var(--color-primary-dark)]">
@@ -131,7 +131,7 @@
     </aside>
 
     {{-- Main Content --}}
-    <div :class="window.innerWidth < 1024 ? 'ml-0' : (sidebarOpen ? 'ml-64' : 'ml-16')" class="transition-all duration-300 min-h-screen flex flex-col">
+    <div :class="!isDesktop ? 'ml-0' : (sidebarOpen ? 'ml-64' : 'ml-16')" class="transition-all duration-300 min-h-screen flex flex-col">
 
         {{-- Top Header --}}
         <header class="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">

@@ -152,6 +152,28 @@ class PropertyImageGalleryTest extends TestCase
             ->assertSee('https://example.com/one.jpg');
     }
 
+    public function test_the_create_form_shows_the_photo_limits(): void
+    {
+        $this->actingAs($this->agent)
+            ->get(route('agent.properties.create'))
+            ->assertOk()
+            ->assertSee('imagePicker({ max: 10, existing: 0 })', false)
+            ->assertSee('up to 10 photos, 4 MB each')
+            ->assertSee('0 of 10 photos');
+    }
+
+    public function test_the_edit_form_counts_and_lists_existing_photos(): void
+    {
+        $property = $this->property(['https://example.com/one.jpg', 'https://example.com/two.jpg']);
+
+        $this->actingAs($this->agent)
+            ->get(route('agent.properties.edit', $property))
+            ->assertOk()
+            ->assertSee('imagePicker({ max: 10, existing: 2 })', false)
+            ->assertSee('2 of 10 photos')
+            ->assertSee('name="remove_images[]" value="https://example.com/one.jpg"', false);
+    }
+
     private function property(array $images): Property
     {
         return Property::create([

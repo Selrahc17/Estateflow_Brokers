@@ -20,7 +20,7 @@ class BrokerAccessMiddlewareTest extends TestCase
 
         $this->actingAs($broker)
             ->get(route('broker.dashboard'))
-            ->assertRedirect(route('auth.login'));
+            ->assertRedirect(route('broker.application.show'));
     }
 
     public function test_suspended_broker_cannot_access_broker_routes(): void

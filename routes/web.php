@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BrokerController as AdminBrokerController;
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -12,12 +13,15 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\PropertyController as AdminPropertyController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Auth\AgentInvitationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Messaging\MessageController;
+use App\Http\Controllers\Broker\ApplicationController as BrokerApplicationController;
 use App\Http\Controllers\Broker\DashboardController as BrokerDashboardController;
 use App\Http\Controllers\Broker\AgentController as BrokerAgentController;
 use App\Http\Controllers\Broker\SettingController as BrokerSettingController;
+use App\Http\Controllers\Broker\TeamController as BrokerTeamController;
 use App\Http\Controllers\Broker\AuditController as BrokerAuditController;
 use App\Http\Controllers\Broker\CommissionController as BrokerCommissionController;
 use App\Http\Controllers\Broker\NotificationController as BrokerNotificationController;
@@ -53,14 +57,17 @@ use Illuminate\Support\Facades\Route;
 
 // ===================== AUTH ROUTES =====================
 Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('role.redirect')->name('auth.login');
-Route::post('/login', [AuthController::class, 'login'])->name('auth.login.post');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('auth.login.post');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->middleware('role.redirect')->name('auth.register');
-Route::post('/register', [AuthController::class, 'register'])->name('auth.register.post');
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register')->name('auth.register.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('auth.logout');
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('auth.forgot');
-Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('auth.forgot.post');
+Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->middleware('throttle:password-reset')->name('auth.forgot.post');
 Route::get('/reset-password/{token}', [AuthController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('auth.reset.post');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:password-reset')->name('auth.reset.post');
+
+Route::get('/invitations/{token}', [AgentInvitationController::class, 'show'])->name('auth.invitation.show');
+Route::post('/invitations/{token}', [AgentInvitationController::class, 'accept'])->middleware('throttle:register')->name('auth.invitation.accept');
 
 // ===================== PUBLIC CLIENT ROUTES =====================
 Route::post('/api/chatbot', function (Request $request, AIService $ai) {
@@ -76,10 +83,10 @@ Route::get('/', [ClientPropertyController::class, 'index'])->name('home');
 Route::get('/properties', [ClientPropertyController::class, 'index'])->name('client.properties');
 Route::get('/recommendations', [ClientPropertyController::class, 'recommendations'])->name('client.recommendations');
 Route::get('/properties/{slug}', [ClientPropertyController::class, 'show'])->name('client.property.show');
-Route::post('/properties/{property}/inquire', [ClientInquiryController::class, 'store'])->name('client.property.inquire');
+Route::post('/properties/{property}/inquire', [ClientInquiryController::class, 'store'])->middleware('throttle:public-forms')->name('client.property.inquire');
 Route::view('/about', 'pages.client.about.index')->name('client.about');
 Route::view('/contact', 'pages.client.contact.index')->name('client.contact');
-Route::post('/contact', [ContactController::class, 'store'])->name('client.contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:public-forms')->name('client.contact.store');
 Route::view('/privacy-policy', 'pages.client.legal.privacy')->name('client.legal.privacy');
 Route::view('/terms-of-use', 'pages.client.legal.terms')->name('client.legal.terms');
 Route::view('/inquiry/success', 'pages.client.inquiry.success')->name('client.inquiry.success');
@@ -88,7 +95,7 @@ Route::view('/inquiry/success', 'pages.client.inquiry.success')->name('client.in
 Route::view('/offline', 'offline')->name('offline');
 
 // ===================== AUTHENTICATED CLIENT ROUTES =====================
-Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client'])->group(function () {
+Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client', 'audit'])->group(function () {
     Route::get('/', [ClientDashboardController::class, 'index'])->name('home');
     Route::get('/reservation', [ClientReservationController::class, 'index'])->name('reservation');
     Route::post('/reservation/{lot}', [ClientReservationController::class, 'store'])->name('reservation.store');
@@ -118,7 +125,7 @@ Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client']
 });
 
 // ===================== ADMIN ROUTES =====================
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'audit'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users');
     Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
@@ -142,6 +149,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::patch('/reservations/{reservation}/status', [AdminReservationController::class, 'updateStatus'])->name('reservations.status');
     Route::get('/documents', [AdminDocumentController::class, 'index'])->name('documents');
     Route::post('/documents', [AdminDocumentController::class, 'store'])->name('documents.store');
+    Route::get('/documents/{document}/download', [AdminDocumentController::class, 'download'])->name('documents.download');
     Route::post('/documents/{document}/verify', [AdminDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [AdminDocumentController::class, 'reject'])->name('documents.reject');
     Route::post('/documents/{document}/request-more', [AdminDocumentController::class, 'requestMore'])->name('documents.request-more');
@@ -149,7 +157,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/feedback', [AdminFeedbackController::class, 'index'])->name('feedback');
     Route::post('/feedback/{feedback}/resolve', [AdminFeedbackController::class, 'resolve'])->name('feedback.resolve');
     Route::get('/contact-messages', [AdminContactMessageController::class, 'index'])->name('contact-messages');
+    Route::post('/contact-messages/{contactMessage}/handle', [AdminContactMessageController::class, 'handle'])->name('contact-messages.handle');
     Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit');
+    Route::get('/backups', [AdminBackupController::class, 'index'])->name('backups');
+    Route::post('/backups', [AdminBackupController::class, 'store'])->name('backups.store');
+    Route::post('/backups/{backup}/download', [AdminBackupController::class, 'download'])->where('backup', '[a-z0-9-]+\.zip')->name('backups.download');
+    Route::delete('/backups/{backup}', [AdminBackupController::class, 'destroy'])->where('backup', '[a-z0-9-]+\.zip')->name('backups.destroy');
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');
     Route::post('/settings/profile', [AdminSettingController::class, 'updateProfile'])->name('settings.profile');
@@ -158,6 +171,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/settings/chatbot-logo', [AdminSettingController::class, 'updateChatbotLogo'])->name('settings.chatbot-logo');
     Route::get('/notifications', [AdminNotificationController::class, 'index'])->name('notifications');
     Route::post('/notifications/read-all', [AdminNotificationController::class, 'markAllRead'])->name('notifications.read-all');
+});
+
+// ===================== BROKER APPLICATION (before approval) =====================
+Route::prefix('broker/application')->name('broker.application.')->middleware(['auth', 'broker.pending', 'audit'])->group(function () {
+    Route::get('/', [BrokerApplicationController::class, 'show'])->name('show');
+    Route::put('/details', [BrokerApplicationController::class, 'updateDetails'])->name('details');
+    Route::post('/documents', [BrokerApplicationController::class, 'storeDocument'])->name('documents.store');
+    Route::get('/documents/{document}/download', [BrokerApplicationController::class, 'downloadDocument'])->name('documents.download');
 });
 
 // ===================== NOMINATIM PROXY =====================
@@ -182,10 +203,17 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'au
     Route::get('/settings', [BrokerSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/profile', [BrokerSettingController::class, 'updateProfile'])->name('settings.profile');
     Route::post('/settings/password', [BrokerSettingController::class, 'updatePassword'])->name('settings.password');
+    Route::put('/settings/license', [BrokerSettingController::class, 'updateLicense'])->name('settings.license');
+    Route::post('/settings/documents', [BrokerSettingController::class, 'storeDocument'])->name('settings.documents.store');
+    Route::get('/settings/documents/{document}/download', [BrokerSettingController::class, 'downloadDocument'])->name('settings.documents.download');
+    Route::get('/team/clients', [BrokerTeamController::class, 'clients'])->name('team.clients');
+    Route::get('/team/clients/{client}', [BrokerTeamController::class, 'showClient'])->name('team.clients.show');
+    Route::get('/team/inquiries', [BrokerTeamController::class, 'inquiries'])->name('team.inquiries');
+    Route::get('/team/reservations', [BrokerTeamController::class, 'reservations'])->name('team.reservations');
     Route::get('/audit', [BrokerAuditController::class, 'index'])->name('audit.index');
     Route::get('/agents', [BrokerAgentController::class, 'index'])->name('agents.index');
-    Route::get('/agents/create', [BrokerAgentController::class, 'create'])->name('agents.create');
     Route::post('/agents', [BrokerAgentController::class, 'store'])->name('agents.store');
+    Route::post('/agents/{agent}/invitation', [BrokerAgentController::class, 'resendInvitation'])->name('agents.invitation');
     Route::get('/agents/{agent}/edit', [BrokerAgentController::class, 'edit'])->name('agents.edit');
     Route::post('/agents/{agent}/documents', [BrokerAgentController::class, 'uploadDocument'])->name('agents.documents.store');
     Route::get('/agents/{agent}/documents/{document}/download', [BrokerAgentController::class, 'downloadDocument'])->name('agents.documents.download');

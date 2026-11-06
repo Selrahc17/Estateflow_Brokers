@@ -6,18 +6,32 @@
 @section('content')
 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 mb-6">
     @foreach([
-        ['Total Agents', $stats['total_agents'], 'bg-blue-50', 'text-blue-600'],
-        ['Active Agents', $stats['active_agents'], 'bg-green-50', 'text-green-600'],
-        ['Pending Approval', $stats['pending_agents'], 'bg-teal-50', 'text-teal-700'],
-        ['Sales This Month', $stats['sales_this_month'], 'bg-red-50', 'text-red-600'],
-        ['Leads This Month', $stats['leads_this_month'], 'bg-indigo-50', 'text-indigo-600'],
+        ['Total Agents', $stats['total_agents'], 'bg-blue-50 dark:bg-blue-950', 'text-blue-600 dark:text-blue-300'],
+        ['Active Agents', $stats['active_agents'], 'bg-green-50 dark:bg-green-950', 'text-green-600 dark:text-green-300'],
+        ['Pending Invites', $stats['pending_invites'], 'bg-teal-50 dark:bg-teal-950', 'text-teal-700 dark:text-teal-300'],
+        ['Sales This Month', $stats['sales_this_month'], 'bg-red-50 dark:bg-red-950', 'text-red-600 dark:text-red-300'],
+        ['Leads This Month', $stats['leads_this_month'], 'bg-indigo-50 dark:bg-indigo-950', 'text-indigo-600 dark:text-indigo-300'],
     ] as $stat)
-    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
+    <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 p-4 text-center">
         <p class="text-xl font-bold {{ $stat[3] }}">{{ $stat[1] }}</p>
-        <p class="text-xs text-stone-500 mt-1">{{ $stat[0] }}</p>
+        <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">{{ $stat[0] }}</p>
     </div>
     @endforeach
 </div>
+
+@if($renewals->isNotEmpty())
+<section class="mb-6 rounded-xl border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950 p-5" aria-labelledby="renewals-heading">
+    <h2 id="renewals-heading" class="font-semibold text-stone-800 dark:text-stone-100">Renewals Needing Attention</h2>
+    <ul class="mt-3 divide-y divide-amber-200 dark:divide-amber-900">
+        @foreach($renewals as $renewal)
+        <li class="flex items-center justify-between gap-3 py-2 text-sm">
+            <a href="{{ $renewal['link'] }}" class="font-medium text-stone-700 dark:text-stone-200 hover:underline">{{ $renewal['name'] }}</a>
+            <span class="shrink-0 font-medium {{ $renewal['state'] === 'expired' ? 'text-red-700 dark:text-red-300' : 'text-amber-800 dark:text-amber-300' }}">{{ $renewal['label'] }}</span>
+        </li>
+        @endforeach
+    </ul>
+</section>
+@endif
 
 @php
     $chartLabels   = $chart['labels']->toJson();
@@ -25,28 +39,28 @@
     $chartLeads    = $chart['leads']->toJson();
     $chartViewings = $chart['viewings']->toJson();
 @endphp
-<div class="bg-white rounded-xl border border-stone-200 mb-6">
-    <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-stone-100">
+<div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-stone-100 dark:border-stone-800">
         <div>
-            <h2 class="font-semibold text-stone-800">Team Activity</h2>
-            <p class="mt-1 text-xs text-stone-500">Monthly activity from your assigned Agents</p>
+            <h2 class="font-semibold text-stone-800 dark:text-stone-100">Team Activity</h2>
+            <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">Monthly activity from your assigned Agents</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-            <div class="flex items-center gap-3 text-xs text-stone-500 mr-3">
+            <div class="flex items-center gap-3 text-xs text-stone-500 dark:text-stone-400 mr-3">
                 <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-red-500"></span>Sales</span>
                 <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-blue-500"></span>Leads</span>
-                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-teal-600"></span>Viewings</span>
+                <span class="flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-teal-500"></span>Viewings</span>
             </div>
             <div class="flex items-center gap-1">
-                <button onclick="setChartType('bar')" id="btn-bar" class="chart-type-btn px-3 py-1 rounded-lg text-xs font-medium bg-red-600 text-white transition">Bar</button>
-                <button onclick="setChartType('line')" id="btn-line" class="chart-type-btn px-3 py-1 rounded-lg text-xs font-medium bg-stone-100 text-stone-600 hover:bg-stone-200 transition">Line</button>
+                <button onclick="setChartType('bar')" id="btn-bar" class="chart-type-btn chart-type-active px-3 py-1 rounded-lg text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 transition">Bar</button>
+                <button onclick="setChartType('line')" id="btn-line" class="chart-type-btn px-3 py-1 rounded-lg text-xs font-medium bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 transition">Line</button>
             </div>
         </div>
     </div>
     <div class="flex items-center gap-3 px-5 pt-4">
-        <label for="activity-month" class="text-xs font-semibold text-stone-500">Through month</label>
+        <label for="activity-month" class="text-xs font-semibold text-stone-500 dark:text-stone-400">Through month</label>
         <select id="activity-month" onchange="showMonth(this.value === '' ? null : Number(this.value))"
-                class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
+                class="rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]">
             @foreach($chart['labels'] as $i => $label)
             <option value="{{ $i }}" {{ $i === count($chart['labels']) - 1 ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
@@ -59,6 +73,9 @@
 </div>
 
 @push('scripts')
+<style>
+    .chart-type-btn.chart-type-active { background-color: var(--color-teal-700); color: #fff; }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 const allLabels   = {!! $chartLabels !!};
@@ -68,6 +85,10 @@ const allViewings = {!! $chartViewings !!};
 
 let currentType = 'bar';
 let currentMonth = allLabels.length - 1;
+
+const chartColors = () => document.documentElement.classList.contains('dark')
+    ? { text: '#a6a09b', grid: '#292524' }
+    : { text: '#79716b', grid: '#f5f5f4' };
 
 const ctx = document.getElementById('teamActivityChart').getContext('2d');
 const chart = new Chart(ctx, {
@@ -80,10 +101,18 @@ const chart = new Chart(ctx, {
             tooltip: { mode: 'index', intersect: false },
         },
         scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-            y: { beginAtZero: true, ticks: { precision: 0, font: { size: 11 } }, grid: { color: '#f5f5f4' } },
+            x: { grid: { display: false }, ticks: { color: chartColors().text, font: { size: 11 } } },
+            y: { beginAtZero: true, ticks: { color: chartColors().text, precision: 0, font: { size: 11 } }, grid: { color: chartColors().grid } },
         },
     },
+});
+
+window.addEventListener('theme-changed', () => {
+    const { text, grid } = chartColors();
+    chart.options.scales.x.ticks.color = text;
+    chart.options.scales.y.ticks.color = text;
+    chart.options.scales.y.grid.color = grid;
+    chart.update();
 });
 
 function buildData(monthIndex) {
@@ -98,7 +127,7 @@ function buildData(monthIndex) {
         datasets: [
             { label: 'Sales',    data: sales,    backgroundColor: 'rgba(239,68,68,0.8)',   borderColor: 'rgb(239,68,68)',   borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4 },
             { label: 'Leads',   data: leads,    backgroundColor: 'rgba(59,130,246,0.8)',  borderColor: 'rgb(59,130,246)',  borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4 },
-            { label: 'Viewings',data: viewings, backgroundColor: 'rgba(245,158,11,0.8)', borderColor: 'rgb(245,158,11)', borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4 },
+            { label: 'Viewings',data: viewings, backgroundColor: 'rgba(59,141,152,0.8)', borderColor: 'rgb(59,141,152)', borderWidth: 2, tension: 0.4, fill: false, pointRadius: 4 },
         ],
     };
 }
@@ -108,10 +137,8 @@ function setChartType(type) {
     chart.config.type = type;
     chart.update();
     document.querySelectorAll('.chart-type-btn').forEach(b => {
-        b.classList.toggle('bg-red-600', b.id === 'btn-' + type);
-        b.classList.toggle('text-white', b.id === 'btn-' + type);
-        b.classList.toggle('bg-stone-100', b.id !== 'btn-' + type);
-        b.classList.toggle('text-stone-600', b.id !== 'btn-' + type);
+        const active = b.id === 'btn-' + type;
+        b.classList.toggle('chart-type-active', active);
     });
 }
 
@@ -124,15 +151,15 @@ function showMonth(index) {
 @endpush
 
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
-    <div class="xl:col-span-2 bg-white rounded-xl border border-stone-200">
-        <div class="flex items-center justify-between px-5 py-4 border-b border-stone-100">
-            <h2 class="font-semibold text-stone-800">Your Agents</h2>
-            <span class="text-xs text-red-600">{{ $stats['total_agents'] }} total</span>
+    <div class="xl:col-span-2 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+            <h2 class="font-semibold text-stone-800 dark:text-stone-100">Your Agents</h2>
+            <span class="text-xs text-teal-700 dark:text-teal-300">{{ $stats['total_agents'] }} total</span>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-stone-50 border-b border-stone-100">
-                    <tr class="text-left text-stone-500">
+                <thead class="bg-stone-50 dark:bg-stone-800/60 border-b border-stone-100 dark:border-stone-800">
+                    <tr class="text-left text-stone-500 dark:text-stone-400">
                         <th class="px-5 py-3 font-medium">Agent</th>
                         <th class="px-5 py-3 font-medium">Email</th>
                         <th class="px-5 py-3 font-medium">Properties</th>
@@ -140,17 +167,21 @@ function showMonth(index) {
                         <th class="px-5 py-3 font-medium">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-stone-100">
+                <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
                     @forelse($agents as $agent)
-                    <tr class="hover:bg-stone-50 transition">
-                        <td class="px-5 py-3 font-medium text-stone-700">{{ $agent->name }}</td>
-                        <td class="px-5 py-3 text-stone-500 text-xs">{{ $agent->email }}</td>
-                        <td class="px-5 py-3 text-stone-500">{{ $agent->properties_count }}</td>
-                        <td class="px-5 py-3 text-stone-500">{{ $agent->clients_count }}</td>
+                    <tr class="hover:bg-stone-50 dark:hover:bg-stone-800 transition">
+                        <td class="px-5 py-3 font-medium text-stone-700 dark:text-stone-200">{{ $agent->name }}</td>
+                        <td class="px-5 py-3 text-stone-500 dark:text-stone-400 text-xs">{{ $agent->email }}</td>
+                        <td class="px-5 py-3 text-stone-500 dark:text-stone-400">{{ $agent->properties_count }}</td>
+                        <td class="px-5 py-3 text-stone-500 dark:text-stone-400">{{ $agent->clients_count }}</td>
                         <td class="px-5 py-3">
-                            <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $agent->is_active ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-600' }}">
+                            @if($agent->isInvited())
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">Invited</span>
+                            @else
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ $agent->is_active ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300' : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300' }}">
                                 {{ $agent->is_active ? 'Active' : 'Inactive' }}
                             </span>
+                            @endif
                         </td>
                     </tr>
                     @empty
@@ -160,27 +191,27 @@ function showMonth(index) {
             </table>
         </div>
         @if($agents->hasPages())
-            <div class="border-t border-stone-100 px-5 py-4">{{ $agents->links() }}</div>
+            <div class="border-t border-stone-100 dark:border-stone-800 px-5 py-4">{{ $agents->links() }}</div>
         @endif
     </div>
 
-    <div class="bg-white rounded-xl border border-stone-200 p-5">
+    <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 p-5">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="font-semibold text-stone-800">Agent Status</h2>
-            <span class="text-xs text-red-600">Overview</span>
+            <h2 class="font-semibold text-stone-800 dark:text-stone-100">Agent Status</h2>
+            <span class="text-xs text-teal-700 dark:text-teal-300">Overview</span>
         </div>
         <div class="space-y-3">
-            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
-                <span class="text-sm text-stone-600">Active</span>
-                <span class="text-sm font-semibold text-green-600">{{ $stats['active_agents'] }}</span>
+            <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
+                <span class="text-sm text-stone-600 dark:text-stone-300">Active</span>
+                <span class="text-sm font-semibold text-green-600 dark:text-green-300">{{ $stats['active_agents'] }}</span>
             </div>
-            <div class="flex items-center justify-between border-b border-stone-100 pb-3">
-                <span class="text-sm text-stone-600">Pending approval</span>
-                <span class="text-sm font-semibold text-teal-700">{{ $stats['pending_agents'] }}</span>
+            <div class="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
+                <span class="text-sm text-stone-600 dark:text-stone-300">Pending invites</span>
+                <span class="text-sm font-semibold text-teal-700 dark:text-teal-300">{{ $stats['pending_invites'] }}</span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-sm text-stone-600">Assigned total</span>
-                <span class="text-sm font-semibold text-stone-800">{{ $stats['total_agents'] }}</span>
+                <span class="text-sm text-stone-600 dark:text-stone-300">Assigned total</span>
+                <span class="text-sm font-semibold text-stone-800 dark:text-stone-100">{{ $stats['total_agents'] }}</span>
             </div>
         </div>
     </div>

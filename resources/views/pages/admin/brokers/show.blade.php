@@ -1,9 +1,27 @@
 @extends('layouts.admin')
-@section('title', 'Agent Details')
-@section('page-title', 'Agent Details')
-@section('page-subtitle', '{{ $user->name }}')
+@section('title', 'Broker Details')
+@section('page-title', 'Broker Details')
+@section('page-subtitle', $user->name)
 
 @section('content')
+@if(session('success'))
+<div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+@endif
+
+@error('approval')
+<div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ $message }}</div>
+@enderror
+
+@error('notes')
+<div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ $message }}</div>
+@enderror
+
+@error('reason')
+<div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ $message }}</div>
+@enderror
+
+@include('pages.admin.brokers._compliance')
+
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
 
     <div class="bg-white rounded-xl border border-stone-200 p-6">

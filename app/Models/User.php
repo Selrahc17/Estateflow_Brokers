@@ -13,11 +13,13 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'broker_id', 'is_active', 'is_approved', 'phone', 'avatar', 'license_number'
+        'name', 'email', 'password', 'role', 'broker_id', 'is_active', 'is_approved', 'phone', 'avatar', 'license_number',
+        'prc_id_expires_at', 'dhsud_registration_number', 'dhsud_registration_expires_at', 'tin', 'privacy_consented_at',
+        'invitation_token', 'invitation_expires_at',
     ];
 
     protected $hidden = [
-        'password', 'remember_token'
+        'password', 'remember_token', 'tin', 'invitation_token',
     ];
 
     protected function casts(): array
@@ -25,6 +27,10 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'prc_id_expires_at' => 'date',
+            'dhsud_registration_expires_at' => 'date',
+            'privacy_consented_at' => 'datetime',
+            'invitation_expires_at' => 'datetime',
         ];
     }
 
@@ -42,6 +48,12 @@ class User extends Authenticatable
     public function isClient(): bool
     {
         return $this->role === 'client';
+    }
+
+    // An agent who has been invited but has not finished setting up their account
+    public function isInvited(): bool
+    {
+        return $this->role === 'agent' && ! $this->is_approved;
     }
 
     public function broker()
@@ -104,5 +116,13 @@ class User extends Authenticatable
     public function agentDocuments()
     {
         return $this->hasMany(Document::class, 'agent_id');
+    }
+
+    // A broker's own licensing documents, excluding files about their agents
+    public function complianceDocuments()
+    {
+        return $this->hasMany(Document::class, 'broker_id')
+            ->whereNull('agent_id')
+            ->whereIn('type', array_keys(Document::BROKER_COMPLIANCE_TYPES));
     }
 }

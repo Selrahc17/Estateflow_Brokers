@@ -4,6 +4,12 @@
 @section('page-subtitle', 'Review and moderate property listings')
 
 @section('content')
+@if(session('success'))
+<div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+@endif
+@if($errors->any())
+<div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ $errors->first() }}</div>
+@endif
 @if(count($duplicateGroups) > 0)
 <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-5">
     <h3 class="font-semibold text-yellow-800 mb-3 flex items-center gap-2">
@@ -11,9 +17,6 @@
         Potential Duplicates Found ({{ count($duplicateGroups) }})
     </h3>
     @foreach($duplicateGroups as $group)
-        @php
-            $groupProperties = Property::whereIn('id', $group)->get();
-        @endphp
         <form method="POST" action="{{ route('admin.properties.delete-multiple') }}" class="border border-yellow-300 rounded-lg p-4 bg-yellow-100 mb-3">
             @csrf
             @method('DELETE')
@@ -21,7 +24,7 @@
                 <div class="flex-1">
                     <p class="font-medium text-yellow-800 text-sm mb-2">Group {{ $loop->iteration }}</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        @foreach($groupProperties as $prop)
+@foreach($group as $prop)
                         <label class="flex items-center gap-2 bg-white p-2 rounded border border-yellow-200 text-sm cursor-pointer">
                             <input type="checkbox" name="ids[]" value="{{ $prop->id }}" class="rounded">
                             <div class="flex-1">
@@ -88,9 +91,9 @@
                         @csrf
                         @method('PATCH')
                         <select name="status" onchange="this.form.submit()" class="text-xs border border-stone-200 rounded px-2 py-1">
-                            <option value="available" {{ $property->status === 'available' ? 'selected' : '' }}>Available</option>
-                            <option value="hidden" {{ $property->status === 'hidden' ? 'selected' : '' }}>Hide</option>
-                            <option value="flagged" {{ $property->status === 'flagged' ? 'selected' : '' }}>Flag</option>
+                            @foreach(['available' => 'Available', 'coming_soon' => 'Coming Soon', 'sold' => 'Sold', 'hidden' => 'Hide', 'flagged' => 'Flag'] as $value => $text)
+                            <option value="{{ $value }}" @selected($property->status === $value)>{{ $text }}</option>
+                            @endforeach
                         </select>
                     </form>
                 </td>

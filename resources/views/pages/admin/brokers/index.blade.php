@@ -9,6 +9,10 @@
 <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
 @endif
 
+@error('approval')
+<div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ $message }}</div>
+@enderror
+
 <div class="flex flex-col sm:flex-row gap-3 justify-between mb-5">
     <form method="GET" class="flex gap-2">
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search brokers..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 w-56">
@@ -45,22 +49,8 @@
             <span class="text-stone-400">Since {{ $broker->created_at->format('M Y') }}</span>
         </div>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('admin.brokers.show', $broker) }}" class="flex-1 text-center border border-stone-200 hover:bg-stone-50 text-stone-600 py-2 rounded-lg text-xs font-medium transition">View Profile</a>
+            <a href="{{ route('admin.brokers.show', $broker) }}" class="flex-1 text-center border border-stone-200 hover:bg-stone-50 text-stone-600 py-2 rounded-lg text-xs font-medium transition">{{ $broker->is_approved ? 'View Profile' : 'Review Application' }}</a>
             <a href="{{ route('admin.users.edit', $broker) }}" class="flex-1 text-center border border-amber-200 hover:bg-amber-50 text-amber-600 py-2 rounded-lg text-xs font-medium transition">Edit</a>
-            @if(!$broker->is_approved)
-            <form action="{{ route('admin.brokers.approve', $broker) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="flex-1 text-center bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-medium transition">Approve</button>
-            </form>
-            @endif
-            @if($broker->is_approved)
-            <form action="{{ route('admin.brokers.reject', $broker) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <button type="submit" class="flex-1 text-center bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-xs font-medium transition">Reject</button>
-            </form>
-            @endif
         </div>
     </div>
     @empty

@@ -28,7 +28,7 @@
         {{-- Mobile Filter Toggle --}}
         <div class="lg:hidden">
             <button @click="filtersOpen = !filtersOpen"
-                class="flex items-center gap-2 border border-stone-200 rounded-xl px-4 py-2.5 text-sm font-medium text-stone-600 bg-white w-full justify-between">
+                class="flex items-center gap-2 border border-stone-200 rounded-xl px-4 py-2.5 text-sm font-medium text-stone-600 bg-white w-full justify-between dark:bg-stone-900 dark:border-stone-700 dark:text-stone-300">
                 <span class="flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
                     Filters
@@ -50,21 +50,21 @@
                     <input type="hidden" name="search" value="{{ request('search') }}">
                 @endif
 
-                <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">
+                <div class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 overflow-hidden">
 
                     {{-- Header --}}
-                    <div class="px-5 py-4 border-b border-stone-100 flex items-center justify-between">
-                        <h3 class="font-semibold text-stone-800 text-sm">Filters</h3>
+                    <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
+                        <h3 class="font-semibold text-stone-800 dark:text-white text-sm">Filters</h3>
                         @if($activeFilters > 0)
                             <a href="{{ route('client.properties', request('search') ? ['search' => request('search')] : []) }}"
-                               class="text-xs text-teal-700 hover:underline">Clear all</a>
+                               class="text-xs text-teal-700 dark:text-teal-400 hover:underline">Clear all</a>
                         @endif
                     </div>
 
                     {{-- Location: Province --}}
                     @if($provinces->isNotEmpty())
-                    <div class="px-5 py-4 border-b border-stone-100">
-                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">Province</p>
+                    <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+                        <p class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-3">Province</p>
                         <div class="space-y-2 max-h-48 overflow-y-auto">
                             @foreach($provinces as $province)
                             <label class="flex items-center gap-2.5 cursor-pointer group">
@@ -72,7 +72,7 @@
                                     {{ request('province') === $province ? 'checked' : '' }}
                                     onchange="this.form.submit()"
                                     class="w-4 h-4 text-teal-700 border-stone-300 focus:ring-teal-400">
-                                <span class="text-sm text-stone-600 group-hover:text-teal-700 transition">{{ $province }}</span>
+                                <span class="text-sm text-stone-600 dark:text-stone-300 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition">{{ $province }}</span>
                             </label>
                             @endforeach
                         </div>
@@ -81,8 +81,8 @@
 
                     {{-- Location: City --}}
                     @if($cities->isNotEmpty())
-                    <div class="px-5 py-4 border-b border-stone-100">
-                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">City / Municipality</p>
+                    <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+                        <p class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-3">City / Municipality</p>
                         <div class="space-y-2 max-h-48 overflow-y-auto">
                             @foreach($cities as $city)
                             <label class="flex items-center gap-2.5 cursor-pointer group">
@@ -90,7 +90,7 @@
                                     {{ request('city') === $city ? 'checked' : '' }}
                                     onchange="this.form.submit()"
                                     class="w-4 h-4 text-teal-700 border-stone-300 focus:ring-teal-400">
-                                <span class="text-sm text-stone-600 group-hover:text-teal-700 transition">{{ $city }}</span>
+                                <span class="text-sm text-stone-600 dark:text-stone-300 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition">{{ $city }}</span>
                             </label>
                             @endforeach
                         </div>
@@ -99,8 +99,8 @@
 
                     {{-- Property Type --}}
                     @if($types->isNotEmpty())
-                    <div class="px-5 py-4 border-b border-stone-100">
-                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">Property Type</p>
+                    <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+                        <p class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-3">Property Type</p>
                         <div class="space-y-2">
                             @foreach($types as $type)
                             <label class="flex items-center gap-2.5 cursor-pointer group">
@@ -108,7 +108,7 @@
                                     {{ request('type') === $type ? 'checked' : '' }}
                                     onchange="this.form.submit()"
                                     class="w-4 h-4 text-teal-700 border-stone-300 focus:ring-teal-400">
-                                <span class="text-sm text-stone-600 group-hover:text-teal-700 transition">{{ $type }}</span>
+                                <span class="text-sm text-stone-600 dark:text-stone-300 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition">{{ $type }}</span>
                             </label>
                             @endforeach
                         </div>
@@ -116,20 +116,20 @@
                     @endif
 
                     {{-- Price Range --}}
-                    <div class="px-5 py-4 border-b border-stone-100">
-                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">Price Range</p>
+                    <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800">
+                        <p class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-3">Price Range</p>
                         <div class="space-y-2">
                             <div>
                                 <label class="text-xs text-stone-400 mb-1 block">Min Price (₱)</label>
                                 <input type="number" name="min_price" value="{{ request('min_price') }}"
                                     placeholder="0"
-                                    class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                    class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder:text-stone-500">
                             </div>
                             <div>
                                 <label class="text-xs text-stone-400 mb-1 block">Max Price (₱)</label>
                                 <input type="number" name="max_price" value="{{ request('max_price') }}"
                                     placeholder="Any"
-                                    class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                    class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder:text-stone-500">
                             </div>
                             <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-2 rounded-lg text-sm font-medium transition">
                                 Apply Price
@@ -139,9 +139,9 @@
 
                     {{-- Sort --}}
                     <div class="px-5 py-4">
-                        <p class="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3">Sort By</p>
+                        <p class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-wider mb-3">Sort By</p>
                         <select name="sort" onchange="this.form.submit()"
-                            class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white">
+                            class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 bg-white dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder:text-stone-500">
                             <option value="newest" {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>Newest First</option>
                             <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
                             <option value="price_asc" {{ request('sort') === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
@@ -160,35 +160,35 @@
             @if($activeFilters > 0)
             <div class="flex flex-wrap gap-2 mb-4">
                 @if(request('province'))
-                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 text-xs font-medium px-3 py-1.5 rounded-full">
+                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100 text-xs font-medium px-3 py-1.5 rounded-full">
                         📍 {{ request('province') }}
-                        <a href="{{ request()->fullUrlWithoutQuery(['province']) }}" class="hover:text-teal-900">✕</a>
+                        <a href="{{ request()->fullUrlWithoutQuery(['province']) }}" class="hover:text-teal-900 dark:hover:text-white">✕</a>
                     </span>
                 @endif
                 @if(request('city'))
-                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 text-xs font-medium px-3 py-1.5 rounded-full">
+                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100 text-xs font-medium px-3 py-1.5 rounded-full">
                         🏙 {{ request('city') }}
-                        <a href="{{ request()->fullUrlWithoutQuery(['city']) }}" class="hover:text-teal-900">✕</a>
+                        <a href="{{ request()->fullUrlWithoutQuery(['city']) }}" class="hover:text-teal-900 dark:hover:text-white">✕</a>
                     </span>
                 @endif
                 @if(request('type'))
-                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 text-xs font-medium px-3 py-1.5 rounded-full">
+                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100 text-xs font-medium px-3 py-1.5 rounded-full">
                         🏠 {{ request('type') }}
-                        <a href="{{ request()->fullUrlWithoutQuery(['type']) }}" class="hover:text-teal-900">✕</a>
+                        <a href="{{ request()->fullUrlWithoutQuery(['type']) }}" class="hover:text-teal-900 dark:hover:text-white">✕</a>
                     </span>
                 @endif
                 @if(request('min_price') || request('max_price'))
-                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 text-xs font-medium px-3 py-1.5 rounded-full">
+                    <span class="flex items-center gap-1.5 bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-100 text-xs font-medium px-3 py-1.5 rounded-full">
                         💰 ₱{{ request('min_price') ? number_format(request('min_price')) : '0' }} – {{ request('max_price') ? '₱'.number_format(request('max_price')) : 'Any' }}
-                        <a href="{{ request()->fullUrlWithoutQuery(['min_price','max_price']) }}" class="hover:text-teal-900">✕</a>
+                        <a href="{{ request()->fullUrlWithoutQuery(['min_price','max_price']) }}" class="hover:text-teal-900 dark:hover:text-white">✕</a>
                     </span>
                 @endif
             </div>
             @endif
 
             @if($properties->isEmpty())
-            <div class="py-20 text-center bg-white rounded-2xl border border-stone-200">
-                <svg class="w-16 h-16 text-stone-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <div class="py-20 text-center bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700">
+                <svg class="w-16 h-16 text-stone-200 dark:text-stone-700 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 <p class="text-stone-400 text-lg font-medium">No properties found</p>
                 <p class="text-stone-300 text-sm mt-1">Try adjusting your filters</p>
                 <a href="{{ route('client.properties') }}" class="mt-4 inline-block bg-teal-700 hover:bg-teal-800 text-white px-5 py-2 rounded-xl text-sm font-medium transition">Clear Filters</a>

@@ -13,8 +13,6 @@ use Illuminate\View\View;
 
 class PropertyController extends Controller
 {
-    private const MAX_GALLERY_IMAGES = 10;
-
     public function index(): View
     {
         $properties = Property::where('broker_id', auth()->id())
@@ -163,6 +161,11 @@ class PropertyController extends Controller
         $keptImages = array_values(array_diff($property->images ?? [], $removedImages));
         $data['images'] = [...$keptImages, ...$this->storeGalleryImages($request, count($keptImages))];
 
+        // Only an admin can release a listing they hid or flagged.
+        if (in_array($property->status, ['hidden', 'flagged'], true)) {
+            unset($data['status']);
+        }
+
         $property->update($data);
 
         return redirect()->route('agent.properties.index')->with('success', 'Property updated successfully.');
@@ -192,10 +195,10 @@ class PropertyController extends Controller
         }
 
         $request->validate([
-            'images' => ['array', 'max:' . max(0, self::MAX_GALLERY_IMAGES - $existingCount)],
+            'images' => ['array', 'max:' . max(0, Property::MAX_GALLERY_IMAGES - $existingCount)],
             'images.*' => ['image', 'max:4096'],
         ], [
-            'images.max' => 'A property can have up to ' . self::MAX_GALLERY_IMAGES . ' additional images.',
+            'images.max' => 'A property can have up to ' . Property::MAX_GALLERY_IMAGES . ' additional images.',
         ]);
 
         $baseUrl = rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/');

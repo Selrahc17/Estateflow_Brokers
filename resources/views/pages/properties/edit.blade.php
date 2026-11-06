@@ -23,6 +23,7 @@
                     <button type="button" data-ai-describe class="text-xs text-teal-800 hover:underline">Generate with AI</button>
                 </div>
                 <textarea id="property-description" name="description" rows="3" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">{{ old('description', $property->description) }}</textarea>
+                <p data-ai-status role="status" class="mt-1 text-xs text-stone-600"></p>
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -176,7 +177,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-medium text-stone-500 mb-1">Province</label>
-                            <input type="text" name="province" x-model="province"
+                            <input type="text" name="province" x-model="province" :placeholder="lat ? 'Type the province' : ''"
                                    class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                         </div>
                         <div>
@@ -216,36 +217,10 @@
                 </div>
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-stone-700 mb-1">Featured Image</label>
-                @if($property->featured_image)
-                    <div class="mb-2"><img src="{{ $property->featured_image }}" class="h-24 rounded-lg object-cover"></div>
-                @endif
-                <input type="file" name="featured_image" accept="image/*"
-                       class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-teal-50 file:text-teal-800 hover:file:bg-teal-100">
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-stone-700 mb-1">Additional Images <span class="text-stone-400 font-normal text-xs">(up to 10 photos)</span></label>
-                @if(!empty($property->images))
-                    <div class="flex flex-wrap gap-3 mb-2">
-                        @foreach($property->images as $img)
-                            <label class="block w-28 cursor-pointer">
-                                <img src="{{ $img }}" alt="" class="h-20 w-28 rounded-lg object-cover border border-stone-200">
-                                <span class="mt-1 flex items-center gap-1.5 text-xs text-stone-600">
-                                    <input type="checkbox" name="remove_images[]" value="{{ $img }}" class="rounded border-stone-300 text-red-500 focus:ring-red-400">
-                                    Remove
-                                </span>
-                            </label>
-                        @endforeach
-                    </div>
-                @endif
-                <input type="file" name="images[]" accept="image/*" multiple
-                       class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-teal-50 file:text-teal-800 hover:file:bg-teal-100">
-                <p class="text-xs text-stone-400 mt-1">New images are added to the existing ones. Tick Remove to delete a photo.</p>
-                @error('images')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
-                @error('images.*')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
-            </div>
+            @include('pages.properties._image-fields', [
+                'currentFeatured' => $property->featured_image,
+                'currentImages' => $property->images ?? [],
+            ])
         </div>
 
         <div class="flex items-center gap-3 mt-6 pt-6 border-t border-stone-200">
@@ -254,24 +229,7 @@
         </div>
     </form>
 
-    @push('scripts')
-    <script>
-    document.querySelector('[data-ai-describe]')?.addEventListener('click', async (button) => {
-        const target = document.getElementById('property-description');
-        button.currentTarget.disabled = true;
-        button.currentTarget.textContent = 'Generating...';
-        const response = await fetch('{{ route('agent.ai.describe') }}', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'},
-            body: JSON.stringify(Object.fromEntries(new FormData(document.querySelector('form'))))
-        });
-        const result = await response.json();
-        target.value = result.description || 'AI description is unavailable. Add an OpenAI API key or write the description manually.';
-        button.currentTarget.disabled = false;
-        button.currentTarget.textContent = 'Generate with AI';
-    });
-    </script>
-    @endpush
+    @include('pages.properties._ai-describe-script')
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -384,8 +342,9 @@ function mapPicker(initLat, initLng) {
                 || addr.village
                 || '';
 
-            this.province = addr.province || addr.state_district || '';
-            this.region   = addr.state || '';
+            const { province, region } = window.philippineProvinceAndRegion(addr);
+            this.province = province;
+            this.region = region;
 
             if (this.marker) {
                 this.marker.bindPopup(

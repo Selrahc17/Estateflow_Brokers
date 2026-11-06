@@ -3,10 +3,20 @@
 namespace App\Providers;
 
 use App\Models\AppNotification;
+use App\Models\AuditLog;
+use App\Models\ContactMessage;
 use App\Models\Document;
+use App\Models\Feedback;
 use App\Models\Reservation;
 use App\Models\Setting;
+use App\Models\User;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 
@@ -25,7 +35,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer(['layouts.app', 'layouts.broker', 'layouts.client', 'layouts.public', 'pages.auth.login'], function ($view) {
+        $this->configureRateLimiting();
+        $this->recordSignInsAndSignOuts();
+
+        View::composer(['layouts.app', 'layouts.broker', 'layouts.client', 'layouts.public', 'layouts.auth'], function ($view) {
             $view->with('appLogo', Setting::get('logo_url', null));
         });
 
@@ -41,6 +54,9 @@ class AppServiceProvider extends ServiceProvider
                     'pendingReservations' => $pendingReservations,
                     'pendingDocuments' => $pendingDocuments,
                     'unreadNotifs' => $unreadNotifs,
+                    'pendingBrokers' => User::where('role', 'broker')->where('is_approved', false)->count(),
+                    'pendingFeedback' => Feedback::where('status', 'pending')->count(),
+                    'newContactMessages' => ContactMessage::where('status', 'new')->count(),
                 ]);
             } else {
                 $view->with([
@@ -48,8 +64,65 @@ class AppServiceProvider extends ServiceProvider
                     'pendingReservations' => 0,
                     'pendingDocuments' => 0,
                     'unreadNotifs' => 0,
+                    'pendingBrokers' => 0,
+                    'pendingFeedback' => 0,
+                    'newContactMessages' => 0,
                 ]);
             }
         });
+    }
+
+    private function recordSignInsAndSignOuts(): void
+    {
+        $record = fn (?User $user, string $action, string $route) => $user && AuditLog::create([
+            'actor_id' => $user->id,
+            'actor_role' => $user->role,
+            'method' => 'POST',
+            'route_name' => $route,
+            'action' => $action,
+            'description' => strtolower($action),
+            'status_code' => 200,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
+        Event::listen(Login::class, fn (Login $event) => $record($event->user, 'Signed in', 'auth.login'));
+        Event::listen(Logout::class, fn (Logout $event) => $record($event->user, 'Signed out', 'auth.logout'));
+    }
+
+    private function configureRateLimiting(): void
+    {
+        // Show the limit as a form error rather than a bare 429 page.
+        $tooManyAttempts = function (Request $request, array $headers) {
+            $seconds = (int) ($headers['Retry-After'] ?? 60);
+
+            return back()
+                ->withErrors(['email' => "Too many attempts. Please wait {$seconds} seconds and try again."])
+                ->withInput($request->except(['password', 'password_confirmation']));
+        };
+
+        $emailAndIp = function (Request $request): string {
+            $email = $request->input('email');
+
+            return (is_string($email) ? strtolower($email) : '').'|'.$request->ip();
+        };
+
+        RateLimiter::for('login', fn (Request $request) => [
+            Limit::perMinute(5)->by($emailAndIp($request))->response($tooManyAttempts),
+            Limit::perMinute(20)->by($request->ip())->response($tooManyAttempts),
+        ]);
+
+        RateLimiter::for('password-reset', fn (Request $request) => [
+            Limit::perMinute(3)->by($emailAndIp($request))->response($tooManyAttempts),
+            Limit::perMinute(10)->by($request->ip())->response($tooManyAttempts),
+        ]);
+
+        RateLimiter::for('register', fn (Request $request) => [
+            Limit::perMinute(10)->by($request->ip())->response($tooManyAttempts),
+        ]);
+
+        RateLimiter::for('public-forms', fn (Request $request) => [
+            Limit::perMinute(5)->by($request->ip())->response($tooManyAttempts),
+        ]);
     }
 }

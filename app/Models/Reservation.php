@@ -42,6 +42,11 @@ class Reservation extends Model
         return $this->belongsTo(User::class, 'broker_id');
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function agent()
     {
         return $this->belongsTo(User::class, 'agent_id');

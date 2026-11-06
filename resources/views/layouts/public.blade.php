@@ -1,7 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="darkMode ? 'dark' : ''">
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ dark: darkMode }">
 <head>
     <meta charset="UTF-8">
+    {{-- Runs before first paint so dark mode pages never flash white. --}}
+    <script>
+        if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1A6B79">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,6 +18,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     <style>
+        .dark { color-scheme: dark; }
         .dark body { background-color: #0c0a09; color: #e7e5e4; }
         .dark .dark\:bg-stone-950 { background-color: #0c0a09; }
     </style>
@@ -35,7 +40,7 @@
                         </svg>
                     @endif
                 </div>
-                <span class="text-lg font-bold text-stone-800 dark:text-white">Estate<span class="text-[var(--color-primary)]">Flow</span></span>
+                <span class="text-lg font-bold text-stone-800 dark:text-white">Estate<span class="text-[var(--color-primary)] dark:text-teal-400">Flow</span></span>
             </a>
 
             {{-- Search Bar (Desktop) --}}
@@ -91,8 +96,8 @@
                 {{-- Desktop Nav --}}
                 <div class="hidden sm:flex items-center gap-2">
                     @guest
-                    <a href="{{ route('auth.login') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] transition px-3 py-2">Sign In</a>
-                    <a href="{{ route('auth.register') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] transition px-3 py-2">Register</a>
+                    <a href="{{ route('auth.login') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition px-3 py-2">Sign In</a>
+                    <a href="{{ route('auth.register') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition px-3 py-2">Register</a>
                     @endguest
 
                     @auth
@@ -126,29 +131,29 @@
 
                             {{-- Nav Links --}}
                             <div class="py-1 dark:[&_a]:text-stone-300 dark:[&_a:hover]:bg-stone-800 dark:[&_a:hover]:text-amber-400">
-                                <a href="{{ route('client.account.reservation') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.reservation') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
+                                <a href="{{ route('client.account.reservation') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition {{ request()->routeIs('client.account.reservation') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     My Reservation
                                 </a>
-                                <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.documents') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
+                                <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition {{ request()->routeIs('client.account.documents') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     My Documents
                                 </a>
                                 @php
                                     $unreadCount = \App\Models\AppNotification::where('user_id', auth()->id())->where('is_read', false)->count();
                                 @endphp
-                                <a href="{{ route('client.account.notifications') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.notifications') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
+                                <a href="{{ route('client.account.notifications') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition {{ request()->routeIs('client.account.notifications') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                                     Notifications
                                     @if($unreadCount > 0)
                                         <span class="ml-auto bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">{{ $unreadCount }}</span>
                                     @endif
                                 </a>
-                                <a href="{{ route('client.account.feedback') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.feedback') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
+                                <a href="{{ route('client.account.feedback') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition {{ request()->routeIs('client.account.feedback') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                                     Feedback & Ratings
                                 </a>
-                                <a href="{{ route('client.account.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] transition {{ request()->routeIs('client.account.profile') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
+                                <a href="{{ route('client.account.profile') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition {{ request()->routeIs('client.account.profile') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                     My Profile
                                 </a>
@@ -167,7 +172,7 @@
                         </div>
                     </div>
                     @else
-                        <a href="{{ $userRoleDashboard ?? route(auth()->user()->role . '.dashboard') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] transition px-3 py-2">
+                        <a href="{{ $userRoleDashboard ?? route(auth()->user()->role . '.dashboard') }}" class="text-sm font-medium text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition px-3 py-2">
                             Go to Dashboard
                         </a>
                     @endif
@@ -193,10 +198,10 @@
         {{-- Mobile Menu --}}
         <div x-show="mobileMenu" x-transition class="sm:hidden border-t border-stone-100 dark:border-stone-800 px-4 py-4 bg-white dark:bg-stone-900 space-y-1">
             <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-1">Browse</p>
-            <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] py-2 px-1 font-medium">All Properties</a>
-            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">House and Lot</a>
-            <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">Lot Only</a>
-            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] py-2 px-1">Condominium</a>
+            <a href="{{ route('client.properties') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-[var(--color-primary)] dark:hover:text-teal-400 py-2 px-1 font-medium">All Properties</a>
+            <a href="{{ route('client.properties') }}?type=House+and+Lot" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] dark:hover:text-teal-400 py-2 px-1">House and Lot</a>
+            <a href="{{ route('client.properties') }}?type=Lot+Only" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] dark:hover:text-teal-400 py-2 px-1">Lot Only</a>
+            <a href="{{ route('client.properties') }}?type=Condominium" class="block text-sm text-stone-500 dark:text-stone-400 hover:text-[var(--color-primary)] dark:hover:text-teal-400 py-2 px-1">Condominium</a>
             <div class="border-t border-stone-100 dark:border-stone-800 pt-3 mt-2">
                 @if(auth()->check() && auth()->user()->role === 'client')
                 <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-2">My Account</p>
@@ -292,7 +297,7 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
              x-transition:leave-end="opacity-0 scale-90 translate-y-4"
-             class="absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden mb-2">
+             class="absolute bottom-16 right-0 w-80 sm:w-96 bg-white dark:bg-stone-900 rounded-2xl shadow-2xl border border-stone-200 dark:border-stone-700 overflow-hidden mb-2">
 
             {{-- Chat Header --}}
             <div class="bg-gradient-to-r from-[#112E3B] to-[#1A6B79] px-4 py-3 flex items-center justify-between">
@@ -318,7 +323,7 @@
             </div>
 
             {{-- Messages --}}
-            <div class="h-72 overflow-y-auto p-4 space-y-3 bg-stone-50" id="chatbot-messages">
+            <div class="h-72 overflow-y-auto p-4 space-y-3 bg-stone-50 dark:bg-stone-950" id="chatbot-messages">
                 <template x-for="(msg, i) in messages" :key="i">
                     <div :class="msg.from === 'user' ? 'flex flex-row-reverse items-end gap-2' : 'flex items-end gap-2'">
                         <template x-if="msg.from === 'ai'">
@@ -330,7 +335,7 @@
                                 @endif
                             </div>
                         </template>
-                        <div :class="msg.from === 'user' ? 'bg-teal-700 text-white rounded-2xl rounded-br-none' : 'bg-white border border-stone-200 text-stone-700 rounded-2xl rounded-bl-none'"
+                        <div :class="msg.from === 'user' ? 'bg-teal-700 text-white rounded-2xl rounded-br-none' : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-200 rounded-2xl rounded-bl-none'"
                              class="px-3 py-2 max-w-xs shadow-sm">
                             <p class="text-xs leading-relaxed" x-text="msg.text"></p>
                         </div>
@@ -339,24 +344,24 @@
             </div>
 
             {{-- Quick Replies --}}
-            <div class="px-4 py-2 border-t border-stone-100 bg-white">
+            <div class="px-4 py-2 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
                 <div class="flex gap-1.5 flex-wrap">
-                    <button @click="messages.push({from:'user',text:'Payment due?'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">Payment due?</button>
-                    <button @click="messages.push({from:'user',text:'My documents'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">My documents</button>
-                    <button @click="messages.push({from:'user',text:'Lot details'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">Lot details</button>
-                    <button @click="messages.push({from:'user',text:'Contact agent'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-700 text-stone-500 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200">Contact agent</button>
+                    <button @click="messages.push({from:'user',text:'Payment due?'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Payment due?</button>
+                    <button @click="messages.push({from:'user',text:'My documents'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">My documents</button>
+                    <button @click="messages.push({from:'user',text:'Lot details'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Lot details</button>
+                    <button @click="messages.push({from:'user',text:'Contact agent'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Contact agent</button>
                 </div>
             </div>
 
             {{-- Input --}}
-            <div class="p-3 border-t border-stone-100 bg-white">
+            <div class="p-3 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
                 <div class="flex gap-2">
                     <input
                         x-model="message"
                         @keydown.enter="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
                         type="text"
                         placeholder="Ask anything..."
-                        class="flex-1 border border-stone-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 bg-stone-50">
+                        class="flex-1 border border-stone-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder:text-stone-500">
                     <button
                         @click="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
                         class="w-8 h-8 bg-teal-700 hover:bg-teal-800 text-white rounded-xl flex items-center justify-center transition shrink-0">
@@ -364,7 +369,7 @@
                     </button>
                 </div>
                 <p class="text-center text-xs text-stone-400 mt-2">
-                    <a href="{{ route('client.account.chat') }}" class="hover:text-teal-600 transition">Open full AI Assistant →</a>
+                    <a href="{{ route('client.account.chat') }}" class="hover:text-teal-600 dark:hover:text-teal-400 transition">Open full AI Assistant →</a>
                 </p>
             </div>
         </div>

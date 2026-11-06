@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Client;
 use App\Models\User;
+use App\Services\BrokerComplianceService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -27,43 +30,70 @@ class AuthController extends Controller
         return view('pages.auth.register');
     }
 
-    // Handle registration
-    public function register(Request $request): RedirectResponse
+    // Handle registration. Agents are added by their broker, so they cannot sign up here.
+    public function register(Request $request, BrokerComplianceService $compliance): RedirectResponse
     {
-        $request->validate([
+        $isBroker = $request->input('role') === 'broker';
+
+        $rules = [
             'first_name' => 'required|string|max:100',
             'last_name'  => 'required|string|max:100',
             'email'      => 'required|email|unique:users,email',
             'phone'      => 'nullable|string|max:20',
             'password'   => 'required|string|min:8|confirmed',
-            'role'       => 'required|in:client,agent',
-        ]);
+            'role'       => 'required|in:client,broker',
+            'privacy_consent' => 'accepted',
+        ];
 
-        $fullName = $request->first_name . ' ' . $request->last_name;
-        $hashedPassword = Hash::make($request->password);
-
-        $user = User::create([
-            'name'     => $fullName,
-            'email'    => $request->email,
-            'password' => $hashedPassword,
-            'role'     => $request->role,
-            'is_approved' => $request->role === 'agent' ? false : true,
-            'is_active' => true,
-        ]);
-
-        if ($request->role === 'client') {
-            Client::create([
-                'user_id'    => $user->id,
-                'first_name' => $request->first_name,
-                'last_name'  => $request->last_name,
-                'email'      => $request->email,
-                'phone'      => $request->phone,
-                'password'   => $hashedPassword,
-                'status'     => 'active',
-            ]);
+        if ($isBroker) {
+            $rules = [...$rules, ...$compliance->detailRules(), 'prc_id_file' => BrokerComplianceService::FILE_RULES];
         }
 
+        $data = $request->validate($rules, [
+            ...$compliance->messages(),
+            'email.unique' => 'An account with this email already exists. Try signing in instead.',
+            'password.min' => 'Your password must be at least 8 characters.',
+            'password.confirmed' => 'The passwords do not match.',
+            'privacy_consent.accepted' => 'Please agree to the Privacy Policy to continue.',
+        ], $compliance->attributes());
+
+        $user = DB::transaction(function () use ($data, $isBroker, $request, $compliance) {
+            $hashedPassword = Hash::make($data['password']);
+            $brokerFields = $isBroker
+                ? Arr::only($data, ['license_number', 'prc_id_expires_at', 'dhsud_registration_number', 'dhsud_registration_expires_at', 'tin'])
+                : [];
+
+            $user = User::create([
+                'name'     => $data['first_name'] . ' ' . $data['last_name'],
+                'email'    => $data['email'],
+                'phone'    => $data['phone'] ?? null,
+                'password' => $hashedPassword,
+                'role'     => $data['role'],
+                'is_approved' => ! $isBroker,
+                'is_active' => true,
+                'privacy_consented_at' => now(),
+                ...$brokerFields,
+            ]);
+
+            if ($isBroker) {
+                $compliance->storeDocument($user, 'prc_id', $request->file('prc_id_file'));
+            } else {
+                Client::create([
+                    'user_id'    => $user->id,
+                    'first_name' => $data['first_name'],
+                    'last_name'  => $data['last_name'],
+                    'email'      => $data['email'],
+                    'phone'      => $data['phone'] ?? null,
+                    'password'   => $hashedPassword,
+                    'status'     => 'active',
+                ]);
+            }
+
+            return $user;
+        });
+
         Auth::login($user);
+        $request->session()->regenerate();
 
         return redirect($this->redirectForRole($user));
     }
@@ -74,25 +104,28 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
+        ], [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address.',
+            'password.required' => 'Please enter your password.',
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $user = Auth::user();
-            
+
             // Check if user is active
             if (!$user->is_active) {
                 Auth::logout();
                 return back()->withErrors([
-                    'email' => 'Your account has been suspended.',
+                    'email' => 'Your account has been suspended. Please contact support.',
                 ])->onlyInput('email');
             }
 
-            // Check if staff account is approved
-            if (in_array($user->role, ['agent', 'broker'], true) && !$user->is_approved) {
+            // Pending brokers may sign in to finish their application; pending agents may not.
+            if ($user->role === 'agent' && !$user->is_approved) {
                 Auth::logout();
-                $roleLabel = $user->role === 'broker' ? 'broker' : 'agent';
                 return back()->withErrors([
-                    'email' => "Your {$roleLabel} account is pending approval.",
+                    'email' => 'Your agent account is not active yet. Please contact your broker.',
                 ])->onlyInput('email');
             }
 
@@ -101,17 +134,22 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Incorrect email or password. Please try again.',
         ])->onlyInput('email');
     }
 
     // Handle logout
     public function logout(Request $request): RedirectResponse
     {
+        $isStaff = in_array($request->user()?->role, ['agent', 'broker'], true);
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+
+        return $isStaff
+            ? redirect()->route('auth.login')->with('success', 'You have been signed out.')
+            : redirect('/');
     }
 
     // Redirect based on role
@@ -119,7 +157,7 @@ class AuthController extends Controller
     {
         return match ($user->role) {
             'admin'  => route('admin.dashboard'),
-            'broker' => route('broker.dashboard'),
+            'broker' => $user->is_approved ? route('broker.dashboard') : route('broker.application.show'),
             'agent'  => route('agent.dashboard'),
             default  => route('client.properties'),
         };
@@ -132,13 +170,17 @@ class AuthController extends Controller
 
     public function sendResetLink(Request $request): RedirectResponse
     {
-        $request->validate(['email' => 'required|email']);
+        $request->validate(['email' => 'required|email'], [
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address.',
+        ]);
 
-        $status = Password::sendResetLink($request->only('email'));
+        // The reply and its timing must not reveal whether the email is registered,
+        // so the link is sent after the response and every outcome reads the same.
+        $credentials = $request->only('email');
+        app()->terminating(fn () => rescue(fn () => Password::sendResetLink($credentials)));
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('success', 'Password reset link sent to your email.')
-            : back()->withErrors(['email' => __($status)]);
+        return back()->with('success', "If that email is registered, we've sent a password reset link.");
     }
 
     public function showResetForm(Request $request, string $token): View
@@ -152,6 +194,9 @@ class AuthController extends Controller
             'token'    => 'required',
             'email'    => 'required|email',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'password.min' => 'Your password must be at least 8 characters.',
+            'password.confirmed' => 'The passwords do not match.',
         ]);
 
         $status = Password::reset(
@@ -166,6 +211,6 @@ class AuthController extends Controller
 
         return $status === Password::PASSWORD_RESET
             ? redirect()->route('auth.login')->with('success', 'Password reset successfully. Please log in.')
-            : back()->withErrors(['email' => __($status)]);
+            : back()->withErrors(['email' => 'This reset link is invalid or has expired.']);
     }
     }

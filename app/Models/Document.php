@@ -10,6 +10,14 @@ class Document extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const BROKER_COMPLIANCE_TYPES = [
+        'prc_id' => ['label' => 'PRC ID', 'hint' => 'Your current PRC professional ID card.'],
+        'bond' => ['label' => 'Bond or Indemnity Insurance', 'hint' => 'Proof of your cash or surety bond, or professional indemnity insurance (at least ₱20,000).'],
+        'bir_2303' => ['label' => 'BIR Form 2303', 'hint' => 'Your BIR Certificate of Registration.'],
+        'amlc_certificate' => ['label' => 'AMLC Certificate', 'hint' => 'Your AMLC Certificate of Registration.'],
+        'ptr' => ['label' => 'Privilege Tax Receipt (PTR)', 'hint' => 'Your current PTR.'],
+    ];
+
     protected $fillable = [
         'client_id', 'agent_id', 'broker_id', 'uploaded_by', 'name', 'type', 'file_path',
         'file_size', 'status', 'notes', 'verified_at', 'check_status',

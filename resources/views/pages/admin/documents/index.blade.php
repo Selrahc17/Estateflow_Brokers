@@ -105,10 +105,13 @@
                                 {{ $doc->status === 'needs_more'  ? 'bg-blue-100 text-blue-600'    : '' }}">
                                 {{ ucfirst(str_replace('_', ' ', $doc->status)) }}
                             </span>
+                            @if($doc->notes)
+                            <p class="mt-1 max-w-[12rem] text-xs text-stone-500">{{ $doc->notes }}</p>
+                            @endif
                         </td>
                         <td class="px-5 py-3">
                             <div class="flex items-center gap-1.5 flex-wrap">
-                                <a href="{{ str_starts_with($doc->file_path, 'http') ? $doc->file_path : asset('storage/' . $doc->file_path) }}" target="_blank"
+                                <a href="{{ route('admin.documents.download', $doc) }}" target="_blank"
                                    class="text-xs bg-stone-100 text-stone-600 hover:bg-stone-200 px-2 py-1 rounded-lg font-medium transition">
                                     View
                                 </a>
@@ -117,9 +120,11 @@
                                     @csrf
                                     <button type="submit" class="text-xs bg-green-100 text-green-700 hover:bg-green-200 px-2 py-1 rounded-lg font-medium transition">Approve</button>
                                 </form>
-                                <form action="{{ route('admin.documents.reject', $doc) }}" method="POST">
+                                <form method="POST" class="flex items-center gap-1.5">
                                     @csrf
-                                    <button type="submit" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded-lg font-medium transition">Reject</button>
+                                    <input type="text" name="notes" required maxlength="1000" placeholder="Reason" aria-label="Reason for {{ $doc->name }}" class="w-28 border border-stone-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-red-400">
+                                    <button type="submit" formaction="{{ route('admin.documents.reject', $doc) }}" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-2 py-1 rounded-lg font-medium transition">Reject</button>
+                                    <button type="submit" formaction="{{ route('admin.documents.request-more', $doc) }}" class="whitespace-nowrap text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 px-2 py-1 rounded-lg font-medium transition">Request More</button>
                                 </form>
                                 @endif
                                 <form action="{{ route('admin.documents.destroy', $doc) }}" method="POST" onsubmit="return confirm('Delete this document?')">

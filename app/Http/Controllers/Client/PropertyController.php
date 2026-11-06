@@ -66,6 +66,7 @@ class PropertyController extends Controller
     {
         $property = Property::where('slug', $slug)
             ->with(['lots' => fn($q) => $q->where('status', 'available'), 'broker'])
+            ->whereNotIn('status', ['hidden', 'flagged'])
             ->firstOrFail();
 
         $property->increment('view_count');

@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\CheckRole::class,
             'audit' => \App\Http\Middleware\RecordAuditLog::class,
             'role.redirect' => \App\Http\Middleware\RedirectAuthenticatedRole::class,
+            'broker.pending' => \App\Http\Middleware\EnsurePendingBroker::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('auth.login'));
     })

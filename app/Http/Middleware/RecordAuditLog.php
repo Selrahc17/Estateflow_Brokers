@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\AuditLog;
 use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,7 +29,7 @@ class RecordAuditLog
                 'method' => $request->method(),
                 'route_name' => $routeName,
                 'action' => $action,
-                'description' => $routeName ? str_replace(['.', '-', '_'], ' ', $routeName) : $request->path(),
+                'description' => $this->describe($request, $routeName),
                 'status_code' => $response->getStatusCode(),
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
@@ -36,5 +37,14 @@ class RecordAuditLog
         }
 
         return $response;
+    }
+
+    private function describe(Request $request, ?string $routeName): string
+    {
+        $description = $routeName ? str_replace(['.', '-', '_'], ' ', $routeName) : $request->path();
+
+        $subject = collect($request->route()?->parameters())->first(fn ($value) => $value instanceof Model);
+
+        return $subject ? "{$description} #{$subject->getKey()}" : $description;
     }
 }

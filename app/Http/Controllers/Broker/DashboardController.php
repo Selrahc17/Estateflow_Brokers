@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Broker;
 
 use App\Http\Controllers\Controller;
+use App\Models\CommissionAgreement;
 use App\Models\Inquiry;
 use App\Models\Property;
 use App\Models\Reservation;
 use App\Models\SiteVisit;
+use App\Services\BrokerComplianceService;
 use Carbon\Carbon;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -14,15 +16,15 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+    public function index(BrokerComplianceService $compliance): View
     {
         $broker = auth()->user();
         $agentsQuery = $broker->agents();
 
         $stats = [
             'total_agents' => (clone $agentsQuery)->count(),
-            'active_agents' => (clone $agentsQuery)->where('is_active', true)->count(),
-            'pending_agents' => (clone $agentsQuery)->where('is_approved', false)->count(),
+            'active_agents' => (clone $agentsQuery)->where('is_active', true)->where('is_approved', true)->count(),
+            'pending_invites' => (clone $agentsQuery)->where('is_approved', false)->count(),
         ];
 
         $agents = $agentsQuery
@@ -46,7 +48,9 @@ class DashboardController extends Controller
             'viewings' => $viewings->values(),
         ];
 
-        return view('pages.broker.dashboard', compact('stats', 'agents', 'chart'));
+        $renewals = $compliance->renewalsNeedingAttention($broker);
+
+        return view('pages.broker.dashboard', compact('stats', 'agents', 'chart', 'renewals'));
     }
 
     private function monthlyCounts($months, string $model, $agentIds, ?callable $filter = null)
@@ -63,12 +67,22 @@ class DashboardController extends Controller
 
     public function performance(): View
     {
-        $agents = auth()->user()->agents()->get()->map(function ($agent) {
+        $agreements = CommissionAgreement::where('broker_id', auth()->id())
+            ->with('payments')
+            ->get()
+            ->groupBy('agent_id');
+
+        $agents = auth()->user()->agents()->get()->map(function ($agent) use ($agreements) {
             $agent->leads_count = Inquiry::where('broker_id', $agent->id)->count();
             $agent->viewings_count = SiteVisit::where('broker_id', $agent->id)->count();
             $agent->sales_count = Reservation::where('broker_id', $agent->id)
                 ->whereIn('status', ['confirmed', 'completed'])
                 ->count();
+
+            $payments = $agreements->get($agent->id, collect())->flatMap->payments;
+            $agent->commission_expected = $payments->sum('agent_amount');
+            $agent->commission_paid = $payments->where('payment_status', 'paid')->sum('agent_amount');
+
             return $agent;
         });
 

@@ -4,6 +4,9 @@
 @section('page-subtitle', 'Property Details')
 
 @section('content')
+@if(session('success'))
+<div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+@endif
 <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
     <div class="xl:col-span-2">
         <div class="bg-white rounded-xl border border-stone-200 p-5 mb-5">
@@ -79,9 +82,9 @@
                 @method('PATCH')
                 <label class="block mb-2 text-sm text-stone-600">Update Property Status</label>
                 <select name="status" class="w-full border border-stone-200 rounded-lg px-3 py-2 mb-4">
-                    <option value="available" {{ $property->status === 'available' ? 'selected' : '' }}>Available</option>
-                    <option value="hidden" {{ $property->status === 'hidden' ? 'selected' : '' }}>Hide Property</option>
-                    <option value="flagged" {{ $property->status === 'flagged' ? 'selected' : '' }}>Flag as Inappropriate</option>
+                    @foreach(['available' => 'Available', 'coming_soon' => 'Coming Soon', 'sold' => 'Sold', 'hidden' => 'Hide Property', 'flagged' => 'Flag as Inappropriate'] as $value => $text)
+                    <option value="{{ $value }}" @selected($property->status === $value)>{{ $text }}</option>
+                    @endforeach
                 </select>
                 <button type="submit" class="w-full bg-red-600 text-white py-2 rounded-lg hover:bg-red-700">Update Status</button>
             </form>

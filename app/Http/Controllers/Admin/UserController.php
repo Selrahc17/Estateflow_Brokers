@@ -40,6 +40,7 @@ class UserController extends Controller
         ]);
 
         $data['broker_id'] = $data['role'] === 'agent' ? ($data['broker_id'] ?? null) : null;
+        $data['is_approved'] = $data['role'] !== 'broker';
 
         User::create($data);
 

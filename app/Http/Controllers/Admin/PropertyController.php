@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppNotification;
 use App\Models\Property;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,30 +20,10 @@ class PropertyController extends Controller
                     ->orWhere('address', 'like', '%'.request('search').'%');
             }))
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        // Find potential duplicates
-        $potentialDuplicates = Property::select('name', 'city', 'province', 'latitude', 'longitude')
-            ->selectRaw('COUNT(*) as count, GROUP_CONCAT(id) as ids')
-            ->groupBy('name', 'city', 'province')
-            ->havingRaw('COUNT(*) > 1')
-            ->orWhere(function ($q) {
-                $q->whereNotNull('latitude')->whereNotNull('longitude')
-                  ->groupBy('latitude', 'longitude')
-                  ->havingRaw('COUNT(*) > 1');
-            })
-            ->get();
-
-        // Flatten potential duplicates into a list of property ID groups
-        $duplicateGroups = [];
-        foreach ($potentialDuplicates as $dup) {
-            if ($dup->ids) {
-                $ids = explode(',', $dup->ids);
-                if (count($ids) > 1) {
-                    $duplicateGroups[] = $ids;
-                }
-            }
-        }
+        $duplicateGroups = $this->duplicateGroups();
 
         return view('pages.admin.properties.index', compact('properties', 'duplicateGroups'));
     }
@@ -68,16 +49,51 @@ class PropertyController extends Controller
 
     public function updateStatus(Request $request, Property $property): RedirectResponse
     {
-        $request->validate(['status' => 'required|in:available,hidden,flagged']);
+        $request->validate(['status' => 'required|in:available,coming_soon,sold,hidden,flagged']);
+
         $property->update(['status' => $request->status]);
 
-        return redirect()->route('admin.properties')->with('success', 'Property status updated.');
+        if (in_array($request->status, ['hidden', 'flagged'], true) && $property->broker_id) {
+            AppNotification::create([
+                'user_id' => $property->broker_id,
+                'type' => 'property_moderated',
+                'title' => 'Listing removed from the public site',
+                'message' => "An admin marked {$property->name} as {$request->status}. Clients can no longer see it.",
+                'link' => route('agent.properties.show', $property),
+                'is_read' => false,
+            ]);
+        }
+
+        return back()->with('success', 'Property status updated.');
     }
 
     public function deleteMultiple(Request $request): RedirectResponse
     {
-        $request->validate(['ids' => 'required|array|min:2']);
+        $request->validate(
+            ['ids' => 'required|array|min:1', 'ids.*' => 'integer'],
+            ['ids.required' => 'Select at least one property to delete.']
+        );
         Property::whereIn('id', $request->ids)->delete();
         return back()->with('success', 'Selected duplicate properties deleted.');
+    }
+
+    /**
+     * Listings with the same name and place, or the same map pin.
+     *
+     * @return array<int, \Illuminate\Support\Collection<int, Property>>
+     */
+    private function duplicateGroups(): array
+    {
+        $properties = Property::with('broker')->get();
+
+        $byName = $properties->groupBy(fn (Property $property) => strtolower("{$property->name}|{$property->city}|{$property->province}"));
+        $byPin = $properties->filter(fn (Property $property) => $property->latitude && $property->longitude)
+            ->groupBy(fn (Property $property) => "{$property->latitude}|{$property->longitude}");
+
+        return $byName->values()->concat($byPin->values())
+            ->filter(fn ($group) => $group->count() > 1)
+            ->unique(fn ($group) => $group->pluck('id')->sort()->implode(','))
+            ->values()
+            ->all();
     }
 }

@@ -10,6 +10,8 @@ class Property extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const MAX_GALLERY_IMAGES = 10;
+
     protected $fillable = [
         'broker_id', 'name', 'slug', 'description', 'address',
         'city', 'province', 'type', 'latitude', 'longitude', 'price', 'agent_commission', 'valid_until', 'status',

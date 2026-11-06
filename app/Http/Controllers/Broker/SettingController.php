@@ -3,16 +3,60 @@
 namespace App\Http\Controllers\Broker;
 
 use App\Http\Controllers\Controller;
+use App\Models\Document;
+use App\Services\BrokerComplianceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class SettingController extends Controller
 {
-    public function index(): View
+    public function index(BrokerComplianceService $compliance): View
     {
-        return view('pages.broker.settings.index');
+        return view('pages.broker.settings.index', [
+            'checklist' => $compliance->checklist(auth()->user()),
+        ]);
+    }
+
+    public function updateLicense(Request $request, BrokerComplianceService $compliance): RedirectResponse
+    {
+        $broker = auth()->user();
+
+        $broker->update($request->validate(
+            $compliance->licenseRules($broker->id),
+            $compliance->messages(),
+            $compliance->attributes()
+        ));
+
+        return back()->with('success', 'License details updated.');
+    }
+
+    public function storeDocument(Request $request, BrokerComplianceService $compliance): RedirectResponse
+    {
+        $broker = auth()->user();
+
+        $data = $request->validate([
+            'type' => ['required', Rule::in(array_keys(Document::BROKER_COMPLIANCE_TYPES))],
+            'file' => BrokerComplianceService::FILE_RULES,
+        ], $compliance->messages());
+
+        $compliance->storeDocument($broker, $data['type'], $request->file('file'));
+        $compliance->notifyAdminsOfRenewal($broker, $data['type']);
+
+        return back()->with('success', Document::BROKER_COMPLIANCE_TYPES[$data['type']]['label'].' uploaded for admin review.');
+    }
+
+    public function downloadDocument(Document $document)
+    {
+        abort_unless(auth()->user()->complianceDocuments()->whereKey($document->id)->exists(), 404);
+        abort_unless(Storage::disk('local')->exists($document->file_path), 404);
+
+        return Storage::disk('local')->download(
+            $document->file_path,
+            $document->name.'.'.pathinfo($document->file_path, PATHINFO_EXTENSION)
+        );
     }
 
     public function updateProfile(Request $request): RedirectResponse

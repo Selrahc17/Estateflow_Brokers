@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppNotification;
 use App\Models\Document;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class DocumentController extends Controller
@@ -48,22 +50,70 @@ class DocumentController extends Controller
         return back()->with('success', 'Document uploaded successfully.');
     }
 
+    public function download(Document $document)
+    {
+        if (str_starts_with($document->file_path, 'http')) {
+            return redirect()->away($document->file_path);
+        }
+
+        $filename = $document->name.'.'.pathinfo($document->file_path, PATHINFO_EXTENSION);
+
+        foreach (['local', 'public'] as $disk) {
+            if (Storage::disk($disk)->exists($document->file_path)) {
+                return Storage::disk($disk)->download($document->file_path, $filename);
+            }
+        }
+
+        abort(404);
+    }
+
     public function verify(Document $document): RedirectResponse
     {
-        $document->update(['status' => 'verified', 'verified_at' => now(), 'uploaded_by' => auth()->id()]);
+        $document->update(['status' => 'verified', 'verified_at' => now(), 'notes' => null]);
+        $this->notifyOwner($document, "{$document->name} was verified.");
+
         return back()->with('success', 'Document verified.');
     }
 
     public function reject(Request $request, Document $document): RedirectResponse
     {
-        $document->update(['status' => 'rejected', 'notes' => $request->notes, 'uploaded_by' => auth()->id()]);
+        $notes = $this->reason($request);
+        $document->update(['status' => 'rejected', 'notes' => $notes, 'verified_at' => null]);
+        $this->notifyOwner($document, "{$document->name} was rejected: {$notes}");
+
         return back()->with('success', 'Document rejected.');
     }
 
     public function requestMore(Request $request, Document $document): RedirectResponse
     {
-        $document->update(['status' => 'needs_more', 'notes' => $request->notes, 'uploaded_by' => auth()->id()]);
+        $notes = $this->reason($request);
+        $document->update(['status' => 'needs_more', 'notes' => $notes, 'verified_at' => null]);
+        $this->notifyOwner($document, "More is needed for {$document->name}: {$notes}");
+
         return back()->with('success', 'Requested additional documents.');
+    }
+
+    private function reason(Request $request): string
+    {
+        return $request->validate(
+            ['notes' => ['required', 'string', 'max:1000']],
+            ['notes.required' => 'Please give a reason so the owner knows what to fix.']
+        )['notes'];
+    }
+
+    private function notifyOwner(Document $document, string $message): void
+    {
+        $userId = $document->client_id ? $document->client?->user_id : $document->broker_id;
+
+        if ($userId) {
+            AppNotification::create([
+                'user_id' => $userId,
+                'type' => 'document_review',
+                'title' => 'Document review update',
+                'message' => $message,
+                'is_read' => false,
+            ]);
+        }
     }
 
     public function destroy(Document $document): RedirectResponse

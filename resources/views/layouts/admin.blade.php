@@ -50,14 +50,17 @@
 
             <p x-show="sidebarOpen" class="text-xs text-stone-500 uppercase tracking-widest px-3 pb-2 pt-4">Management</p>
 
-            <a href="{{ route('admin.users') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.users') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
+            <a href="{{ route('admin.users') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.users*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 <span x-show="sidebarOpen" class="text-sm font-medium">User Management</span>
             </a>
 
-            <a href="{{ route('admin.brokers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.brokers') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
+            <a href="{{ route('admin.brokers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.brokers*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 <span x-show="sidebarOpen" class="text-sm font-medium">Broker Management</span>
+                @if($pendingBrokers > 0)
+                    <span x-show="sidebarOpen" class="ml-auto bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $pendingBrokers }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.properties') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.properties') || request()->routeIs('admin.properties.show') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
@@ -65,7 +68,7 @@
                 <span x-show="sidebarOpen" class="text-sm font-medium">Property Management</span>
             </a>
 
-            <a href="{{ route('admin.reservations') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.reservations') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
+            <a href="{{ route('admin.reservations') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.reservations*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span x-show="sidebarOpen" class="text-sm font-medium">Reservations</span>
                 @if($pendingReservations > 0)
@@ -73,7 +76,7 @@
                 @endif
             </a>
 
-            <a href="{{ route('admin.documents') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.documents') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
+            <a href="{{ route('admin.documents') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.documents*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <span x-show="sidebarOpen" class="text-sm font-medium">Documents</span>
                 @if($pendingDocuments > 0)
@@ -81,6 +84,22 @@
                 @endif
             </a>
 
+
+            <a href="{{ route('admin.feedback') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.feedback*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800 hover:text-white' }} transition">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                <span x-show="sidebarOpen" class="text-sm font-medium">Feedback</span>
+                @if($pendingFeedback > 0)
+                    <span x-show="sidebarOpen" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $pendingFeedback }}</span>
+                @endif
+            </a>
+
+            <a href="{{ route('admin.contact-messages') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.contact-messages*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800 hover:text-white' }} transition">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span x-show="sidebarOpen" class="text-sm font-medium">Contact Messages</span>
+                @if($newContactMessages > 0)
+                    <span x-show="sidebarOpen" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $newContactMessages }}</span>
+                @endif
+            </a>
 
             <a href="{{ route('admin.notifications') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.notifications') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -95,6 +114,11 @@
             <a href="{{ route('admin.audit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.audit') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
                 <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                 <span x-show="sidebarOpen" class="text-sm font-medium">Audit Logs</span>
+            </a>
+
+            <a href="{{ route('admin.backups') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.backups*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800 hover:text-white' }} transition">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4"/></svg>
+                <span x-show="sidebarOpen" class="text-sm font-medium">Backups</span>
             </a>
 
             <a href="{{ route('admin.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.settings') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
@@ -155,7 +179,7 @@
                 </div>
                 {{-- Notifications --}}
                 <a href="{{ route('admin.notifications') }}" class="relative text-stone-500 hover:text-red-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                     @if($unreadNotifs > 0)
                         <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">{{ $unreadNotifs }}</span>
                     @endif

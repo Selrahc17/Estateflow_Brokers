@@ -4,135 +4,162 @@
 @section('page-subtitle', 'Create a new property listing')
 
 @section('content')
-<div class="max-w-3xl mx-auto bg-white rounded-xl border border-stone-200 p-6" x-data="{ ...mapPicker(), selectedType: '{{ old('type', '') }}' }">
-    <form method="POST" action="{{ route('agent.properties.store') }}" enctype="multipart/form-data">
+@php
+    $field = 'w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-800 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-teal-400';
+    $fieldError = fn (string $name) => $errors->has($name) ? 'border-red-400' : '';
+    $label = 'mb-1 block text-sm font-medium text-stone-700';
+    $sectionHeader = 'flex items-start gap-3 border-b border-stone-100 px-5 py-4';
+    $sectionNumber = 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-teal-100 text-sm font-semibold text-teal-800';
+    $oldLatitude = is_numeric(old('latitude')) ? (float) old('latitude') : null;
+    $oldLongitude = is_numeric(old('longitude')) ? (float) old('longitude') : null;
+@endphp
+<div class="mx-auto max-w-3xl" x-data="{ ...mapPicker(@js($oldLatitude), @js($oldLongitude), @js($oldLatitude !== null && $oldLongitude !== null)), selectedType: @js(old('type', '')) }">
+    <form method="POST" action="{{ route('agent.properties.store') }}" enctype="multipart/form-data" class="space-y-5">
         @csrf
 
+        @if($errors->any() && ! session('duplicate_property'))
+            <div role="alert" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">Please check the {{ $errors->count() === 1 ? 'field' : 'fields' }} marked below.</div>
+        @endif
+
         @if(session('duplicate_property'))
-            <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl mb-5">
-                <h4 class="font-semibold text-yellow-800 text-sm flex items-center gap-2 mb-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <div class="rounded-xl border border-yellow-200 bg-yellow-50 p-4">
+                <h4 class="mb-2 flex items-center gap-2 text-sm font-semibold text-yellow-800">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     Potential Duplicate Found!
                 </h4>
-                <div class="bg-white rounded-lg p-3 border border-yellow-300 mb-3">
-                    <p class="font-medium text-stone-700 text-sm">{{ session('duplicate_property')->name }}</p>
-                    <p class="text-xs text-stone-500 mt-1">{{ implode(', ', array_filter([session('duplicate_property')->address, session('duplicate_property')->city, session('duplicate_property')->province])) }}</p>
+                <div class="mb-3 rounded-lg border border-yellow-300 bg-white p-3">
+                    <p class="text-sm font-medium text-stone-700">{{ session('duplicate_property')->name }}</p>
+                    <p class="mt-1 text-xs text-stone-500">{{ implode(', ', array_filter([session('duplicate_property')->address, session('duplicate_property')->city, session('duplicate_property')->province])) }}</p>
                 </div>
-                <label class="flex items-center gap-2 text-sm text-yellow-800 cursor-pointer">
+                <label class="flex cursor-pointer items-center gap-2 text-sm text-yellow-800">
                     <input type="checkbox" name="confirm_duplicate" class="rounded">
                     I confirm this is not a duplicate and want to proceed
                 </label>
             </div>
         @endif
 
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-stone-700 mb-1">Property Name</label>
-                <input type="text" name="name" value="{{ old('name') }}" required
-                       class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('name') border-red-400 @enderror">
-                @error('name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <div class="flex items-center justify-between mb-1">
-                    <label class="block text-sm font-medium text-stone-700">Description</label>
-                    <button type="button" data-ai-describe class="text-xs text-teal-800 hover:underline">Generate with AI</button>
-                </div>
-                <textarea id="property-description" name="description" rows="3" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">{{ old('description') }}</textarea>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {{-- Basic details --}}
+        <section class="rounded-xl border border-stone-200 bg-white" aria-labelledby="section-details">
+            <div class="{{ $sectionHeader }}">
+                <span class="{{ $sectionNumber }}" aria-hidden="true">1</span>
                 <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Property Type</label>
-                    <select name="type" x-model="selectedType" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('type') border-red-400 @enderror">
-                        <option value="">Select property type</option>
-                        @foreach(['House and Lot','Condominium','Townhouse','Lot Only','Office Space','Warehouse','Farm','Villa','Apartment'] as $type)
-                        <option value="{{ $type }}" {{ old('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
-                        @endforeach
-                    </select>
-                    @error('type') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Price (₱)</label>
-                    <input type="number" name="price" step="0.01" value="{{ old('price') }}"
-                           class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Commission Rate (%)</label>
-                    <input type="number" name="agent_commission" step="0.01" min="0" max="100" value="{{ old('agent_commission') }}"
-                           class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Valid Until</label>
-                    <input type="date" name="valid_until" value="{{ old('valid_until') }}"
-                           class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-stone-700 mb-1">Status</label>
-                    <select name="status" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                        <option value="available">Available</option>
-                        <option value="coming_soon">Coming Soon</option>
-                        <option value="sold">Sold</option>
-                    </select>
+                    <h2 id="section-details" class="font-semibold text-stone-800">Basic Details</h2>
+                    <p class="text-xs text-stone-500">What clients will see first.</p>
                 </div>
             </div>
+            <div class="space-y-4 p-5">
+                <div>
+                    <label for="name" class="{{ $label }}">Property Name <span class="text-red-600" aria-hidden="true">*</span></label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required placeholder="e.g. Vista Homes Phase 2" class="{{ $field }} {{ $fieldError('name') }}">
+                    @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
 
-            <div class="border border-stone-200 rounded-xl p-4 bg-stone-50" x-show="selectedType !== 'Lot Only'" x-cloak>
-                <p class="text-sm font-semibold text-stone-700 mb-3">House / Building Specifications</p>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Bedrooms</label>
-                        <input type="number" name="bedrooms" min="0" value="{{ old('bedrooms') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        <label for="type" class="{{ $label }}">Property Type <span class="text-red-600" aria-hidden="true">*</span></label>
+                        <select id="type" name="type" x-model="selectedType" required class="{{ $field }} {{ $fieldError('type') }}">
+                            <option value="">Select property type</option>
+                            @foreach(['House and Lot','Condominium','Townhouse','Lot Only','Office Space','Warehouse','Farm','Villa','Apartment'] as $type)
+                            <option value="{{ $type }}" @selected(old('type') === $type)>{{ $type }}</option>
+                            @endforeach
+                        </select>
+                        @error('type')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Bathrooms</label>
-                        <input type="number" name="bathrooms" min="0" value="{{ old('bathrooms') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        <label for="status" class="{{ $label }}">Status <span class="text-red-600" aria-hidden="true">*</span></label>
+                        <select id="status" name="status" class="{{ $field }} {{ $fieldError('status') }}">
+                            <option value="available" @selected(old('status', 'available') === 'available')>Available</option>
+                            <option value="coming_soon" @selected(old('status') === 'coming_soon')>Coming Soon</option>
+                            <option value="sold" @selected(old('status') === 'sold')>Sold</option>
+                        </select>
+                        @error('status')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Stories / Floors</label>
-                        <input type="number" name="stories" min="0" value="{{ old('stories') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+
+                <div>
+                    <div class="mb-1 flex items-center justify-between gap-3">
+                        <label for="property-description" class="text-sm font-medium text-stone-700">Description</label>
+                        <button type="button" data-ai-describe class="inline-flex items-center gap-1.5 rounded-lg border border-teal-200 px-2.5 py-1 text-xs font-medium text-teal-800 transition hover:bg-teal-50 disabled:cursor-wait disabled:opacity-60">Generate with AI</button>
                     </div>
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Floor Area (sqm)</label>
-                        <input type="number" step="0.01" name="floor_area" min="0" value="{{ old('floor_area') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-stone-500 mb-1">Parking Slots</label>
-                        <input type="number" name="parking_slots" min="0" value="{{ old('parking_slots') }}" placeholder="—" class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    </div>
+                    <textarea id="property-description" name="description" rows="4" placeholder="Describe the property, its location, and what makes it stand out." class="{{ $field }}">{{ old('description') }}</textarea>
+                    <p data-ai-status role="status" class="mt-1 text-xs text-stone-600"></p>
                 </div>
             </div>
+        </section>
 
-            <div class="border border-teal-200 rounded-xl p-4 bg-teal-50" x-show="selectedType === 'Lot Only'" x-cloak>
-                <p class="text-sm font-semibold text-teal-900 mb-1">Lot Specifications</p>
-                <p class="text-xs text-teal-700 mb-3">Use the separate Lots screen for individual lot inventory under a development.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-teal-800 mb-1">Lot Area (sqm)</label>
-                        <input type="number" step="0.01" name="lot_area" min="0" value="{{ old('lot_area') }}" placeholder="—" class="w-full border border-teal-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-teal-800 mb-1">Frontage (m)</label>
-                        <input type="number" step="0.01" name="frontage" min="0" value="{{ old('frontage') }}" placeholder="—" class="w-full border border-teal-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    </div>
+        {{-- Pricing --}}
+        <section class="rounded-xl border border-stone-200 bg-white" aria-labelledby="section-pricing">
+            <div class="{{ $sectionHeader }}">
+                <span class="{{ $sectionNumber }}" aria-hidden="true">2</span>
+                <div>
+                    <h2 id="section-pricing" class="font-semibold text-stone-800">Pricing and Terms</h2>
+                    <p class="text-xs text-stone-500">Leave the price blank to show "Price on request".</p>
                 </div>
             </div>
-
-            {{-- Location Section --}}
-            <div class="border border-stone-200 rounded-xl overflow-hidden">
-                <div class="px-4 py-3 bg-stone-50 border-b border-stone-200 flex items-center justify-between">
-                    <p class="text-sm font-semibold text-stone-700 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Location & Map Pin
-                    </p>
-                    <button type="button" @click="useMyLocation"
-                            class="flex items-center gap-1.5 text-xs text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 px-3 py-1.5 rounded-lg transition font-medium">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-                        Use My Location
-                    </button>
+            <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-3">
+                <div>
+                    <label for="price" class="{{ $label }}">Price (₱)</label>
+                    <input id="price" type="number" name="price" step="0.01" min="0" value="{{ old('price') }}" placeholder="0.00" class="{{ $field }} {{ $fieldError('price') }}">
+                    @error('price')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
+                <div>
+                    <label for="agent_commission" class="{{ $label }}">Commission Rate (%)</label>
+                    <input id="agent_commission" type="number" name="agent_commission" step="0.01" min="0" max="100" value="{{ old('agent_commission') }}" placeholder="0" class="{{ $field }} {{ $fieldError('agent_commission') }}">
+                    @error('agent_commission')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label for="valid_until" class="{{ $label }}">Valid Until</label>
+                    <input id="valid_until" type="date" name="valid_until" value="{{ old('valid_until') }}" class="{{ $field }} {{ $fieldError('valid_until') }}">
+                    @error('valid_until')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+            </div>
+        </section>
 
-                <div class="p-4 space-y-3">
+        {{-- Specifications --}}
+        <section class="rounded-xl border border-stone-200 bg-white" aria-labelledby="section-specs">
+            <div class="{{ $sectionHeader }}">
+                <span class="{{ $sectionNumber }}" aria-hidden="true">3</span>
+                <div>
+                    <h2 id="section-specs" class="font-semibold text-stone-800">Specifications</h2>
+                    <p class="text-xs text-stone-500" x-show="selectedType !== 'Lot Only'">The fields change with the property type.</p>
+                    <p class="text-xs text-stone-500" x-show="selectedType === 'Lot Only'" x-cloak>Use the Lot Availability screen for individual lots under a development.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3">
+                @foreach([
+                    ['bedrooms', 'Bedrooms', '1', "selectedType !== 'Lot Only'"],
+                    ['bathrooms', 'Bathrooms', '1', "selectedType !== 'Lot Only'"],
+                    ['stories', 'Stories / Floors', '1', "selectedType !== 'Lot Only'"],
+                    ['floor_area', 'Floor Area (sqm)', '0.01', "selectedType !== 'Lot Only'"],
+                    ['parking_slots', 'Parking Slots', '1', "selectedType !== 'Lot Only'"],
+                    ['lot_area', 'Lot Area (sqm)', '0.01', "!['Condominium', 'Apartment', 'Office Space'].includes(selectedType)"],
+                    ['frontage', 'Frontage (m)', '0.01', "selectedType === 'Lot Only'"],
+                ] as [$name, $text, $step, $condition])
+                <div x-show="{{ $condition }}" @if($name === 'frontage') x-cloak @endif>
+                    <label for="{{ $name }}" class="{{ $label }}">{{ $text }}</label>
+                    <input id="{{ $name }}" type="number" name="{{ $name }}" step="{{ $step }}" min="0" value="{{ old($name) }}" placeholder="—" class="{{ $field }} {{ $fieldError($name) }}">
+                    @error($name)<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
+                </div>
+                @endforeach
+            </div>
+        </section>
+
+        {{-- Location --}}
+        <section class="rounded-xl border border-stone-200 bg-white" aria-labelledby="section-location">
+            <div class="{{ $sectionHeader }} justify-between">
+                <div class="flex items-start gap-3">
+                    <span class="{{ $sectionNumber }}" aria-hidden="true">4</span>
+                    <div>
+                        <h2 id="section-location" class="font-semibold text-stone-800">Location</h2>
+                        <p class="text-xs text-stone-500">Search or click the map to fill in the address.</p>
+                    </div>
+                </div>
+                <button type="button" @click="useMyLocation" class="flex shrink-0 items-center gap-1.5 rounded-lg border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-medium text-teal-800 transition hover:bg-teal-100">
+                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                    Use My Location
+                </button>
+            </div>
+            <div class="space-y-3 p-5">
                     {{-- Live search with debounce --}}
                     <div class="relative">
                         <div class="flex gap-2">
@@ -150,7 +177,7 @@
                             </div>
                             <button type="button" @click="clearPin"
                                     x-show="lat !== null"
-                                    class="text-xs text-red-500 hover:text-red-700 border border-red-200 hover:bg-red-50 px-3 py-2 rounded-lg transition">
+                                    class="text-xs text-red-700 hover:text-red-800 border border-red-200 hover:bg-red-50 px-3 py-2 rounded-lg transition">
                                 Clear Pin
                             </button>
                         </div>
@@ -201,7 +228,7 @@
                         <div>
                             <label class="block text-xs font-medium text-stone-500 mb-1">Province</label>
                             <input type="text" name="province" x-model="province"
-                                   placeholder="Auto-filled"
+                                   :placeholder="lat ? 'Type the province' : 'Auto-filled'"
                                    class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                         </div>
                         <div>
@@ -215,11 +242,11 @@
                     {{-- Manual coordinate input --}}
                     <div class="border-t border-stone-100 pt-3">
                         <p class="text-xs font-medium text-stone-500 mb-2">Manual Coordinates <span class="text-stone-400 font-normal">(or paste from Google Maps)</span></p>
-                        <div class="flex gap-2 items-center">
+                        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                             <input type="number" step="any" x-model="manualLat" placeholder="Latitude (e.g. 14.5995)"
-                                   class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
+                                   class="min-w-0 flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
                             <input type="number" step="any" x-model="manualLng" placeholder="Longitude (e.g. 120.9842)"
-                                   class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
+                                   class="min-w-0 flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
                             <button type="button" @click="applyManualCoords"
                                     class="bg-stone-700 hover:bg-stone-800 text-white px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap">
                                 Go
@@ -236,53 +263,39 @@
                             <svg class="w-3.5 h-3.5" :class="lat ? 'text-green-500' : 'text-stone-300'" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
                             <span x-text="lat && lng ? 'Pinned: ' + parseFloat(lat).toFixed(6) + ', ' + parseFloat(lng).toFixed(6) : 'No pin set'"></span>
                         </span>
-                        <span x-show="lat" class="text-green-600 font-medium flex items-center gap-1">
+                        <span x-show="lat" class="text-green-700 font-medium flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             Location saved
                         </span>
                     </div>
                 </div>
-            </div>
+        </section>
 
-            <div>
-                <label class="block text-sm font-medium text-stone-700 mb-1">Featured Image</label>
-                <input type="file" name="featured_image" accept="image/*"
-                       class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-teal-50 file:text-teal-800 hover:file:bg-teal-100">
+        {{-- Photos --}}
+        <section class="rounded-xl border border-stone-200 bg-white" aria-labelledby="section-photos">
+            <div class="{{ $sectionHeader }}">
+                <span class="{{ $sectionNumber }}" aria-hidden="true">5</span>
+                <div>
+                    <h2 id="section-photos" class="font-semibold text-stone-800">Photos</h2>
+                    <p class="text-xs text-stone-500">The featured image is the one clients see on the listing card.</p>
+                </div>
             </div>
-
-            <div>
-                <label class="block text-sm font-medium text-stone-700 mb-1">Additional Images <span class="text-stone-400 font-normal text-xs">(up to 10 photos)</span></label>
-                <input type="file" name="images[]" accept="image/*" multiple
-                       class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-teal-50 file:text-teal-800 hover:file:bg-teal-100">
-                @error('images')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
-                @error('images.*')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+            <div class="space-y-4 p-5">
+                @include('pages.properties._image-fields')
             </div>
-        </div>
+        </section>
 
-        <div class="flex items-center gap-3 mt-6 pt-6 border-t border-stone-200">
-            <button type="submit" class="bg-teal-700 hover:bg-teal-800 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition">Create Property</button>
-            <a href="{{ route('agent.properties.index') }}" class="text-stone-500 hover:text-stone-700 text-sm">Cancel</a>
+        {{-- Actions stay in reach on a long form --}}
+        <div class="sticky bottom-3 z-30 flex items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white/95 px-5 py-3 shadow-lg backdrop-blur">
+            <p class="hidden text-xs text-stone-500 sm:block"><span class="text-red-600" aria-hidden="true">*</span> Required fields</p>
+            <div class="flex flex-1 items-center justify-end gap-3 sm:flex-none">
+                <a href="{{ route('agent.properties.index') }}" class="rounded-lg px-4 py-2.5 text-sm font-medium text-stone-600 transition hover:bg-stone-50">Cancel</a>
+                <button type="submit" class="rounded-lg bg-teal-700 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800">Create Property</button>
+            </div>
         </div>
     </form>
 
-    @push('scripts')
-    <script>
-    document.querySelector('[data-ai-describe]')?.addEventListener('click', async (button) => {
-        const target = document.getElementById('property-description');
-        button.currentTarget.disabled = true;
-        button.currentTarget.textContent = 'Generating...';
-        const response = await fetch('{{ route('agent.ai.describe') }}', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'},
-            body: JSON.stringify(Object.fromEntries(new FormData(document.querySelector('form'))))
-        });
-        const result = await response.json();
-        target.value = result.description || 'AI description is unavailable. Add an OpenAI API key or write the description manually.';
-        button.currentTarget.disabled = false;
-        button.currentTarget.textContent = 'Generate with AI';
-    });
-    </script>
-    @endpush
+    @include('pages.properties._ai-describe-script')
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -292,9 +305,9 @@ function mapPicker(initLat = null, initLng = null, hasPin = false) {
     return {
         lat: hasPin ? initLat : null,
         lng: hasPin ? initLng : null,
-        address:    '{{ old('address', '') }}',
-        city:       '{{ old('city', '') }}',
-        province:   '{{ old('province', '') }}',
+        address:    @js(old('address', '')),
+        city:       @js(old('city', '')),
+        province:   @js(old('province', '')),
         region:     '',
         searchQuery: '',
         results:    [],
@@ -393,15 +406,6 @@ function mapPicker(initLat = null, initLng = null, hasPin = false) {
         },
 
         fillAddress(addr, displayName) {
-            // Philippine address structure from Nominatim:
-            // addr.road / addr.pedestrian          = street
-            // addr.suburb / addr.neighbourhood     = barangay
-            // addr.city_district / addr.city       = city (e.g. Quezon City)
-            // addr.town / addr.municipality        = municipality (e.g. Calamba)
-            // addr.county                          = sometimes used for city
-            // addr.province                        = province (e.g. Laguna)
-            // addr.state                           = region (e.g. Calabarzon)
-
             // Full address: street + barangay
             const streetParts = [
                 addr.house_number || '',
@@ -422,12 +426,9 @@ function mapPicker(initLat = null, initLng = null, hasPin = false) {
                 || addr.village
                 || '';
 
-            // Province — Nominatim uses addr.province for PH provinces
-            // addr.state_district is sometimes used for sub-regions
-            this.province = addr.province || addr.state_district || '';
-
-            // Region — addr.state in PH = region (e.g. "Calabarzon", "NCR")
-            this.region = addr.state || '';
+            const { province, region } = window.philippineProvinceAndRegion(addr);
+            this.province = province;
+            this.region = region;
 
             // Update marker popup
             if (this.marker) {

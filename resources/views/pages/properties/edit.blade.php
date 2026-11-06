@@ -228,15 +228,23 @@
             <div>
                 <label class="block text-sm font-medium text-stone-700 mb-1">Additional Images <span class="text-stone-400 font-normal text-xs">(up to 10 photos)</span></label>
                 @if(!empty($property->images))
-                    <div class="flex flex-wrap gap-2 mb-2">
+                    <div class="flex flex-wrap gap-3 mb-2">
                         @foreach($property->images as $img)
-                            <img src="{{ $img }}" class="h-20 w-28 rounded-lg object-cover border border-stone-200">
+                            <label class="block w-28 cursor-pointer">
+                                <img src="{{ $img }}" alt="" class="h-20 w-28 rounded-lg object-cover border border-stone-200">
+                                <span class="mt-1 flex items-center gap-1.5 text-xs text-stone-600">
+                                    <input type="checkbox" name="remove_images[]" value="{{ $img }}" class="rounded border-stone-300 text-red-500 focus:ring-red-400">
+                                    Remove
+                                </span>
+                            </label>
                         @endforeach
                     </div>
                 @endif
                 <input type="file" name="images[]" accept="image/*" multiple
                        class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-teal-50 file:text-teal-800 hover:file:bg-teal-100">
-                <p class="text-xs text-stone-400 mt-1">Uploading new images will replace the existing ones.</p>
+                <p class="text-xs text-stone-400 mt-1">New images are added to the existing ones. Tick Remove to delete a photo.</p>
+                @error('images')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                @error('images.*')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
 

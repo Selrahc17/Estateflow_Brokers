@@ -13,6 +13,8 @@ use Illuminate\View\View;
 
 class PropertyController extends Controller
 {
+    private const MAX_GALLERY_IMAGES = 10;
+
     public function index(): View
     {
         $properties = Property::where('broker_id', auth()->id())
@@ -98,16 +100,7 @@ class PropertyController extends Controller
                 : null;
         }
 
-        if ($request->hasFile('images')) {
-            $request->validate(['images.*' => 'image|max:4096']);
-            $urls = [];
-            foreach ($request->file('images') as $img) {
-                $filename = uniqid() . '.' . $img->getClientOriginalExtension();
-                \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
-                $urls[] = rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/') . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
-            }
-            $data['images'] = $urls;
-        }
+        $data['images'] = $this->storeGalleryImages($request);
 
         Property::create($data);
 
@@ -162,17 +155,13 @@ class PropertyController extends Controller
             $data['featured_image'] = $baseUrl . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
         }
 
-        if ($request->hasFile('images')) {
-            $request->validate(['images.*' => 'image|max:4096']);
-            $baseUrl = rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/');
-            $urls = [];
-            foreach ($request->file('images') as $img) {
-                $filename = uniqid() . '.' . $img->getClientOriginalExtension();
-                \Storage::disk('supabase')->put($filename, file_get_contents($img->getRealPath()), 'public');
-                $urls[] = $baseUrl . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
-            }
-            $data['images'] = $urls;
-        }
+        $removedImages = $request->validate([
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'string',
+        ])['remove_images'] ?? [];
+
+        $keptImages = array_values(array_diff($property->images ?? [], $removedImages));
+        $data['images'] = [...$keptImages, ...$this->storeGalleryImages($request, count($keptImages))];
 
         $property->update($data);
 
@@ -189,6 +178,34 @@ class PropertyController extends Controller
     private function ensureOwnership(Property $property): void
     {
         abort_unless((int) $property->broker_id === (int) auth()->id(), 403);
+    }
+
+    /**
+     * Validate and upload the request's gallery photos, returning their public URLs.
+     *
+     * @return array<int, string>
+     */
+    private function storeGalleryImages(Request $request, int $existingCount = 0): array
+    {
+        if (! $request->hasFile('images')) {
+            return [];
+        }
+
+        $request->validate([
+            'images' => ['array', 'max:' . max(0, self::MAX_GALLERY_IMAGES - $existingCount)],
+            'images.*' => ['image', 'max:4096'],
+        ], [
+            'images.max' => 'A property can have up to ' . self::MAX_GALLERY_IMAGES . ' additional images.',
+        ]);
+
+        $baseUrl = rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/');
+
+        return array_map(function ($image) use ($baseUrl) {
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            \Storage::disk('supabase')->put($filename, file_get_contents($image->getRealPath()), 'public');
+
+            return $baseUrl . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
+        }, $request->file('images'));
     }
 
     public function aiDescribe(Request $request): JsonResponse

@@ -3,8 +3,8 @@
 
     {{-- Image --}}
     <div class="relative bg-stone-100 dark:bg-stone-800 aspect-[4/3]">
-        @if($property->featured_image)
-        <img src="{{ $property->featured_image }}" alt="{{ $property->name }}"
+        @if($property->gallery_images)
+        <img src="{{ $property->gallery_images[0] }}" alt="{{ $property->name }}"
                          class="property-card-image object-cover object-center"
                          style="width: 100%; height: 100%; object-fit: cover; object-position: center;"
              loading="lazy" decoding="async">

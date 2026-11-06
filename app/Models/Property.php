@@ -28,6 +28,16 @@ class Property extends Model
         ];
     }
 
+    /**
+     * Every photo of the property, with the featured image first.
+     *
+     * @return array<int, string>
+     */
+    public function getGalleryImagesAttribute(): array
+    {
+        return array_values(array_unique(array_filter([$this->featured_image, ...($this->images ?? [])])));
+    }
+
     public function broker()
     {
         return $this->belongsTo(User::class, 'broker_id');

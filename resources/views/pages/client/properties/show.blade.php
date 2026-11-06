@@ -15,26 +15,52 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {{-- Left: Images + Details --}}
-        <div class="lg:col-span-2 space-y-6" x-data="{ activeImg: 0 }">
+        <div class="lg:col-span-2 space-y-6">
 
             {{-- Image Gallery --}}
-            <div class="rounded-2xl overflow-hidden">
-                <div class="relative bg-stone-100 aspect-video">
-                    @php
-                        $imgs = [];
-                        if ($property->featured_image) { $imgs[] = $property->featured_image; }
-                        if (!empty($property->images)) {
-                            foreach ($property->images as $img) { $imgs[] = $img; }
-                        }
-                        if (empty($imgs)) {
-                            $imgs = ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=500&fit=crop'];
-                        }
-                    @endphp
-                    @foreach($imgs as $i => $img)
-                    <img src="{{ $img }}" alt="{{ $property->name }}"
+            @php $imgs = $property->gallery_images; @endphp
+            <div class="rounded-2xl overflow-hidden"
+                 x-data="{
+                     activeImg: 0,
+                     total: {{ count($imgs) }},
+                     touchStartX: null,
+                     show(index) {
+                         this.activeImg = (index + this.total) % this.total;
+                         this.$refs.thumbnails?.children[this.activeImg]?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                     },
+                     swipe(endX) {
+                         const distance = endX - this.touchStartX;
+                         if (this.total > 1 && Math.abs(distance) > 40) this.show(this.activeImg + (distance < 0 ? 1 : -1));
+                     },
+                 }"
+                 @keydown.arrow-left="show(activeImg - 1)"
+                 @keydown.arrow-right="show(activeImg + 1)">
+                <div class="relative bg-stone-100 dark:bg-stone-800 aspect-video"
+                     @touchstart.passive="touchStartX = $event.changedTouches[0].clientX"
+                     @touchend.passive="swipe($event.changedTouches[0].clientX)">
+                    @forelse($imgs as $i => $img)
+                    <img src="{{ $img }}" alt="{{ $property->name }} photo {{ $i + 1 }}"
                          x-show="activeImg === {{ $i }}"
-                         class="absolute inset-0 w-full h-full object-contain" loading="eager" decoding="async">
-                    @endforeach
+                         @if($i > 0) style="display: none" @endif
+                         class="absolute inset-0 w-full h-full object-contain" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" decoding="async">
+                    @empty
+                    <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-stone-400">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        <p class="text-sm">No photos yet</p>
+                    </div>
+                    @endforelse
+                    @if(count($imgs) > 1)
+                    <button type="button" @click="show(activeImg - 1)" aria-label="Previous photo"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                    <button type="button" @click="show(activeImg + 1)" aria-label="Next photo"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full bg-black/50 hover:bg-black/70 text-white transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </button>
+                    <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs font-medium px-2.5 py-1 rounded-full"
+                          x-text="(activeImg + 1) + ' / ' + total">1 / {{ count($imgs) }}</span>
+                    @endif
                     {{-- Badges --}}
                     <div class="absolute top-4 left-4 flex gap-2">
                         <span class="{{ $property->status === 'sold' ? 'bg-red-500' : ($property->status === 'coming_soon' ? 'bg-blue-500' : 'bg-teal-600') }} text-white text-xs font-semibold px-3 py-1 rounded-full">
@@ -45,12 +71,12 @@
                 </div>
                 {{-- Thumbnails --}}
                 @if(count($imgs) > 1)
-                <div class="flex gap-2 mt-2 overflow-x-auto pb-1">
+                <div class="flex gap-2 mt-2 p-0.5 overflow-x-auto" x-ref="thumbnails">
                     @foreach($imgs as $i => $img)
-                    <button @click="activeImg = {{ $i }}"
+                    <button type="button" @click="show({{ $i }})" aria-label="Show photo {{ $i + 1 }}"
                             :class="activeImg === {{ $i }} ? 'ring-2 ring-teal-500' : 'opacity-60 hover:opacity-100'"
                             class="w-20 h-14 rounded-lg overflow-hidden shrink-0 transition">
-                        <img src="{{ $img }}" class="w-full h-full object-cover">
+                        <img src="{{ $img }}" alt="" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     </button>
                     @endforeach
                 </div>

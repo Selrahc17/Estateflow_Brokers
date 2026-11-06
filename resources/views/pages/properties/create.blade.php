@@ -254,6 +254,8 @@
                 <label class="block text-sm font-medium text-stone-700 mb-1">Additional Images <span class="text-stone-400 font-normal text-xs">(up to 10 photos)</span></label>
                 <input type="file" name="images[]" accept="image/*" multiple
                        class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:bg-teal-50 file:text-teal-800 hover:file:bg-teal-100">
+                @error('images')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
+                @error('images.*')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
         </div>
 

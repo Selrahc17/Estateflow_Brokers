@@ -38,7 +38,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase mb-1">Buyer</p>
-                            <p class="font-semibold text-stone-800">{{ $inquiry->user?->name ?? 'Guest' }}</p>
+                            <p class="font-semibold text-stone-800">{{ $inquiry->contact_label }}</p>
                             <p class="text-xs text-stone-400 mt-1">{{ $inquiry->email }}</p>
                         </div>
 
@@ -52,6 +52,9 @@
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase mb-1">Contact</p>
                             <p class="text-sm font-medium text-stone-700">{{ $inquiry->phone }}</p>
+                            @if($inquiry->facebook)
+                            <p class="text-xs text-stone-500 mt-1 break-words">Facebook: {{ $inquiry->facebook }}</p>
+                            @endif
                         </div>
 
                         <div>

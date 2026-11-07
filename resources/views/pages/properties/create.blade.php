@@ -13,7 +13,7 @@
     $oldLatitude = is_numeric(old('latitude')) ? (float) old('latitude') : null;
     $oldLongitude = is_numeric(old('longitude')) ? (float) old('longitude') : null;
 @endphp
-<div class="mx-auto max-w-3xl" x-data="{ ...mapPicker(@js($oldLatitude), @js($oldLongitude), @js($oldLatitude !== null && $oldLongitude !== null)), selectedType: @js(old('type', '')) }">
+<div class="mx-auto max-w-3xl" x-data="{ ...mapPicker(@js($oldLatitude), @js($oldLongitude), @js($oldLatitude !== null && $oldLongitude !== null)), selectedType: @js(old('type', '')), lotTypes: @js(\App\Models\Property::LOT_TYPES) }">
     <form method="POST" action="{{ route('agent.properties.store') }}" enctype="multipart/form-data" class="space-y-5">
         @csrf
 
@@ -59,7 +59,7 @@
                         <label for="type" class="{{ $label }}">Property Type <span class="text-red-600" aria-hidden="true">*</span></label>
                         <select id="type" name="type" x-model="selectedType" required class="{{ $field }} {{ $fieldError('type') }}">
                             <option value="">Select property type</option>
-                            @foreach(['House and Lot','Condominium','Townhouse','Lot Only','Office Space','Warehouse','Farm','Villa','Apartment'] as $type)
+                            @foreach(\App\Models\Property::TYPES as $type)
                             <option value="{{ $type }}" @selected(old('type') === $type)>{{ $type }}</option>
                             @endforeach
                         </select>
@@ -121,19 +121,19 @@
                 <span class="{{ $sectionNumber }}" aria-hidden="true">3</span>
                 <div>
                     <h2 id="section-specs" class="font-semibold text-stone-800">Specifications</h2>
-                    <p class="text-xs text-stone-500" x-show="selectedType !== 'Lot Only'">The fields change with the property type.</p>
-                    <p class="text-xs text-stone-500" x-show="selectedType === 'Lot Only'" x-cloak>Use the Lot Availability screen for individual lots under a development.</p>
+                    <p class="text-xs text-stone-500" x-show="!lotTypes.includes(selectedType)">The fields change with the property type.</p>
+                    <p class="text-xs text-stone-500" x-show="lotTypes.includes(selectedType)" x-cloak>Use the Lot Availability screen for individual lots under a development.</p>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3">
                 @foreach([
-                    ['bedrooms', 'Bedrooms', '1', "selectedType !== 'Lot Only'"],
-                    ['bathrooms', 'Bathrooms', '1', "selectedType !== 'Lot Only'"],
-                    ['stories', 'Stories / Floors', '1', "selectedType !== 'Lot Only'"],
-                    ['floor_area', 'Floor Area (sqm)', '0.01', "selectedType !== 'Lot Only'"],
-                    ['parking_slots', 'Parking Slots', '1', "selectedType !== 'Lot Only'"],
+                    ['bedrooms', 'Bedrooms', '1', "!lotTypes.includes(selectedType)"],
+                    ['bathrooms', 'Bathrooms', '1', "!lotTypes.includes(selectedType)"],
+                    ['stories', 'Stories / Floors', '1', "!lotTypes.includes(selectedType)"],
+                    ['floor_area', 'Floor Area (sqm)', '0.01', "!lotTypes.includes(selectedType)"],
+                    ['parking_slots', 'Parking Slots', '1', "!lotTypes.includes(selectedType)"],
                     ['lot_area', 'Lot Area (sqm)', '0.01', "!['Condominium', 'Apartment', 'Office Space'].includes(selectedType)"],
-                    ['frontage', 'Frontage (m)', '0.01', "selectedType === 'Lot Only'"],
+                    ['frontage', 'Frontage (m)', '0.01', "lotTypes.includes(selectedType)"],
                 ] as [$name, $text, $step, $condition])
                 <div x-show="{{ $condition }}" @if($name === 'frontage') x-cloak @endif>
                     <label for="{{ $name }}" class="{{ $label }}">{{ $text }}</label>

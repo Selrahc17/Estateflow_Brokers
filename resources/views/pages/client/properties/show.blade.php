@@ -306,6 +306,11 @@
                         @error('phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
+                        <label class="text-xs text-stone-500 mb-1 block">Facebook <span class="text-stone-400">(optional)</span></label>
+                        <input type="text" name="facebook" maxlength="255" placeholder="Name or profile link" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        @error('facebook') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
                         <label class="text-xs text-stone-500 mb-1 block">Message *</label>
                         <textarea name="message" rows="3" placeholder="I'm interested in this property..." required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none @error('message') ring-2 ring-red-400 @enderror"></textarea>
                         @error('message') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -349,6 +354,11 @@
                         <label class="text-xs text-stone-500 mb-1 block">Phone *</label>
                         <input type="text" name="phone" placeholder="+63 912 345 6789" required value="{{ old('phone') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('phone') ring-2 ring-red-400 @enderror">
                         @error('phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="text-xs text-stone-500 mb-1 block">Facebook <span class="text-stone-400">(optional)</span></label>
+                        <input type="text" name="facebook" maxlength="255" placeholder="Name or profile link" value="{{ old('facebook') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        @error('facebook') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="text-xs text-stone-500 mb-1 block">Message *</label>

@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
-use App\Models\Client;
 use App\Models\Inquiry;
 use App\Models\Property;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class InquiryController extends Controller
@@ -27,47 +24,30 @@ class InquiryController extends Controller
 
     public function store(Request $request, Property $property): RedirectResponse
     {
+        $user = auth()->user();
+
         $validated = $request->validate([
-            'name' => 'nullable|string|max:255',
+            'name' => [$user ? 'nullable' : 'required', 'string', 'max:255'],
             'message' => 'required|string|min:10|max:1000',
             'phone' => 'required|string|min:7|max:20',
             'email' => 'required|email',
+            'facebook' => 'nullable|string|max:255',
         ]);
 
-        $user = auth()->user();
         $contactEmail = $user?->email ?? $validated['email'];
-        $fullName = trim((string) ($validated['name'] ?? ($user?->name ?? '')));
+        $contactName = trim((string) ($user?->name ?? $validated['name'] ?? ''));
 
-        $client = $user
-            ? Client::where('user_id', $user->id)->first()
-            : Client::where('email', $validated['email'])->first();
-
-        if (! $client) {
-            $client = new Client();
-        }
-
-        $nameParts = $this->parseName($fullName, $contactEmail);
-
-        $client->fill([
-            'user_id' => $user?->id ?? $client->user_id,
-            'broker_id' => $property->broker_id,
-            'first_name' => $client->first_name ?: $nameParts['first_name'],
-            'last_name' => $client->last_name ?: $nameParts['last_name'],
-            'email' => $contactEmail,
-            'phone' => $validated['phone'],
-            'status' => 'active',
-            'password' => $client->password ?: Hash::make(Str::random(24)),
-        ]);
-
-        $client->save();
-
+        // An inquiry stays a lead. Only the assigned agent turns it into a Client,
+        // so typing someone's email here can never change an existing Client.
         Inquiry::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user?->id,
             'property_id' => $property->id,
             'broker_id' => $property->broker_id,
+            'contact_name' => $contactName,
             'message' => $validated['message'],
             'phone' => $validated['phone'],
             'email' => $contactEmail,
+            'facebook' => $validated['facebook'] ?? null,
             'status' => 'new',
         ]);
 
@@ -75,7 +55,7 @@ class InquiryController extends Controller
             'user_id' => $property->broker_id,
             'type' => 'inquiry',
             'title' => 'New property inquiry',
-            'message' => ($user?->name ?? $nameParts['first_name'] . ' ' . $nameParts['last_name']) . ' submitted an inquiry for ' . $property->name . '.',
+            'message' => $contactName . ' submitted an inquiry for ' . $property->name . '.',
             'link' => route('agent.inquiries.index'),
             'is_read' => false,
         ]);
@@ -98,38 +78,5 @@ class InquiryController extends Controller
         abort_if($inquiry->user_id !== auth()->id(), 403);
 
         return view('pages.client.inquiries.show', compact('inquiry'));
-    }
-
-    private function extractFirstName(string $email): string
-    {
-        $localPart = explode('@', $email)[0] ?? 'client';
-        $localPart = str_replace(['.', '_', '-'], ' ', $localPart);
-
-        return ucfirst(trim(explode(' ', $localPart)[0] ?? 'Client'));
-    }
-
-    private function extractLastName(string $email): string
-    {
-        $localPart = explode('@', $email)[0] ?? 'client';
-        $localPart = str_replace(['.', '_', '-'], ' ', $localPart);
-        $parts = preg_split('/\s+/', trim($localPart)) ?: [''];
-
-        return ucfirst($parts[1] ?? '');
-    }
-
-    private function parseName(string $fullName, string $email): array
-    {
-        if (trim($fullName) !== '') {
-            $parts = preg_split('/\s+/', trim($fullName), 2) ?: [''];
-            $firstName = ucfirst($parts[0] ?? 'Client');
-            $lastName = isset($parts[1]) ? ucfirst($parts[1]) : '';
-
-            return ['first_name' => $firstName, 'last_name' => $lastName];
-        }
-
-        return [
-            'first_name' => $this->extractFirstName($email),
-            'last_name' => $this->extractLastName($email),
-        ];
     }
 }

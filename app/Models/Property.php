@@ -12,6 +12,11 @@ class Property extends Model
 
     public const MAX_GALLERY_IMAGES = 10;
 
+    public const TYPES = ['House and Lot', 'Condominium', 'Townhouse', 'Lot Only', 'Subdivision Lot Only', 'Farm Lot', 'Office Space', 'Warehouse', 'Villa', 'Apartment'];
+
+    /** Types sold as land, which use lot fields instead of building fields. */
+    public const LOT_TYPES = ['Lot Only', 'Subdivision Lot Only', 'Farm Lot'];
+
     protected $fillable = [
         'broker_id', 'name', 'slug', 'description', 'address',
         'city', 'province', 'type', 'latitude', 'longitude', 'price', 'agent_commission', 'valid_until', 'status',

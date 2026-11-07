@@ -63,12 +63,13 @@ class TeamController extends Controller
         $inquiries = Inquiry::whereIn('broker_id', $this->scopedAgentIds($agents))
             ->when(request('search'), function ($query) {
                 $search = '%'.request('search').'%';
-                $query->where(fn ($q) => $q->where('email', 'like', $search)
+                $query->where(fn ($q) => $q->where('contact_name', 'like', $search)
+                    ->orWhere('email', 'like', $search)
                     ->orWhere('message', 'like', $search)
                     ->orWhereHas('property', fn ($property) => $property->where('name', 'like', $search)));
             })
             ->when(request('status'), fn ($query) => $query->where('status', request('status')))
-            ->with(['broker:id,name', 'property:id,name'])
+            ->with(['broker:id,name', 'property:id,name', 'user:id,name'])
             ->latest()
             ->paginate(15)
             ->withQueryString();

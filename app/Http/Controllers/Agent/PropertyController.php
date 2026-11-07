@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PropertyController extends Controller
@@ -50,7 +51,7 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
-            'type'        => 'required|in:House and Lot,Condominium,Townhouse,Lot Only,Office Space,Warehouse,Farm,Villa,Apartment',
+            'type'        => ['required', Rule::in(Property::TYPES)],
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
@@ -127,7 +128,7 @@ class PropertyController extends Controller
             'address'     => 'nullable|string',
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
-            'type'        => 'required|in:House and Lot,Condominium,Townhouse,Lot Only,Office Space,Warehouse,Farm,Villa,Apartment',
+            'type'        => ['required', Rule::in(Property::TYPES)],
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',

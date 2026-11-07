@@ -13,7 +13,7 @@
         'closed' => 'Closed',
         'lost' => 'Lost',
     ],
-    'searchPlaceholder' => 'Search email, property, or message...',
+    'searchPlaceholder' => 'Search name, email, property, or message...',
 ])
 
 <div class="overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900">
@@ -34,8 +34,12 @@
                 <tr class="align-top transition hover:bg-stone-50 dark:hover:bg-stone-800">
                     <td class="px-5 py-3 font-medium text-stone-700 dark:text-stone-200">{{ $inquiry->property?->name ?? 'Property removed' }}</td>
                     <td class="px-5 py-3 text-stone-600 dark:text-stone-300">
-                        <p>{{ $inquiry->email ?? '—' }}</p>
+                        <p class="font-medium">{{ $inquiry->contact_label }}</p>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">{{ $inquiry->email ?? '—' }}</p>
                         <p class="text-xs text-stone-500 dark:text-stone-400">{{ $inquiry->phone }}</p>
+                        @if($inquiry->facebook)
+                        <p class="text-xs text-stone-500 dark:text-stone-400">Facebook: {{ $inquiry->facebook }}</p>
+                        @endif
                     </td>
                     <td class="px-5 py-3 text-stone-600 dark:text-stone-300">{{ $inquiry->broker?->name ?? '—' }}</td>
                     <td class="max-w-xs px-5 py-3 text-xs text-stone-500 dark:text-stone-400">{{ $inquiry->message }}</td>

@@ -23,7 +23,7 @@ class PortalSidebarTest extends TestCase
             ->assertSee('Admin Panel')
             ->assertSeeInOrder([
                 'Overview', 'Dashboard', 'Reports &amp; Analytics',
-                'Management', 'User Management', 'Broker Management', 'Property Management', 'Reservations', 'Documents', 'Feedback', 'Contact Messages', 'Notifications',
+                'Management', 'User Management', 'Broker Management', 'Property Management', 'Inquiries', 'Reservations', 'Documents', 'Feedback', 'Contact Messages', 'Notifications',
                 'System', 'Audit Logs', 'Backups', 'System Settings',
             ], false);
     }
@@ -32,7 +32,7 @@ class PortalSidebarTest extends TestCase
     {
         $response = $this->actingAs($this->user('admin'))->get(route('admin.dashboard'));
 
-        foreach (['dashboard', 'reports', 'users', 'brokers', 'properties', 'reservations', 'documents', 'feedback', 'contact-messages', 'notifications', 'audit', 'backups', 'settings'] as $page) {
+        foreach (['dashboard', 'reports', 'users', 'brokers', 'properties', 'inquiries', 'reservations', 'documents', 'feedback', 'contact-messages', 'notifications', 'audit', 'backups', 'settings'] as $page) {
             $response->assertSee('href="'.route("admin.$page").'"', false);
         }
     }

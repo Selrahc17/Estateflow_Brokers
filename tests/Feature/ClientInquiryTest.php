@@ -8,11 +8,11 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ClientInquiryCreatesBrokerClientTest extends TestCase
+class ClientInquiryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_inquiries_create_a_broker_client_record(): void
+    public function test_guest_inquiries_reach_the_listing_agent_without_creating_a_client(): void
     {
         $broker = User::factory()->create([
             'role' => 'broker',
@@ -35,6 +35,7 @@ class ClientInquiryCreatesBrokerClientTest extends TestCase
         ]);
 
         $response = $this->post(route('client.property.inquire', $property), [
+            'name' => 'Sample Client',
             'message' => 'I am interested in this property and would like more details.',
             'phone' => '09171234567',
             'email' => 'client@example.com',
@@ -42,11 +43,12 @@ class ClientInquiryCreatesBrokerClientTest extends TestCase
 
         $response->assertRedirect();
 
-        $this->assertDatabaseHas('clients', [
+        $this->assertDatabaseHas('inquiries', [
             'broker_id' => $broker->id,
             'email' => 'client@example.com',
-            'status' => 'active',
+            'contact_name' => 'Sample Client',
         ]);
+        $this->assertDatabaseMissing('clients', ['email' => 'client@example.com']);
     }
 
     public function test_authenticated_inquiry_uses_the_logged_in_client_identity(): void
@@ -114,12 +116,7 @@ class ClientInquiryCreatesBrokerClientTest extends TestCase
             'email' => 'jane.guest@example.com',
             'user_id' => null,
         ]);
-        $this->assertDatabaseHas('clients', [
-            'broker_id' => $broker->id,
-            'email' => 'jane.guest@example.com',
-            'first_name' => 'Jane',
-            'last_name' => 'Guest',
-        ]);
+        $this->assertDatabaseMissing('clients', ['email' => 'jane.guest@example.com']);
         $this->assertDatabaseHas('app_notifications', [
             'user_id' => $broker->id,
             'type' => 'inquiry',

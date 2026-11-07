@@ -13,7 +13,7 @@
                    class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 w-full sm:w-64">
             <select name="type" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
                 <option value="">All Types</option>
-                @foreach(['House and Lot','Condominium','Townhouse','Lot Only','Office Space','Warehouse','Farm','Villa','Apartment'] as $type)
+                @foreach(\App\Models\Property::TYPES as $type)
                 <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
                 @endforeach
             </select>

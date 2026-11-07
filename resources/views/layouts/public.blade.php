@@ -67,6 +67,8 @@
                                 <option value="">Any type</option>
                                 <option value="House and Lot" {{ request('type') == 'House and Lot' ? 'selected' : '' }}>House and Lot</option>
                                 <option value="Lot Only" {{ request('type') == 'Lot Only' ? 'selected' : '' }}>Lot Only</option>
+                                <option value="Subdivision Lot Only" {{ request('type') == 'Subdivision Lot Only' ? 'selected' : '' }}>Subdivision Lot Only</option>
+                                <option value="Farm Lot" {{ request('type') == 'Farm Lot' ? 'selected' : '' }}>Farm Lot</option>
                                 <option value="Condominium" {{ request('type') == 'Condominium' ? 'selected' : '' }}>Condominium</option>
                                 <option value="Commercial" {{ request('type') == 'Commercial' ? 'selected' : '' }}>Commercial</option>
                             </select>

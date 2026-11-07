@@ -9,7 +9,7 @@
             <a href="{{ route('agent.inquiries.index') }}" class="text-teal-700 hover:text-teal-800 text-sm font-medium mb-2 inline-flex items-center gap-1">
                 ← Back to Inquiries
             </a>
-            <h1 class="text-3xl font-bold text-stone-800">Inquiry from {{ $inquiry->user?->name ?? 'Guest' }}</h1>
+            <h1 class="text-3xl font-bold text-stone-800">Inquiry from {{ $inquiry->contact_label }}</h1>
         </div>
         <div>
             <form action="{{ route('agent.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
@@ -41,7 +41,7 @@
                 <div class="space-y-3">
                     <div>
                         <p class="text-xs text-stone-400 font-semibold uppercase">Full Name</p>
-                        <p class="text-lg font-semibold text-stone-800 mt-1">{{ $inquiry->user?->name ?? 'Guest' }}</p>
+                        <p class="text-lg font-semibold text-stone-800 mt-1">{{ $inquiry->contact_label }}</p>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -57,6 +57,16 @@
                             </a>
                         </div>
                     </div>
+                    @if($inquiry->facebook)
+                    <div>
+                        <p class="text-xs text-stone-400 font-semibold uppercase">Facebook</p>
+                        @if($inquiry->facebook_url)
+                        <a href="{{ $inquiry->facebook_url }}" target="_blank" rel="noopener noreferrer" class="text-teal-700 hover:text-teal-800 font-medium mt-1 break-all">{{ $inquiry->facebook }}</a>
+                        @else
+                        <p class="text-sm font-medium text-stone-700 mt-1 break-words">{{ $inquiry->facebook }}</p>
+                        @endif
+                    </div>
+                    @endif
                 </div>
             </div>
 
@@ -167,6 +177,21 @@
                         @endif
                     </div>
                 </div>
+            </div>
+
+            {{-- Lead to Client --}}
+            <div class="bg-white rounded-lg border border-stone-200 p-4">
+                <p class="text-xs font-semibold text-stone-500 uppercase mb-2">Client Record</p>
+                @if($client)
+                <p class="text-sm text-stone-600 mb-3">This buyer is already one of your clients.</p>
+                <a href="{{ route('agent.clients.show', $client) }}" class="block rounded-lg border border-teal-700 py-2 text-center text-sm font-semibold text-teal-700 transition hover:bg-teal-50">View Client</a>
+                @else
+                <p class="text-sm text-stone-600 mb-3">This is still a lead. Add them as a client when they are ready to move forward.</p>
+                <form action="{{ route('agent.inquiries.client', $inquiry) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full rounded-lg bg-teal-700 py-2 text-sm font-semibold text-white transition hover:bg-teal-800">Add as Client</button>
+                </form>
+                @endif
             </div>
 
             {{-- Next Steps --}}

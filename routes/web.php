@@ -4,6 +4,7 @@ use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BrokerController as AdminBrokerController;
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
+use App\Http\Controllers\Admin\InquiryController as AdminInquiryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DocumentController as AdminDocumentController;
 use App\Http\Controllers\Admin\AuditController as AdminAuditController;
@@ -140,6 +141,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'audit
     Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
     Route::patch('/users/{user}/toggle-status', [AdminUserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::get('/inquiries', [AdminInquiryController::class, 'index'])->name('inquiries');
     Route::get('/properties', [AdminPropertyController::class, 'index'])->name('properties');
     Route::get('/properties/{property}', [AdminPropertyController::class, 'show'])->name('properties.show');
     Route::patch('/properties/{property}/status', [AdminPropertyController::class, 'updateStatus'])->name('properties.status');
@@ -274,6 +276,7 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::get('/inquiries', [BrokerInquiryController::class, 'index'])->name('inquiries.index');
     Route::get('/inquiries/{inquiry}', [BrokerInquiryController::class, 'show'])->name('inquiries.show');
     Route::patch('/inquiries/{inquiry}/status', [BrokerInquiryController::class, 'updateStatus'])->name('inquiries.status');
+    Route::post('/inquiries/{inquiry}/client', [BrokerInquiryController::class, 'convertToClient'])->name('inquiries.client');
     Route::get('/site-visits', [SiteVisitController::class, 'index'])->name('site-visits.index');
     Route::get('/site-visits/create', [SiteVisitController::class, 'create'])->name('site-visits.create');
     Route::post('/site-visits', [SiteVisitController::class, 'store'])->name('site-visits.store');

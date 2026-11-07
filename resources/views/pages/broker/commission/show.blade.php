@@ -8,37 +8,37 @@
 @php($paymentMode = $paymentMode ?? false)
 <div class="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
     <div class="space-y-6">
-        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
+        <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
             <h2 class="text-lg font-semibold text-stone-800 dark:text-stone-100">Commission Summary</h2>
             <dl class="mt-4 grid gap-4 sm:grid-cols-2">
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-stone-400">Property</dt>
+                    <dt class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Property</dt>
                     <dd class="mt-1 text-sm font-medium text-stone-700 dark:text-stone-200">{{ $agreement->property?->name ?? 'N/A' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-stone-400">Agent</dt>
+                    <dt class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Agent</dt>
                     <dd class="mt-1 text-sm font-medium text-stone-700 dark:text-stone-200">{{ $agreement->agent?->name ?? 'N/A' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-stone-400">Commission Rate</dt>
+                    <dt class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Commission Rate</dt>
                     <dd class="mt-1 text-sm font-medium text-stone-700 dark:text-stone-200">{{ number_format($agreement->commission_rate, 2) }}%</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-stone-400">Payment Schedule</dt>
+                    <dt class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Payment Schedule</dt>
                     <dd class="mt-1 text-sm font-medium text-stone-700 dark:text-stone-200">{{ str_replace('_', ' ', $agreement->payment_schedule) }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-stone-400">Agent Share</dt>
+                    <dt class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Agent Share</dt>
                     <dd class="mt-1 text-sm font-medium text-emerald-600 dark:text-emerald-300">{{ number_format($agreement->agent_share, 2) }}%</dd>
                 </div>
                 <div>
-                    <dt class="text-xs uppercase tracking-wide text-stone-400">Broker Share</dt>
+                    <dt class="text-xs uppercase tracking-wide text-stone-500 dark:text-stone-400">Broker Share</dt>
                     <dd class="mt-1 text-sm font-medium text-amber-600 dark:text-amber-300">{{ number_format($agreement->broker_share, 2) }}%</dd>
                 </div>
             </dl>
         </div>
 
-        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
+        <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
             <h2 class="text-lg font-semibold text-stone-800 dark:text-stone-100">Payment Monitoring</h2>
 
             @if($agreement->payments->count())
@@ -47,11 +47,11 @@
                         <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/60 p-4">
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">Due Date</p>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">Due Date</p>
                                     <p class="mt-1 text-sm font-medium text-stone-800 dark:text-stone-100">{{ $payment->due_date?->format('M d, Y') ?? 'Not set' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">Amount Due</p>
+                                    <p class="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">Amount Due</p>
                                     <p class="mt-1 text-sm font-medium text-stone-800 dark:text-stone-100">
                                         ₱{{ number_format($payment->amount_due, 2) }}
                                         <span class="ml-1 text-xs text-stone-500 dark:text-stone-400">{{ (int) $payment->amount_due }}</span>
@@ -84,7 +84,7 @@
                                         <input type="file" name="proof" accept=".jpg,.jpeg,.png,.pdf" required class="block w-full text-sm text-stone-500 dark:text-stone-400 file:mr-4 file:rounded-full file:border-0 file:bg-[var(--color-primary)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-[var(--color-primary-dark)]">
                                     </div>
                                     <div>
-                                        <label class="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-200">Payment Note <span class="font-normal text-stone-400">(optional)</span></label>
+                                        <label class="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-200">Payment Note <span class="font-normal text-stone-500 dark:text-stone-400">(optional)</span></label>
                                         <textarea name="payment_message" rows="2" class="w-full rounded-lg border border-stone-200 dark:border-stone-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="Add a note about this payment...">{{ old('payment_message') }}</textarea>
                                     </div>
                                     <div class="flex justify-end">
@@ -96,7 +96,7 @@
                             @elseif(!$paymentMode && $currentPayment?->id === $payment->id)
                                 <a href="{{ route('broker.commissions.pay', $agreement) }}" class="mt-4 inline-flex border-t border-stone-200 dark:border-stone-700 pt-4 text-sm font-medium text-teal-700 dark:text-teal-300 hover:text-teal-800 dark:hover:text-teal-200">Open payment form</a>
                             @else
-                                <p class="mt-4 border-t border-stone-200 dark:border-stone-700 pt-4 text-sm text-stone-400">Payment action opens during its due month.</p>
+                                <p class="mt-4 border-t border-stone-200 dark:border-stone-700 pt-4 text-sm text-stone-500 dark:text-stone-400">Payment action opens during its due month.</p>
                             @endif
                         </div>
                     @endforeach
@@ -108,20 +108,20 @@
     </div>
 
     <aside class="space-y-6">
-        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
+        <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
             <h2 class="text-lg font-semibold text-stone-800 dark:text-stone-100">Current Payment State</h2>
             @if($currentPayment)
                 <div class="mt-4 space-y-3 text-sm">
-                    <div class="flex justify-between"><span class="text-stone-400">Status</span><span class="font-medium text-stone-700 dark:text-stone-200">{{ ucfirst($currentPayment->payment_status) }}</span></div>
-                    <div class="flex justify-between"><span class="text-stone-400">Amount Due</span><span class="font-medium text-stone-700 dark:text-stone-200">₱{{ number_format($currentPayment->amount_due, 2) }}</span></div>
-                    <div class="flex justify-between"><span class="text-stone-400">Due Date</span><span class="font-medium text-stone-700 dark:text-stone-200">{{ $currentPayment->due_date?->format('M d, Y') ?? 'Not set' }}</span></div>
+                    <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Status</span><span class="font-medium text-stone-700 dark:text-stone-200">{{ ucfirst($currentPayment->payment_status) }}</span></div>
+                    <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Amount Due</span><span class="font-medium text-stone-700 dark:text-stone-200">₱{{ number_format($currentPayment->amount_due, 2) }}</span></div>
+                    <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Due Date</span><span class="font-medium text-stone-700 dark:text-stone-200">{{ $currentPayment->due_date?->format('M d, Y') ?? 'Not set' }}</span></div>
                     @if($currentPayment->payment_method)
-                        <div class="flex justify-between"><span class="text-stone-400">Payment Method</span><span class="font-medium text-stone-700 dark:text-stone-200">{{ ucfirst(str_replace('_', ' ', $currentPayment->payment_method)) }}</span></div>
+                        <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Payment Method</span><span class="font-medium text-stone-700 dark:text-stone-200">{{ ucfirst(str_replace('_', ' ', $currentPayment->payment_method)) }}</span></div>
                     @endif
                     @if($currentPayment->proof_path)
                         <div>
-                            <span class="text-stone-400">Proof</span>
-                            <a href="{{ Storage::url($currentPayment->proof_path) }}" target="_blank" class="mt-1 block text-sm font-medium text-teal-600 dark:text-teal-300">View proof</a>
+                            <span class="text-stone-500 dark:text-stone-400">Proof</span>
+                            <a href="{{ route('files.commission-proof', $currentPayment) }}" target="_blank" class="mt-1 block text-sm font-medium text-teal-600 dark:text-teal-300">View proof</a>
                         </div>
                     @endif
                 </div>
@@ -130,7 +130,7 @@
             @endif
         </div>
 
-        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
+        <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
             <h2 class="text-lg font-semibold text-stone-800 dark:text-stone-100">Notes</h2>
             @if($currentPayment && $currentPayment->notes->count())
                 <ul class="mt-4 space-y-3">

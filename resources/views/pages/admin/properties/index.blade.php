@@ -5,62 +5,63 @@
 
 @section('content')
 @if(session('success'))
-<div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">{{ session('success') }}</div>
+<div class="mb-5 rounded-lg border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('success') }}</div>
 @endif
 @if($errors->any())
-<div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{{ $errors->first() }}</div>
+<div class="mb-5 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 px-4 py-3 text-sm text-red-700 dark:text-red-300">{{ $errors->first() }}</div>
 @endif
 @if(count($duplicateGroups) > 0)
-<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-5">
-    <h3 class="font-semibold text-yellow-800 mb-3 flex items-center gap-2">
+<div class="bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-900 rounded-xl p-5 mb-5">
+    <h3 class="font-semibold text-yellow-800 dark:text-yellow-300 mb-3 flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         Potential Duplicates Found ({{ count($duplicateGroups) }})
     </h3>
     @foreach($duplicateGroups as $group)
-        <form method="POST" action="{{ route('admin.properties.delete-multiple') }}" class="border border-yellow-300 rounded-lg p-4 bg-yellow-100 mb-3">
+        <form method="POST" action="{{ route('admin.properties.delete-multiple') }}" class="border border-yellow-200 dark:border-yellow-900 rounded-lg p-4 bg-white/60 dark:bg-stone-900/60 mb-3 last:mb-0">
             @csrf
             @method('DELETE')
-            <div class="flex items-start gap-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
                 <div class="flex-1">
-                    <p class="font-medium text-yellow-800 text-sm mb-2">Group {{ $loop->iteration }}</p>
+                    <p class="font-medium text-yellow-800 dark:text-yellow-300 text-sm mb-2">Group {{ $loop->iteration }}</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
 @foreach($group as $prop)
-                        <label class="flex items-center gap-2 bg-white p-2 rounded border border-yellow-200 text-sm cursor-pointer">
+                        <label class="flex items-center gap-2 bg-white dark:bg-stone-900 p-2 rounded border border-yellow-200 dark:border-yellow-900 text-sm cursor-pointer">
                             <input type="checkbox" name="ids[]" value="{{ $prop->id }}" class="rounded">
                             <div class="flex-1">
-                                <p class="font-medium text-stone-700">{{ $prop->name }}</p>
-                                <p class="text-xs text-stone-400">{{ $prop->broker?->name ?? '—' }} • {{ $prop->created_at->format('M d') }}</p>
+                                <p class="font-medium text-stone-700 dark:text-stone-200">{{ $prop->name }}</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400">{{ $prop->broker?->name ?? '—' }} • {{ $prop->created_at->format('M d') }}</p>
                             </div>
                         </label>
                         @endforeach
                     </div>
                 </div>
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg">Delete Selected</button>
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-2 rounded-lg font-medium transition">Delete Selected</button>
             </div>
         </form>
     @endforeach
 </div>
 @endif
 
-<div class="bg-white rounded-xl border border-stone-200">
-    <div class="flex items-center justify-between px-5 py-4 border-b border-stone-100">
-        <h2 class="font-semibold text-stone-800">All Properties</h2>
-        <form method="GET" class="flex gap-2">
+<div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700">
+    <div class="flex flex-col gap-3 px-5 py-4 border-b border-stone-100 dark:border-stone-800 lg:flex-row lg:items-center lg:justify-between">
+        <h2 class="font-semibold text-stone-800 dark:text-stone-100">All Properties</h2>
+        <form method="GET" class="flex flex-wrap gap-2">
             <input type="text" name="search" placeholder="Search properties..." 
                    value="{{ request('search') }}"
-                   class="border border-stone-200 rounded-lg px-3 py-2 text-sm">
-            <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm">
+                   class="min-w-0 flex-1 border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 sm:w-56 sm:flex-none">
+            <select name="status" class="border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
                 <option value="">All Statuses</option>
                 <option value="available" {{ request('status') === 'available' ? 'selected' : '' }}>Available</option>
                 <option value="hidden" {{ request('status') === 'hidden' ? 'selected' : '' }}>Hidden</option>
                 <option value="flagged" {{ request('status') === 'flagged' ? 'selected' : '' }}>Flagged</option>
             </select>
-            <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">Search</button>
+            <button type="submit" class="bg-teal-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition hover:bg-teal-800">Search</button>
         </form>
     </div>
+    <div class="overflow-x-auto">
     <table class="w-full text-sm">
-        <thead class="bg-stone-50 border-b border-stone-100">
-            <tr class="text-left text-stone-500">
+        <thead class="bg-stone-50 dark:bg-stone-800/60 border-b border-stone-100 dark:border-stone-800">
+            <tr class="text-left text-stone-500 dark:text-stone-400">
                 <th class="px-5 py-3 font-medium">Property</th>
                 <th class="px-5 py-3 font-medium">Broker</th>
                 <th class="px-5 py-3 font-medium">Status</th>
@@ -68,41 +69,44 @@
                 <th class="px-5 py-3 font-medium"></th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-stone-100">
+        <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
             @forelse($properties as $property)
-            <tr class="hover:bg-stone-50 transition">
+            <tr class="hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                 <td class="px-5 py-3">
-                    <p class="font-medium text-stone-700">{{ $property->name }}</p>
-                    <p class="text-xs text-stone-400">{{ $property->city }}, {{ $property->province }}</p>
+                    <p class="font-medium text-stone-700 dark:text-stone-200">{{ $property->name }}</p>
+                    <p class="text-xs text-stone-500 dark:text-stone-400">{{ $property->city }}, {{ $property->province }}</p>
                 </td>
-                <td class="px-5 py-3 text-stone-500">{{ $property->broker?->name ?? '—' }}</td>
+                <td class="px-5 py-3 text-stone-500 dark:text-stone-400">{{ $property->broker?->name ?? '—' }}</td>
                 <td class="px-5 py-3">
                     <span class="px-2 py-0.5 rounded-full text-xs font-medium
-                        {{ $property->status==='available' ? 'bg-green-100 text-green-700' : '' }}
-                        {{ $property->status==='hidden' ? 'bg-stone-100 text-stone-700' : '' }}
-                        {{ $property->status==='flagged' ? 'bg-red-100 text-red-700' : '' }}">
+                        {{ $property->status==='available' ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300' : '' }}
+                        {{ $property->status==='hidden' ? 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200' : '' }}
+                        {{ $property->status==='flagged' ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300' : '' }}">
                         {{ ucfirst($property->status) }}
                     </span>
                 </td>
-                <td class="px-5 py-3 text-stone-400 text-xs">{{ $property->created_at->format('M d, Y') }}</td>
-                <td class="px-5 py-3 flex gap-2">
-                    <a href="{{ route('admin.properties.show', $property) }}" class="text-xs text-blue-600 hover:underline">View</a>
+                <td class="px-5 py-3 text-stone-500 dark:text-stone-400 text-xs whitespace-nowrap">{{ $property->created_at->format('M d, Y') }}</td>
+                <td class="px-5 py-3">
+                    <div class="flex items-center gap-2">
+                    <a href="{{ route('admin.properties.show', $property) }}" class="text-xs text-teal-700 dark:text-teal-300 hover:underline">View</a>
                     <form method="POST" action="{{ route('admin.properties.status', $property) }}">
                         @csrf
                         @method('PATCH')
-                        <select name="status" onchange="this.form.submit()" class="text-xs border border-stone-200 rounded px-2 py-1">
+                        <select name="status" onchange="this.form.submit()" class="text-xs border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded px-2 py-1">
                             @foreach(['available' => 'Available', 'coming_soon' => 'Coming Soon', 'sold' => 'Sold', 'hidden' => 'Hide', 'flagged' => 'Flag'] as $value => $text)
                             <option value="{{ $value }}" @selected($property->status === $value)>{{ $text }}</option>
                             @endforeach
                         </select>
                     </form>
+                    </div>
                 </td>
             </tr>
             @empty
-            <tr><td colspan="5" class="px-5 py-8 text-center text-stone-400">No properties found.</td></tr>
+            <tr><td colspan="5" class="px-5 py-8 text-center text-stone-500 dark:text-stone-400">No properties found.</td></tr>
             @endforelse
         </tbody>
     </table>
+    </div>
     <div class="p-5">
         {{ $properties->links() }}
     </div>

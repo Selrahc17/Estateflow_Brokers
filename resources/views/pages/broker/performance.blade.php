@@ -25,7 +25,7 @@
                 <tr class="hover:bg-stone-50 dark:hover:bg-stone-800 transition">
                     <td class="px-5 py-4">
                         <p class="font-medium text-stone-700 dark:text-stone-200">{{ $agent->name }}</p>
-                        <p class="text-xs text-stone-400">{{ $agent->email }}</p>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">{{ $agent->email }}</p>
                     </td>
                     <td class="px-5 py-4 font-semibold text-blue-600 dark:text-blue-300">{{ $agent->leads_count }}</td>
                     <td class="px-5 py-4 font-semibold text-teal-700 dark:text-teal-300">{{ $agent->viewings_count }}</td>
@@ -37,7 +37,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-5 py-10 text-center text-stone-400">No Agents assigned yet.</td>
+                    <td colspan="5" class="px-5 py-10 text-center text-stone-500 dark:text-stone-400">No Agents assigned yet.</td>
                 </tr>
                 @endforelse
             </tbody>

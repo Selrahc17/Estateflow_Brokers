@@ -65,7 +65,7 @@
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <h2 class="font-semibold text-stone-800 dark:text-stone-100 text-sm">{{ $item['label'] }}</h2>
-                        <p class="text-xs text-stone-400 mt-0.5">{{ $item['hint'] }}</p>
+                        <p class="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{{ $item['hint'] }}</p>
                     </div>
                     @if($document)
                     <span class="shrink-0 px-2 py-0.5 rounded-full text-xs font-medium {{ $statusLabels[$document->status][1] ?? 'bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400' }}">
@@ -98,7 +98,7 @@
             </div>
             @endforeach
         </div>
-        <p class="text-xs text-stone-400 px-1">JPG, PNG, or PDF up to 10 MB each. Your documents are stored privately and shown only to you and the admin reviewing your application.</p>
+        <p class="text-xs text-stone-500 dark:text-stone-400 px-1">JPG, PNG, or PDF up to 10 MB each. Your documents are stored privately and shown only to you and the admin reviewing your application.</p>
 
         {{-- Details --}}
         <form action="{{ route('broker.application.details') }}" method="POST" class="bg-white dark:bg-stone-900 rounded-2xl border border-stone-200 dark:border-stone-700 p-6 shadow-sm space-y-4">

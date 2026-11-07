@@ -65,7 +65,7 @@ class CommissionController extends Controller
         }
 
         if ($request->hasFile('proof')) {
-            $path = $request->file('proof')->store('commission-proof', 'public');
+            $path = $request->file('proof')->store('commission-proof', 'local');
             $payment->update(['proof_path' => $path]);
         }
 

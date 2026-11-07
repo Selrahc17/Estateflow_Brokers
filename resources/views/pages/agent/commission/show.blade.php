@@ -48,7 +48,7 @@
 
                             @if($payment->proof_path)
                                 <div class="mt-3">
-                                    <a href="{{ Storage::disk('public')->url($payment->proof_path) }}" target="_blank" class="text-sm font-medium text-teal-600">View proof</a>
+                                    <a href="{{ route('files.commission-proof', $payment) }}" target="_blank" class="text-sm font-medium text-teal-600">View proof</a>
                                 </div>
                             @endif
                         </div>

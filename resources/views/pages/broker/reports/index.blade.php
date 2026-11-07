@@ -4,25 +4,25 @@
 @section('page-subtitle', 'Performance overview for your assigned Agents')
 
 @section('content')
-<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 mb-6">
+<div class="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
     @foreach([
-        ['Revenue', '₱' . number_format($data['total_revenue'], 2), 'text-green-600 dark:text-green-300'],
-        ['Properties', $data['total_properties'], 'text-stone-800 dark:text-stone-100'],
-        ['Clients', $data['total_clients'], 'text-blue-600 dark:text-blue-300'],
-        ['Reservations', $data['total_reservations'], 'text-teal-700 dark:text-teal-300'],
-        ['Commission Expected', '₱' . number_format($data['commission_expected'] ?? 0, 2), 'text-amber-600 dark:text-amber-300'],
-        ['Commission Paid', '₱' . number_format($data['commission_paid'] ?? 0, 2), 'text-emerald-600 dark:text-emerald-300'],
-    ] as [$label, $value, $color])
-    <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-4">
-        <p class="text-xs text-stone-500 dark:text-stone-400">{{ $label }}</p>
-        <p class="mt-1 text-lg font-bold {{ $color }} truncate">{{ $value }}</p>
-    </div>
+        ['Revenue', '₱' . number_format($data['total_revenue'], 2), 'green'],
+        ['Properties', $data['total_properties'], null],
+        ['Clients', $data['total_clients'], null],
+        ['Reservations', $data['total_reservations'], null],
+    ] as [$label, $value, $tone])
+        @include('layouts.partials.stat-tile', compact('label', 'value', 'tone'))
     @endforeach
+</div>
 
-    <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-4">
-        <p class="text-xs text-stone-500 dark:text-stone-400">Commission Disputed</p>
-        <p class="mt-1 text-lg font-bold text-rose-600 dark:text-rose-300 truncate">₱{{ number_format($data['commission_disputed'] ?? 0, 2) }}</p>
-    </div>
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    @foreach([
+        ['Commission Expected', '₱' . number_format($data['commission_expected'] ?? 0, 2), 'amber'],
+        ['Commission Paid', '₱' . number_format($data['commission_paid'] ?? 0, 2), 'green'],
+        ['Commission Disputed', '₱' . number_format($data['commission_disputed'] ?? 0, 2), 'red'],
+    ] as [$label, $value, $tone])
+        @include('layouts.partials.stat-tile', compact('label', 'value', 'tone'))
+    @endforeach
 </div>
 
 <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
@@ -32,9 +32,9 @@
         <div class="flex h-44 items-end gap-2">
             @foreach($data['monthly_revenue'] as $month => $amount)
             <div class="flex min-w-0 flex-1 flex-col items-center gap-1">
-                <span class="truncate text-[10px] text-stone-400">{{ $amount > 0 ? number_format($amount / 1000, 0) . 'K' : '—' }}</span>
+                <span class="truncate text-[10px] text-stone-500 dark:text-stone-400">{{ $amount > 0 ? number_format($amount / 1000, 0) . 'K' : '—' }}</span>
                 <div class="w-full rounded-t-md {{ $amount > 0 ? 'bg-teal-500 hover:bg-teal-600' : 'bg-stone-100 dark:bg-stone-800' }} transition" style="height: {{ max(4, round(($amount / $maxRevenue) * 120)) }}px" title="₱{{ number_format($amount, 2) }}"></div>
-                <span class="text-[10px] text-stone-400">{{ date('M', mktime(0, 0, 0, $month, 1)) }}</span>
+                <span class="text-[10px] text-stone-500 dark:text-stone-400">{{ date('M', mktime(0, 0, 0, $month, 1)) }}</span>
             </div>
             @endforeach
         </div>
@@ -42,14 +42,14 @@
 
     <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
         <h2 class="mb-4 font-semibold text-stone-800 dark:text-stone-100">Reservations by Status</h2>
-        @forelse(['pending' => 'yellow', 'confirmed' => 'green', 'completed' => 'blue', 'cancelled' => 'red'] as $status => $color)
+        @forelse(['pending' => 'bg-amber-500', 'confirmed' => 'bg-green-500', 'completed' => 'bg-blue-500', 'cancelled' => 'bg-red-500'] as $status => $color)
         @php $count = $data['reservations_by_status'][$status] ?? 0; $percent = $data['total_reservations'] ? round($count / $data['total_reservations'] * 100) : 0; @endphp
         <div class="mb-3 last:mb-0">
             <div class="mb-1 flex justify-between text-sm"><span class="font-medium text-stone-700 dark:text-stone-200">{{ ucfirst($status) }}</span><span class="text-stone-500 dark:text-stone-400">{{ $count }}</span></div>
-            <div class="h-2 w-full rounded-full bg-stone-100 dark:bg-stone-800"><div class="h-2 rounded-full bg-{{ $color }}-500" style="width: {{ $percent }}%"></div></div>
+            <div class="h-2 w-full rounded-full bg-stone-100 dark:bg-stone-800"><div class="h-2 rounded-full {{ $color }}" style="width: {{ $percent }}%"></div></div>
         </div>
         @empty
-        <p class="py-6 text-center text-sm text-stone-400">No reservations yet.</p>
+        <p class="py-6 text-center text-sm text-stone-500 dark:text-stone-400">No reservations yet.</p>
         @endforelse
     </div>
 </div>
@@ -65,7 +65,7 @@
                 @forelse($agents as $agent)
                 <tr class="hover:bg-stone-50 dark:hover:bg-stone-800"><td class="px-5 py-3 font-medium text-stone-700 dark:text-stone-200">{{ $agent->name }}</td><td class="px-5 py-3 text-indigo-600 dark:text-indigo-300">{{ $agent->leads_count }}</td><td class="px-5 py-3 text-teal-700 dark:text-teal-300">{{ $agent->viewings_count }}</td><td class="px-5 py-3 text-green-600 dark:text-green-300">{{ $agent->sales_count }}</td></tr>
                 @empty
-                <tr><td colspan="4" class="px-5 py-8 text-center text-stone-400">No Agents assigned yet.</td></tr>
+                <tr><td colspan="4" class="px-5 py-8 text-center text-stone-500 dark:text-stone-400">No Agents assigned yet.</td></tr>
                 @endforelse
             </tbody>
         </table>

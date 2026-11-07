@@ -23,6 +23,18 @@ class ChatMessage extends Model
         ];
     }
 
+    /**
+     * Older messages stored a full URL; newer photos are private and need a sign-in.
+     */
+    public function getAttachmentUrlAttribute(): ?string
+    {
+        if (! $this->attachment) {
+            return null;
+        }
+
+        return str_starts_with($this->attachment, 'http') ? $this->attachment : route('files.chat-photo', $this);
+    }
+
     public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');

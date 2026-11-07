@@ -21,7 +21,7 @@
             @if($property->featured_image)
                 <img src="{{ $property->featured_image }}" alt="{{ $property->name }}" class="h-full w-full object-cover object-center">
             @else
-                <div class="flex h-full items-center justify-center bg-stone-100 dark:bg-stone-800 text-stone-400">
+                <div class="flex h-full items-center justify-center bg-stone-100 dark:bg-stone-800 text-stone-500 dark:text-stone-400">
                     <svg class="h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16l5-5 4 4 3-3 6 6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 </div>
             @endif
@@ -37,9 +37,9 @@
             </div>
 
             <div class="mt-3 min-h-[2.5rem] space-y-1 text-xs text-stone-500 dark:text-stone-400">
-                <p class="break-words"><span class="font-medium text-stone-400">Agent:</span> {{ $property->broker?->name ?? 'Unassigned' }}</p>
+                <p class="break-words"><span class="font-medium text-stone-500 dark:text-stone-400">Agent:</span> {{ $property->broker?->name ?? 'Unassigned' }}</p>
                 @if(!empty($property->city) || !empty($property->province))
-                    <p class="break-words"><span class="font-medium text-stone-400">Location:</span> {{ trim(($property->city ?? '') . ' ' . ($property->province ?? '')) ?: 'Not specified' }}</p>
+                    <p class="break-words"><span class="font-medium text-stone-500 dark:text-stone-400">Location:</span> {{ trim(($property->city ?? '') . ' ' . ($property->province ?? '')) ?: 'Not specified' }}</p>
                 @endif
             </div>
 
@@ -48,11 +48,11 @@
                 @method('PATCH')
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div>
-                        <label class="text-[11px] font-medium uppercase tracking-wide text-stone-400">Commission Rate (%)</label>
+                        <label class="text-[11px] font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400">Commission Rate (%)</label>
                         <input type="number" name="agent_commission" min="0" max="100" step="0.01" value="{{ old('agent_commission', $property->agent_commission) }}" class="mt-1 w-full rounded-lg border border-stone-200 dark:border-stone-700 px-2.5 py-2 text-sm text-stone-700 dark:text-stone-200 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-200">
                     </div>
                     <div>
-                        <label class="text-[11px] font-medium uppercase tracking-wide text-stone-400">Valid Until</label>
+                        <label class="text-[11px] font-medium uppercase tracking-wide text-stone-500 dark:text-stone-400">Valid Until</label>
                         <input type="date" name="valid_until" value="{{ old('valid_until', $property->valid_until?->format('Y-m-d')) }}" class="mt-1 w-full rounded-lg border border-stone-200 dark:border-stone-700 px-2.5 py-2 text-sm text-stone-700 dark:text-stone-200 focus:border-teal-400 focus:outline-none focus:ring-2 focus:ring-teal-200">
                     </div>
                 </div>

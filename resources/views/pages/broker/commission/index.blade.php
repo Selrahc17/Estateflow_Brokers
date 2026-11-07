@@ -10,46 +10,38 @@
         <h2 class="text-xl font-semibold text-stone-800 dark:text-stone-100">Commission Records</h2>
         <p class="text-sm text-stone-500 dark:text-stone-400">Manage the agent payout structure for your team.</p>
     </div>
-    <a href="{{ route('broker.commissions.create') }}" class="inline-flex items-center justify-center rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-dark)]">
+    <a href="{{ route('broker.commissions.create') }}" class="inline-flex items-center justify-center rounded-lg bg-[var(--color-primary)] px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[var(--color-primary-dark)]">
         + New Commission
     </a>
 </div>
 
-<div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-    <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-gradient-to-br from-white to-teal-50 p-4 shadow-sm">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400">Active Agreements</p>
-        <p class="mt-3 text-3xl font-bold text-stone-800 dark:text-stone-100">{{ $agreements->where('status', 'active')->count() }}</p>
-    </div>
-    <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-gradient-to-br from-amber-50 to-white p-4 shadow-sm">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400">Total Expected</p>
-        <p class="mt-3 text-3xl font-bold text-amber-600 dark:text-amber-300">₱{{ number_format($totalExpected ?? 0, 2) }}</p>
-    </div>
-    <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400">Paid</p>
-        <p class="mt-3 text-3xl font-bold text-emerald-600 dark:text-emerald-300">₱{{ number_format($totalPaid ?? 0, 2) }}</p>
-    </div>
-    <div class="rounded-2xl border border-stone-200 dark:border-stone-700 bg-gradient-to-br from-rose-50 to-white p-4 shadow-sm">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-400">Disputed</p>
-        <p class="mt-3 text-3xl font-bold text-rose-600 dark:text-rose-300">₱{{ number_format($totalDisputed ?? 0, 2) }}</p>
-    </div>
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    @foreach([
+        ['Active Agreements', $agreements->where('status', 'active')->count(), null],
+        ['Total Expected', '₱' . number_format($totalExpected ?? 0, 2), 'amber'],
+        ['Paid', '₱' . number_format($totalPaid ?? 0, 2), 'green'],
+        ['Disputed', '₱' . number_format($totalDisputed ?? 0, 2), 'red'],
+    ] as [$label, $value, $tone])
+        @include('layouts.partials.stat-tile', compact('label', 'value', 'tone'))
+    @endforeach
 </div>
 
-<div class="mt-6 overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-sm">
+<div class="mt-6 overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-sm">
     <div class="overflow-x-auto">
         <table class="min-w-[980px] w-full divide-y divide-stone-200 dark:divide-stone-700">
             <thead class="bg-stone-50 dark:bg-stone-800/60">
                 <tr>
-                    <th class="w-[30%] whitespace-nowrap px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">Property</th>
-                    <th class="w-[20%] whitespace-nowrap px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">Agent</th>
-                    <th class="w-[12%] whitespace-nowrap px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">Rate</th>
-                    <th class="w-[15%] whitespace-nowrap px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">Schedule</th>
-                    <th class="w-[13%] whitespace-nowrap px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">Status</th>
-                    <th class="w-[150px] whitespace-nowrap px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 dark:text-stone-400">Action</th>
+                    <th class="w-[30%] whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-stone-400">Property</th>
+                    <th class="w-[20%] whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-stone-400">Agent</th>
+                    <th class="w-[12%] whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-stone-400">Rate</th>
+                    <th class="w-[15%] whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-stone-400">Schedule</th>
+                    <th class="w-[13%] whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-stone-400">Status</th>
+                    <th class="w-[150px] whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-stone-500 dark:text-stone-400">Action</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-stone-200 dark:divide-stone-700 bg-white dark:bg-stone-900">
                 @forelse($agreements as $agreement)
-                    <tr class="transition hover:bg-stone-50/80">
+                    <tr class="transition hover:bg-stone-50 dark:hover:bg-stone-800">
                         <td class="px-4 py-3">
                             @php
                                 $property = $agreement->property;

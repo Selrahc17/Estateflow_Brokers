@@ -61,8 +61,8 @@
                         <p class="whitespace-pre-wrap text-sm">{{ $message->message }}</p>
                     @endif
                     @if($message->attachment)
-                        <a href="{{ $message->attachment }}" target="_blank" rel="noopener" class="mt-2 block">
-                            <img src="{{ $message->attachment }}" alt="Attached photo" class="max-h-56 rounded-lg object-cover">
+                        <a href="{{ $message->attachment_url }}" target="_blank" rel="noopener" class="mt-2 block">
+                            <img src="{{ $message->attachment_url }}" alt="Attached photo" class="max-h-56 rounded-lg object-cover">
                         </a>
                     @endif
                     <div class="mt-2 flex items-center justify-end gap-2 text-[11px] {{ $message->sender_id === auth()->id() ? 'text-teal-100' : 'text-stone-400' }}">

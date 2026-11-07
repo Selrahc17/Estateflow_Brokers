@@ -16,14 +16,14 @@
             @endif
         </div>
         <p class="font-bold text-stone-800 dark:text-stone-100 text-lg">{{ $agent->name }}</p>
-        <p class="text-sm text-stone-400">{{ $agent->email }}</p>
+        <p class="text-sm text-stone-500 dark:text-stone-400">{{ $agent->email }}</p>
         @if($agent->phone)
-            <p class="text-sm text-stone-400">{{ $agent->phone }}</p>
+            <p class="text-sm text-stone-500 dark:text-stone-400">{{ $agent->phone }}</p>
         @endif
         <span class="mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium {{ $agent->is_active ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-300' }}">
             {{ $agent->is_active ? 'Active' : 'Suspended' }}
         </span>
-        <div class="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800 text-xs text-stone-400">
+        <div class="mt-4 pt-4 border-t border-stone-100 dark:border-stone-800 text-xs text-stone-500 dark:text-stone-400">
             <p class="mb-1.5">PRC accreditation</p>
             @include('pages.broker._renewal-badge', ['expiresAt' => $agent->prc_id_expires_at])
             <p class="mt-3">Member since {{ $agent->created_at->format('M d, Y') }}</p>
@@ -46,7 +46,7 @@
             <div>
                 <label class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5 block">Profile Photo</label>
                 <input type="file" name="avatar" accept="image/*" class="w-full border border-stone-200 dark:border-stone-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 file:mr-2 file:py-1 file:px-2 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
-                <p class="text-xs text-stone-400 mt-1">Leave empty to keep current photo</p>
+                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Leave empty to keep current photo</p>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -90,7 +90,7 @@
 
         <div class="mt-8 border-t border-stone-100 dark:border-stone-800 pt-6">
             <h2 class="font-semibold text-stone-800 dark:text-stone-100 mb-1">Supporting Identification</h2>
-            <p class="text-xs text-stone-400 mb-4">Upload the ID submitted by this agent.</p>
+            <p class="text-xs text-stone-500 dark:text-stone-400 mb-4">Upload the ID submitted by this agent.</p>
             @if(session('success'))
                 <p class="mb-3 text-sm text-green-700 dark:text-green-300">{{ session('success') }}</p>
             @endif
@@ -114,12 +114,12 @@
                     <div class="flex items-center justify-between gap-3 border border-stone-100 dark:border-stone-800 rounded-lg px-3 py-2 text-sm">
                         <div>
                             <p class="font-medium text-stone-700 dark:text-stone-200">{{ ucfirst(str_replace('_', ' ', $document->type)) }}</p>
-                            <p class="text-xs text-stone-400">{{ number_format($document->file_size / 1024, 1) }} KB · {{ ucfirst($document->status) }}</p>
+                            <p class="text-xs text-stone-500 dark:text-stone-400">{{ number_format($document->file_size / 1024, 1) }} KB · {{ ucfirst($document->status) }}</p>
                         </div>
                         <a href="{{ route('broker.agents.documents.download', [$agent, $document]) }}" class="text-xs text-teal-700 dark:text-teal-300 hover:underline">Download</a>
                     </div>
                 @empty
-                    <p class="text-sm text-stone-400">No supporting ID uploaded yet.</p>
+                    <p class="text-sm text-stone-500 dark:text-stone-400">No supporting ID uploaded yet.</p>
                 @endforelse
             </div>
         </div>

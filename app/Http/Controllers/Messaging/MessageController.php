@@ -8,7 +8,6 @@ use App\Models\Client;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class MessageController extends Controller
@@ -60,12 +59,11 @@ class MessageController extends Controller
         ]);
 
         $contactIds = $this->contacts($user)->pluck('id');
-        abort_unless(in_array((int) $data['receiver_id'], $contactIds, true), 403);
+        abort_unless($contactIds->contains((int) $data['receiver_id']), 403);
 
         $attachment = null;
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('chat', 'public');
-            $attachment = Storage::disk('public')->url($path);
+            $attachment = $request->file('photo')->store('chat', 'local');
         }
 
         ChatMessage::create([

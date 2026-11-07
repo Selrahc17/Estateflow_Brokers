@@ -130,7 +130,7 @@ class CommissionController extends Controller
             return back()->withErrors(['amount_paid' => 'The amount paid must match the monthly amount due.'])->withInput();
         }
 
-        $path = $request->file('proof')->store('commission-proof', 'public');
+        $path = $request->file('proof')->store('commission-proof', 'local');
 
         $payment->update([
             'payment_status' => 'paid',

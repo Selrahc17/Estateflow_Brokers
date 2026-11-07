@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {{-- Runs before first paint so dark mode pages never flash white. --}}
+    <script>
+        if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1A6B79">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,189 +16,128 @@
     <title>EstateFlow Admin — @yield('title', 'Dashboard')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        .dark { color-scheme: dark; }
+        .dark body { color: #e7e5e4; }
+    </style>
 </head>
-<body class="bg-stone-100 font-sans" x-data="{ sidebarOpen: window.innerWidth >= 1024 }" @resize.window="if (window.innerWidth < 1024) sidebarOpen = false">
+<body class="bg-stone-100 dark:bg-stone-950 font-sans" x-data="{
+        isDesktop: window.innerWidth >= 1024,
+        sidebarOpen: window.innerWidth >= 1024,
+        darkMode: document.documentElement.classList.contains('dark'),
+    }" @resize.window="const wasDesktop = isDesktop; isDesktop = window.innerWidth >= 1024; if (wasDesktop !== isDesktop) sidebarOpen = isDesktop">
+
+    @php
+        $adminUser = auth()->user();
+        $avatarUrl = $adminUser?->avatar
+            ? (str_starts_with($adminUser->avatar, 'http') ? $adminUser->avatar : asset('storage/' . $adminUser->avatar))
+            : null;
+        $adminInitial = strtoupper(substr($adminUser->name ?? 'A', 0, 1));
+        $navSections = [
+            ['title' => 'Overview', 'links' => [
+                ['route' => 'admin.dashboard', 'active' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
+                ['route' => 'admin.reports', 'active' => 'admin.reports', 'label' => 'Reports & Analytics', 'icon' => 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
+            ]],
+            ['title' => 'Management', 'links' => [
+                ['route' => 'admin.users', 'active' => 'admin.users*', 'label' => 'User Management', 'icon' => 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
+                ['route' => 'admin.brokers', 'active' => 'admin.brokers*', 'label' => 'Broker Management', 'badge' => $pendingBrokers, 'badgeColor' => 'bg-amber-600', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
+                ['route' => 'admin.properties', 'active' => ['admin.properties', 'admin.properties.show'], 'label' => 'Property Management', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'],
+                ['route' => 'admin.reservations', 'active' => 'admin.reservations*', 'label' => 'Reservations', 'badge' => $pendingReservations, 'badgeColor' => 'bg-amber-600', 'icon' => 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
+                ['route' => 'admin.documents', 'active' => 'admin.documents*', 'label' => 'Documents', 'badge' => $pendingDocuments, 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
+                ['route' => 'admin.feedback', 'active' => 'admin.feedback*', 'label' => 'Feedback', 'badge' => $pendingFeedback, 'icon' => 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
+                ['route' => 'admin.contact-messages', 'active' => 'admin.contact-messages*', 'label' => 'Contact Messages', 'badge' => $newContactMessages, 'icon' => 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
+                ['route' => 'admin.notifications', 'active' => 'admin.notifications', 'label' => 'Notifications', 'badge' => $unreadNotifs, 'icon' => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9'],
+            ]],
+            ['title' => 'System', 'links' => [
+                ['route' => 'admin.audit', 'active' => 'admin.audit', 'label' => 'Audit Logs', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01'],
+                ['route' => 'admin.backups', 'active' => 'admin.backups*', 'label' => 'Backups', 'icon' => 'M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4'],
+                ['route' => 'admin.settings', 'active' => 'admin.settings', 'label' => 'System Settings', 'icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065zM15 12a3 3 0 11-6 0 3 3 0 016 0z'],
+            ]],
+        ];
+    @endphp
 
     {{-- Sidebar --}}
-        <div x-show="sidebarOpen && window.innerWidth < 1024" x-transition.opacity @click="sidebarOpen = false" class="fixed inset-0 bg-black/40 z-[9998] lg:hidden" aria-hidden="true"></div>
-        <aside class="fixed top-0 left-0 h-screen bg-stone-900 text-white transition-all duration-300 z-[9999] flex flex-col"
-            :class="window.innerWidth < 1024 ? (sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64') : (sidebarOpen ? 'w-64' : 'w-16')">
+    <div x-show="sidebarOpen && !isDesktop" x-transition.opacity @click="sidebarOpen = false" style="display: none" class="fixed inset-0 z-[9998] bg-black/40 lg:hidden" aria-hidden="true"></div>
+    <aside class="fixed inset-y-0 left-0 z-[9999] flex w-64 flex-col bg-[var(--color-sidebar)] text-white transition-all duration-300 max-lg:-translate-x-full"
+        :class="isDesktop ? (sidebarOpen ? '' : 'w-16!') : (sidebarOpen ? 'translate-x-0!' : '')">
 
-        {{-- Logo --}}
-        <div class="flex items-center gap-3 px-4 py-5 border-b border-stone-700">
-            <div class="w-9 h-9 bg-red-600 rounded-lg flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                </svg>
-            </div>
-            <div x-show="sidebarOpen">
-                <p class="text-sm font-bold text-white leading-none">EstateFlow</p>
-                <p class="text-xs text-red-400 font-semibold">Admin Panel</p>
-            </div>
-        </div>
-
-        {{-- Navigation --}}
-        <nav class="min-h-0 flex-1 overflow-y-auto py-4 px-2 space-y-1">
-
-            <p x-show="sidebarOpen" class="text-xs text-stone-500 uppercase tracking-widest px-3 pb-2">Overview</p>
-
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Dashboard</span>
-            </a>
-
-            <a href="{{ route('admin.reports') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.reports') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Reports & Analytics</span>
-            </a>
-
-            <p x-show="sidebarOpen" class="text-xs text-stone-500 uppercase tracking-widest px-3 pb-2 pt-4">Management</p>
-
-            <a href="{{ route('admin.users') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.users*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">User Management</span>
-            </a>
-
-            <a href="{{ route('admin.brokers') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.brokers*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Broker Management</span>
-                @if($pendingBrokers > 0)
-                    <span x-show="sidebarOpen" class="ml-auto bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $pendingBrokers }}</span>
-                @endif
-            </a>
-
-            <a href="{{ route('admin.properties') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.properties') || request()->routeIs('admin.properties.show') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Property Management</span>
-            </a>
-
-            <a href="{{ route('admin.reservations') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.reservations*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Reservations</span>
-                @if($pendingReservations > 0)
-                    <span x-show="sidebarOpen" class="ml-auto bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $pendingReservations }}</span>
-                @endif
-            </a>
-
-            <a href="{{ route('admin.documents') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.documents*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Documents</span>
-                @if($pendingDocuments > 0)
-                    <span x-show="sidebarOpen" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $pendingDocuments }}</span>
-                @endif
-            </a>
-
-
-            <a href="{{ route('admin.feedback') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.feedback*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800 hover:text-white' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Feedback</span>
-                @if($pendingFeedback > 0)
-                    <span x-show="sidebarOpen" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $pendingFeedback }}</span>
-                @endif
-            </a>
-
-            <a href="{{ route('admin.contact-messages') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.contact-messages*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800 hover:text-white' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Contact Messages</span>
-                @if($newContactMessages > 0)
-                    <span x-show="sidebarOpen" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $newContactMessages }}</span>
-                @endif
-            </a>
-
-            <a href="{{ route('admin.notifications') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.notifications') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Notifications</span>
-                @if($unreadNotifs > 0)
-                    <span x-show="sidebarOpen" class="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">{{ $unreadNotifs }}</span>
-                @endif
-            </a>
-
-            <p x-show="sidebarOpen" class="text-xs text-stone-500 uppercase tracking-widest px-3 pb-2 pt-4">System</p>
-
-            <a href="{{ route('admin.audit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.audit') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Audit Logs</span>
-            </a>
-
-            <a href="{{ route('admin.backups') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.backups*') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800 hover:text-white' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">Backups</span>
-            </a>
-
-            <a href="{{ route('admin.settings') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-lg {{ request()->routeIs('admin.settings') ? 'bg-red-600 text-white' : 'text-stone-300 hover:bg-stone-800' }} transition">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span x-show="sidebarOpen" class="text-sm font-medium">System Settings</span>
-            </a>
-
-        </nav>
+        @include('layouts.partials.sidebar-brand', ['portal' => 'Admin Panel'])
+        @include('layouts.partials.sidebar-nav', ['label' => 'Admin navigation', 'sections' => $navSections])
 
         {{-- Admin Profile --}}
-        <div class="shrink-0 border-t border-stone-700 p-3 pb-[env(safe-area-inset-bottom)]">
-            <div class="flex items-center gap-3 px-2 py-2 rounded-lg text-stone-300 hover:bg-stone-800 transition cursor-pointer">
-                <div class="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center shrink-0 text-sm font-bold text-white">{{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}</div>
-                <div x-show="sidebarOpen">
-                    <p class="text-sm font-medium text-white">{{ auth()->user()->name ?? 'Admin' }}</p>
-                    <p class="text-xs text-stone-400">{{ auth()->user()->email ?? '' }}</p>
+        <div class="shrink-0 border-t border-[var(--color-primary-dark)] p-3 pb-[env(safe-area-inset-bottom)]">
+            <a href="{{ route('admin.settings') }}" class="flex items-center gap-3 rounded-lg px-2 py-2 text-teal-100 transition hover:bg-[var(--color-sidebar-hover)]">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--color-primary)] text-sm font-bold text-white">
+                    @if($avatarUrl)
+                        <img src="{{ $avatarUrl }}" alt="{{ $adminUser->name }}" class="h-full w-full object-cover">
+                    @else
+                        {{ $adminInitial }}
+                    @endif
                 </div>
+                <div x-show="sidebarOpen" class="min-w-0">
+                    <p class="truncate text-sm font-medium text-white">{{ $adminUser->name ?? 'Admin' }}</p>
+                    <p class="truncate text-xs text-stone-400">{{ $adminUser->email ?? '' }}</p>
+                </div>
+            </a>
+            <div x-show="sidebarOpen" class="mt-1">
+                @include('pages.auth._sign-out-confirm', ['triggerClass' => 'flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium text-[var(--color-accent)] transition hover:bg-[var(--color-sidebar-hover)]'])
             </div>
-            <form action="{{ route('auth.logout') }}" method="POST" x-show="sidebarOpen" class="mt-1">
-                @csrf
-                <button type="submit" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-stone-400 hover:bg-stone-800 text-xs transition w-full">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                    Sign Out
-                </button>
-            </form>
         </div>
     </aside>
 
     {{-- Main Content --}}
-    <div :class="window.innerWidth < 1024 ? 'ml-0' : (sidebarOpen ? 'ml-64' : 'ml-16')" class="transition-all duration-300 min-h-screen flex flex-col">
+    <div :class="isDesktop && !sidebarOpen ? 'lg:ml-16!' : ''" class="flex min-h-screen flex-col transition-all duration-300 lg:ml-64">
 
         {{-- Top Header --}}
-        <header class="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
-            <div class="flex items-center gap-4">
-                <button @click="sidebarOpen = !sidebarOpen" aria-label="Toggle navigation menu" class="text-stone-500 hover:text-red-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-                </button>
-                <div>
-                    <h1 class="text-lg font-semibold text-stone-800">@yield('page-title', 'Dashboard')</h1>
-                    <p class="text-xs text-stone-400">@yield('page-subtitle', 'System Administration')</p>
-                </div>
+        <header class="sticky top-0 z-40 flex items-center gap-4 border-b border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-4 py-5 sm:px-8">
+            <button @click="sidebarOpen = !sidebarOpen" aria-label="Toggle navigation menu" class="shrink-0 text-stone-500 dark:text-stone-400 transition hover:text-[var(--color-primary)] dark:hover:text-teal-400">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div class="min-w-0 flex-1">
+                <h1 class="text-xl font-bold text-stone-800 dark:text-stone-100">@yield('page-title', 'Dashboard')</h1>
+                <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">@yield('page-subtitle', 'System Administration')</p>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex shrink-0 items-center gap-3">
                 {{-- Pending Alerts --}}
-                <div class="hidden sm:flex items-center gap-2">
+                <div class="hidden items-center gap-2 lg:flex">
                     @if($pendingReservations > 0)
-                        <span class="flex items-center gap-1.5 text-xs bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-full font-medium">
-                            <span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+                        <a href="{{ route('admin.reservations', ['status' => 'pending']) }}" class="flex items-center gap-1.5 rounded-full border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950 px-3 py-1.5 text-xs font-medium text-amber-800 dark:text-amber-300 transition hover:bg-amber-100 dark:hover:bg-amber-900">
+                            <span class="h-1.5 w-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
                             {{ $pendingReservations }} Pending Reservation{{ $pendingReservations != 1 ? 's' : '' }}
-                        </span>
+                        </a>
                     @endif
                     @if($pendingDocuments > 0)
-                        <span class="flex items-center gap-1.5 text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-full font-medium">
-                            <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>
+                        <a href="{{ route('admin.documents') }}" class="flex items-center gap-1.5 rounded-full border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 px-3 py-1.5 text-xs font-medium text-red-700 dark:text-red-300 transition hover:bg-red-100 dark:hover:bg-red-900">
+                            <span class="h-1.5 w-1.5 rounded-full bg-red-500" aria-hidden="true"></span>
                             {{ $pendingDocuments }} Doc{{ $pendingDocuments != 1 ? 's' : '' }} to Verify
-                        </span>
+                        </a>
                     @endif
                 </div>
+                @include('layouts.partials.theme-toggle')
                 {{-- Notifications --}}
-                <a href="{{ route('admin.notifications') }}" class="relative text-stone-500 hover:text-red-600 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                <a href="{{ route('admin.notifications') }}" aria-label="Notifications" class="relative flex h-10 w-10 items-center justify-center rounded-xl border border-stone-200 dark:border-stone-700 text-stone-500 dark:text-stone-400 transition hover:bg-stone-50 dark:hover:bg-stone-800 hover:text-[var(--color-primary)] dark:hover:text-teal-400">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                     @if($unreadNotifs > 0)
-                        <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">{{ $unreadNotifs }}</span>
+                        <span class="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[11px] font-semibold text-white">{{ $unreadNotifs > 99 ? '99+' : $unreadNotifs }}</span>
                     @endif
                 </a>
                 {{-- Avatar --}}
-                <div class="w-9 h-9 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm">A</div>
+                <div class="hidden h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[var(--color-primary)] text-sm font-bold text-white sm:flex">
+                    @if($avatarUrl)
+                        <img src="{{ $avatarUrl }}" alt="" class="h-full w-full object-cover">
+                    @else
+                        {{ $adminInitial }}
+                    @endif
+                </div>
             </div>
         </header>
 
         {{-- Page Content --}}
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-4 sm:p-8">
             @yield('content')
         </main>
 
-        <footer class="text-center text-xs text-stone-400 py-4 border-t border-stone-200">
+        <footer class="border-t border-stone-200 dark:border-stone-700 py-4 text-center text-xs text-stone-500 dark:text-stone-400">
             © {{ date('Y') }} EstateFlow Admin Panel. All rights reserved.
         </footer>
     </div>

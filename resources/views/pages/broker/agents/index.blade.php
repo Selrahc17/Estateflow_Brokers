@@ -89,7 +89,7 @@
             <input type="hidden" name="status" value="{{ $status }}">
         @endif
         <div class="relative min-w-0 flex-1 sm:max-w-sm">
-            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+            <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500 dark:text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Search name or email..." aria-label="Search agents" class="w-full rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 py-2 pl-9 pr-3 text-sm text-stone-800 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-teal-400">
         </div>
         <button type="submit" class="rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-4 py-2 text-sm font-medium text-stone-700 dark:text-stone-200 transition hover:bg-stone-50 dark:hover:bg-stone-800">Search</button>
@@ -232,7 +232,7 @@
                     <h2 id="invite-heading" class="text-lg font-semibold text-stone-800 dark:text-white">Invite an Agent</h2>
                     <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">You will get a link to send them. They use it to set their own password and enter their PRC accreditation. It lasts 7 days.</p>
                 </div>
-                <button type="button" @click="$refs.invite.close()" aria-label="Close" class="shrink-0 text-stone-400 transition hover:text-stone-600 dark:hover:text-stone-200">
+                <button type="button" @click="$refs.invite.close()" aria-label="Close" class="shrink-0 text-stone-500 dark:text-stone-400 transition hover:text-stone-600 dark:hover:text-stone-200">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>

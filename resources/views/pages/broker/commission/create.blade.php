@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Set the agent payout and payment schedule for a deal')
 
 @section('content')
-<div class="mx-auto max-w-3xl rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-6 shadow-sm">
+<div class="mx-auto max-w-3xl rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-6 shadow-sm">
     <form action="{{ route('broker.commissions.store') }}" method="POST" class="space-y-5">
         @csrf
 

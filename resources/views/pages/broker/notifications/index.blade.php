@@ -30,7 +30,7 @@
                 <p class="mt-0.5 text-xs text-stone-500 dark:text-stone-400">{{ $notification->message }}</p>
             </div>
             <div class="flex shrink-0 flex-col items-end gap-1">
-                <span class="text-xs text-stone-400">{{ $notification->created_at->diffForHumans() }}</span>
+                <span class="text-xs text-stone-500 dark:text-stone-400">{{ $notification->created_at->diffForHumans() }}</span>
                 @if(!$notification->is_read)
                 <form action="{{ route('broker.notifications.read', $notification) }}" method="POST">
                     @csrf
@@ -40,7 +40,7 @@
             </div>
         </div>
         @empty
-        <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-10 text-center text-stone-400">No notifications yet.</div>
+        <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-10 text-center text-stone-500 dark:text-stone-400">No notifications yet.</div>
         @endforelse
         <div class="mt-4">{{ $notifications->links() }}</div>
     </div>

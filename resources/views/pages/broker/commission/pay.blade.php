@@ -8,17 +8,17 @@
 <div class="mx-auto max-w-3xl">
     <a href="{{ route('broker.commissions.show', $agreement) }}" class="text-sm font-medium text-teal-700 dark:text-teal-300 hover:text-teal-800 dark:hover:text-teal-200">&larr; Back to commission details</a>
 
-    <div class="mt-4 rounded-2xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-6 shadow-sm">
+    <div class="mt-4 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-6 shadow-sm">
         <div class="flex flex-col gap-3 border-b border-stone-200 dark:border-stone-700 pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">Property</p>
+                <p class="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">Property</p>
                 <h2 class="mt-1 text-xl font-semibold text-stone-800 dark:text-stone-100">{{ $agreement->property?->name ?? 'N/A' }}</h2>
                 <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">Agent: {{ $agreement->agent?->name ?? 'N/A' }}</p>
             </div>
             @if($currentPayment)
                 <div class="text-left sm:text-right">
-                    <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">This Month\'s Amount Due</p>
-                        <p class="text-xs font-semibold uppercase tracking-wide text-stone-400">Monthly Amount Due</p>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">This Month\'s Amount Due</p>
+                        <p class="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">Monthly Amount Due</p>
                     <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">Due {{ $currentPayment->due_date?->format('M d, Y') }}</p>
                 </div>
             @endif
@@ -62,7 +62,7 @@
                 </div>
 
                 <div>
-                    <label for="payment_message" class="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-200">Payment Note <span class="font-normal text-stone-400">(optional)</span></label>
+                    <label for="payment_message" class="mb-1 block text-sm font-medium text-stone-700 dark:text-stone-200">Payment Note <span class="font-normal text-stone-500 dark:text-stone-400">(optional)</span></label>
                     <textarea id="payment_message" name="payment_message" rows="3" class="w-full rounded-lg border border-stone-200 dark:border-stone-700 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" placeholder="Add a note about this payment...">{{ old('payment_message') }}</textarea>
                 </div>
 

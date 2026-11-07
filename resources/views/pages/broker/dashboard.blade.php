@@ -4,18 +4,15 @@
 @section('page-subtitle', 'Team-wide overview and Agent performance')
 
 @section('content')
-<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 mb-6">
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
     @foreach([
-        ['Total Agents', $stats['total_agents'], 'bg-blue-50 dark:bg-blue-950', 'text-blue-600 dark:text-blue-300'],
-        ['Active Agents', $stats['active_agents'], 'bg-green-50 dark:bg-green-950', 'text-green-600 dark:text-green-300'],
-        ['Pending Invites', $stats['pending_invites'], 'bg-teal-50 dark:bg-teal-950', 'text-teal-700 dark:text-teal-300'],
-        ['Sales This Month', $stats['sales_this_month'], 'bg-red-50 dark:bg-red-950', 'text-red-600 dark:text-red-300'],
-        ['Leads This Month', $stats['leads_this_month'], 'bg-indigo-50 dark:bg-indigo-950', 'text-indigo-600 dark:text-indigo-300'],
-    ] as $stat)
-    <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 p-4 text-center">
-        <p class="text-xl font-bold {{ $stat[3] }}">{{ $stat[1] }}</p>
-        <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">{{ $stat[0] }}</p>
-    </div>
+        ['Total Agents', $stats['total_agents'], 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
+        ['Active Agents', $stats['active_agents'], 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
+        ['Pending Invites', $stats['pending_invites'], 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
+        ['Sales This Month', $stats['sales_this_month'], 'M12 8c-2.21 0-4 1.12-4 2.5s1.79 2.5 4 2.5 4 1.12 4 2.5-1.79 2.5-4 2.5m0-10V5m0 13v1m8-7a8 8 0 11-16 0 8 8 0 0116 0z'],
+        ['Leads This Month', $stats['leads_this_month'], 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'],
+    ] as [$label, $value, $icon])
+        @include('layouts.partials.stat-tile', compact('label', 'value', 'icon'))
     @endforeach
 </div>
 
@@ -185,7 +182,7 @@ function showMonth(index) {
                         </td>
                     </tr>
                     @empty
-                    <tr><td colspan="5" class="px-5 py-8 text-center text-stone-400">No Agents assigned yet.</td></tr>
+                    <tr><td colspan="5" class="px-5 py-8 text-center text-stone-500 dark:text-stone-400">No Agents assigned yet.</td></tr>
                     @endforelse
                 </tbody>
             </table>

@@ -24,11 +24,11 @@
                 @endif
             </div>
             <h2 class="font-semibold text-stone-800 dark:text-stone-100">{{ auth()->user()->name }}</h2>
-            <p class="mt-1 text-sm text-stone-400">{{ auth()->user()->email }}</p>
+            <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">{{ auth()->user()->email }}</p>
             <span class="mt-3 rounded-full bg-teal-100 dark:bg-teal-900 px-3 py-1 text-xs font-medium text-teal-800 dark:text-teal-200">Broker</span>
         </div>
         <div class="mt-6 flex justify-between border-t border-stone-100 dark:border-stone-800 pt-4 text-sm">
-            <span class="text-stone-400">Member Since</span>
+            <span class="text-stone-500 dark:text-stone-400">Member Since</span>
             <span class="text-stone-600 dark:text-stone-300">{{ auth()->user()->created_at->format('M Y') }}</span>
         </div>
     </div>

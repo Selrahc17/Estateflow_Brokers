@@ -6,19 +6,19 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class BrokerPropertyTypeFieldsTest extends TestCase
+class PropertyTypeFieldsTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_house_and_lot_form_shows_relevant_fields(): void
     {
-        $broker = User::factory()->create([
-            'role' => 'broker',
+        $agent = User::factory()->create([
+            'role' => 'agent',
             'is_active' => true,
             'is_approved' => true,
         ]);
 
-        $response = $this->actingAs($broker)->get(route('broker.properties.create'));
+        $response = $this->actingAs($agent)->get(route('agent.properties.create'));
 
         $response->assertStatus(200);
         $response->assertSee('Bedrooms');
@@ -29,13 +29,13 @@ class BrokerPropertyTypeFieldsTest extends TestCase
 
     public function test_lot_only_form_shows_lot_specific_fields(): void
     {
-        $broker = User::factory()->create([
-            'role' => 'broker',
+        $agent = User::factory()->create([
+            'role' => 'agent',
             'is_active' => true,
             'is_approved' => true,
         ]);
 
-        $response = $this->actingAs($broker)->get(route('broker.properties.create'));
+        $response = $this->actingAs($agent)->get(route('agent.properties.create'));
 
         $response->assertStatus(200);
         $response->assertSee('Lot Area');

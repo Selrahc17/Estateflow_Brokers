@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BrokerController as AdminBrokerController;
 use App\Http\Controllers\Admin\ContactMessageController as AdminContactMessageController;
@@ -68,6 +69,11 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->middle
 
 Route::get('/invitations/{token}', [AgentInvitationController::class, 'show'])->name('auth.invitation.show');
 Route::post('/invitations/{token}', [AgentInvitationController::class, 'accept'])->middleware('throttle:register')->name('auth.invitation.accept');
+
+Route::middleware(['auth', 'audit'])->group(function () {
+    Route::get('/files/commission-proofs/{payment}', [PrivateFileController::class, 'commissionProof'])->name('files.commission-proof');
+    Route::get('/files/chat-photos/{message}', [PrivateFileController::class, 'chatPhoto'])->name('files.chat-photo');
+});
 
 // ===================== PUBLIC CLIENT ROUTES =====================
 Route::post('/api/chatbot', function (Request $request, AIService $ai) {

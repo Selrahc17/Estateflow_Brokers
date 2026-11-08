@@ -1,37 +1,61 @@
 {
-  "name": "EstateFlow Brokers",
-  "short_name": "EstateFlow",
-  "description": "EstateFlow real estate property portal",
-  "start_url": "/properties",
-  "scope": "/",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#f5f5f4",
-  "theme_color": "#1A6B79",
-  "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Browse Properties",
-      "url": "/properties",
-      "description": "View all available properties"
-    },
-    {
-      "name": "My Account",
-      "url": "/my",
-      "description": "Access your account"
-    }
-  ]
+    "id": "/",
+    "name": "EstateFlow",
+    "short_name": "EstateFlow",
+    "description": "Real estate brokerage management for brokers, agents, and buyers.",
+    "start_url": "/properties",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#f5f5f4",
+    "theme_color": "#1A6B79",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Browse Properties",
+            "url": "/properties",
+            "description": "View all available properties",
+            "icons": [
+                {
+                    "src": "/icons/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "My Account",
+            "url": "/my",
+            "description": "Open your account",
+            "icons": [
+                {
+                    "src": "/icons/icon-192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
 }

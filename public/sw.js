@@ -1,6 +1,7 @@
-const CACHE_NAME = 'estateflow-v4';
+const CACHE_NAME = 'estateflow-v5';
 const OFFLINE_URL = '/offline';
-const PRECACHE = ['/', '/manifest.json', '/favicon.ico', OFFLINE_URL];
+// '/' is left out on purpose: for a signed-in user it redirects to a private dashboard.
+const PRECACHE = [OFFLINE_URL, '/manifest.json', '/favicon.ico', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
     e.waitUntil(caches.open(CACHE_NAME).then((c) => c.addAll(PRECACHE)));
@@ -45,8 +46,6 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(
         fetch(e.request)
             .then((res) => res)
-            .catch(() =>
-                caches.match(e.request).then((cached) => cached || caches.match(OFFLINE_URL))
-            )
+            .catch(() => caches.match(OFFLINE_URL))
     );
 });

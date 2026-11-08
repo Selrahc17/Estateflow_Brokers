@@ -15,10 +15,10 @@ class ReservationController extends Controller
 {
     public function index(): View
     {
-        $client = auth()->user()->clientProfile;
-        $reservations = $client
-            ? Reservation::where('client_id', $client->id)->with('lot.property')->latest()->paginate(10)
-            : collect();
+        $reservations = Reservation::whereIn('client_id', auth()->user()->clientProfiles()->select('id'))
+            ->with('lot.property')
+            ->latest()
+            ->paginate(10);
 
         return view('pages.client.reservation.index', compact('reservations'));
     }
@@ -29,10 +29,11 @@ class ReservationController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        $client = auth()->user()->clientProfile;
+        // Each agent reviews the buyer separately, so only this listing's agent's approval counts.
+        $client = auth()->user()->clientProfiles()->where('broker_id', $lot->property?->broker_id)->first();
         if (!$client) {
             return back()->withErrors([
-                'reservation' => 'A client profile is required before requesting a reservation.',
+                'reservation' => 'Send an inquiry for this property first. Its agent needs to review your requirements before you can reserve.',
             ]);
         }
 

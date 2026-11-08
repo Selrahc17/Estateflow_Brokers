@@ -44,14 +44,15 @@ class ProfileController extends Controller
 
         $user->update($userData);
 
-        if ($client) {
+        // Keep every agent's copy of the buyer's contact details in step.
+        foreach ($user->clientProfiles as $client) {
             $client->update([
                 'first_name'    => $request->first_name,
                 'last_name'     => $request->last_name,
                 'email'         => $request->email,
                 'phone'         => $request->phone,
                 'date_of_birth' => $request->date_of_birth,
-                'civil_status'  => $request->civil_status,
+                'civil_status'  => $request->civil_status ?? $client->civil_status,
                 'address'       => $request->address,
             ]);
         }

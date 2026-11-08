@@ -128,39 +128,57 @@ class InquiryLeadTest extends TestCase
         $this->assertSame(1, Client::where('email', 'jane@example.com')->count());
     }
 
-    public function test_the_agent_can_claim_a_registered_buyer_with_no_agent(): void
+    public function test_the_agent_claims_the_sign_up_record_of_a_buyer_who_inquired_while_signed_in(): void
     {
-        $client = Client::create(['first_name' => 'New', 'last_name' => 'Member', 'email' => 'member@example.com', 'password' => 'secret', 'status' => 'active']);
-        $inquiry = $this->guestInquiry(['email' => 'member@example.com']);
+        $user = User::factory()->create(['role' => 'client', 'email' => 'member@example.com', 'is_active' => true, 'is_approved' => true]);
+        $client = Client::create(['user_id' => $user->id, 'first_name' => 'New', 'last_name' => 'Member', 'email' => 'member@example.com', 'password' => 'secret', 'status' => 'active']);
+        $this->actingAs($user)->post(route('client.property.inquire', $this->property), ['message' => 'Is this property still available?', 'phone' => '09171234567', 'email' => $user->email]);
+        $inquiry = Inquiry::latest('id')->first();
 
         $this->actingAs($this->agent)->post(route('agent.inquiries.client', $inquiry))->assertRedirect(route('agent.clients.show', $client));
 
         $this->assertSame($this->agent->id, $client->fresh()->broker_id);
+        $this->assertSame(1, Client::where('email', 'member@example.com')->count());
     }
 
-    public function test_a_client_of_another_team_is_refused_without_naming_the_team(): void
+    public function test_a_typed_email_never_attaches_a_record_to_someone_elses_account(): void
     {
-        $client = Client::create(['broker_id' => $this->otherAgent->id, 'first_name' => 'Ana', 'last_name' => 'Reyes', 'email' => 'ana@example.com', 'password' => 'secret', 'status' => 'active']);
-        $inquiry = $this->guestInquiry(['email' => 'ana@example.com']);
+        $user = User::factory()->create(['role' => 'client', 'email' => 'member@example.com', 'is_active' => true, 'is_approved' => true]);
+        $signUpRecord = Client::create(['user_id' => $user->id, 'first_name' => 'Real', 'last_name' => 'Member', 'email' => 'member@example.com', 'password' => 'secret', 'status' => 'active']);
+        $inquiry = $this->guestInquiry(['email' => 'member@example.com']);
 
-        $this->actingAs($this->agent)
-            ->from(route('agent.inquiries.show', $inquiry))
-            ->post(route('agent.inquiries.client', $inquiry))
-            ->assertRedirect(route('agent.inquiries.show', $inquiry))
-            ->assertSessionHas('error');
+        $this->actingAs($this->agent)->post(route('agent.inquiries.client', $inquiry))->assertRedirect();
 
-        $this->assertSame($this->otherAgent->id, $client->fresh()->broker_id);
+        $this->assertNull($signUpRecord->fresh()->broker_id);
+        $this->assertDatabaseHas('clients', ['email' => 'member@example.com', 'broker_id' => $this->agent->id, 'user_id' => null]);
     }
 
-    public function test_a_deleted_client_with_that_email_does_not_crash_the_action(): void
+    public function test_a_client_of_another_team_gets_a_separate_record_and_theirs_is_untouched(): void
     {
-        Client::create(['broker_id' => $this->agent->id, 'first_name' => 'Old', 'last_name' => 'Client', 'email' => 'jane@example.com', 'password' => 'secret', 'status' => 'active'])->delete();
+        $theirs = Client::create(['broker_id' => $this->otherAgent->id, 'first_name' => 'Ana', 'last_name' => 'Reyes', 'email' => 'ana@example.com', 'phone' => '09170000000', 'password' => 'secret', 'status' => 'active', 'qualification_status' => 'approved']);
+        $inquiry = $this->guestInquiry(['name' => 'Ana Reyes', 'email' => 'ana@example.com']);
+
+        $this->actingAs($this->agent)->post(route('agent.inquiries.client', $inquiry))->assertRedirect();
+
+        $mine = Client::where('email', 'ana@example.com')->where('broker_id', $this->agent->id)->firstOrFail();
+        $this->assertNotSame($theirs->id, $mine->id);
+        $this->assertSame('pending', $mine->fresh()->qualification_status);
+        $this->assertSame('approved', $theirs->fresh()->qualification_status);
+        $this->assertSame('09170000000', $theirs->fresh()->phone);
+    }
+
+    public function test_adding_a_buyer_the_agent_deleted_before_restores_their_record(): void
+    {
+        $old = Client::create(['broker_id' => $this->agent->id, 'first_name' => 'Old', 'last_name' => 'Client', 'email' => 'jane@example.com', 'password' => 'secret', 'status' => 'active']);
+        $old->delete();
         $inquiry = $this->guestInquiry();
 
         $this->actingAs($this->agent)
             ->post(route('agent.inquiries.client', $inquiry))
-            ->assertRedirect()
-            ->assertSessionHas('error');
+            ->assertRedirect(route('agent.clients.show', $old));
+
+        $this->assertFalse($old->fresh()->trashed());
+        $this->assertSame(1, Client::withTrashed()->where('email', 'jane@example.com')->count());
     }
 
     public function test_another_agent_cannot_turn_the_lead_into_a_client(): void

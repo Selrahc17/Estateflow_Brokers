@@ -14,20 +14,20 @@ class SiteVisitController extends Controller
 {
     public function index(): View
     {
-        $client = auth()->user()->clientProfile;
-        $siteVisits = $client
-            ? SiteVisit::where('client_id', $client->id)->with(['property', 'broker'])->latest()->paginate(10)
-            : collect();
+        $siteVisits = SiteVisit::whereIn('client_id', auth()->user()->clientProfiles()->select('id'))
+            ->with(['property', 'broker'])
+            ->latest()
+            ->paginate(10);
 
         return view('pages.client.site-visits.index', compact('siteVisits'));
     }
 
     public function store(Request $request, Property $property): RedirectResponse
     {
-        $client = auth()->user()->clientProfile;
+        $client = auth()->user()->clientProfiles()->where('broker_id', $property->broker_id)->first();
         if (!$client) {
             return back()->withErrors([
-                'site_visit' => 'A client profile is required before requesting an appointment.',
+                'site_visit' => 'Send an inquiry for this property first. Its agent needs to start reviewing your requirements.',
             ]);
         }
 
@@ -89,6 +89,6 @@ class SiteVisitController extends Controller
 
     private function ensureClientOwnership(SiteVisit $siteVisit): void
     {
-        abort_unless($siteVisit->client_id === auth()->user()->clientProfile?->id, 403);
+        abort_unless(auth()->user()->clientProfiles()->whereKey($siteVisit->client_id)->exists(), 403);
     }
 }

@@ -11,15 +11,16 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $client = auth()->user()->clientProfile;
+        $profiles = auth()->user()->clientProfiles()->with('broker:id,name')->get();
+        $profileIds = $profiles->pluck('id');
 
         $stats = [
-            'active_reservation' => $client ? Reservation::where('client_id', $client->id)->where('status', 'confirmed')->count() : 0,
+            'active_reservation' => Reservation::whereIn('client_id', $profileIds)->where('status', 'confirmed')->count(),
         ];
 
-        $recentReservations = $client ? Reservation::where('client_id', $client->id)->with('lot.property')->latest()->take(3)->get() : collect();
+        $recentReservations = Reservation::whereIn('client_id', $profileIds)->with('lot.property')->latest()->take(3)->get();
         $notifications = AppNotification::where('user_id', auth()->id())->latest()->take(5)->get();
 
-        return view('pages.client.dashboard.index', compact('client', 'stats', 'recentReservations', 'notifications'));
+        return view('pages.client.dashboard.index', compact('profiles', 'stats', 'recentReservations', 'notifications'));
     }
 }

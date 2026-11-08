@@ -72,10 +72,20 @@ class User extends Authenticatable
         return $this->hasMany(Client::class, 'broker_id');
     }
 
-    // A user can have one client profile
+    /**
+     * Every agent the buyer works with keeps a separate client record.
+     */
+    public function clientProfiles()
+    {
+        return $this->hasMany(Client::class, 'user_id');
+    }
+
+    /**
+     * The buyer's first record, created at sign-up. Documents still use it.
+     */
     public function clientProfile()
     {
-        return $this->hasOne(Client::class, 'user_id');
+        return $this->hasOne(Client::class, 'user_id')->oldestOfMany();
     }
 
     // A client can have many favorite properties

@@ -51,7 +51,7 @@ class DocumentController extends Controller
 
     public function download(Document $document)
     {
-        abort_unless($document->client_id === auth()->user()->clientProfile?->id, 403);
+        abort_unless($document->client_id && auth()->user()->clientProfiles()->whereKey($document->client_id)->exists(), 403);
 
         if (Storage::disk('local')->exists($document->file_path)) {
             return Storage::disk('local')->download($document->file_path, $document->name);

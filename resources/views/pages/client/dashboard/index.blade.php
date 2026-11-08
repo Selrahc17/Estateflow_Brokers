@@ -32,21 +32,24 @@
 </div>
 
 <div class="max-w-6xl mx-auto px-6 py-8">
-    @if($client)
-    <div class="bg-white rounded-2xl border border-stone-200 p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-            <p class="text-xs uppercase tracking-widest text-stone-400 font-semibold">Requirements Review</p>
-            <p class="text-lg font-semibold text-stone-800 mt-1">{{ ucfirst(str_replace('_', ' ', $client->qualification_status)) }}</p>
+    @php($reviewing = $profiles->whereNotNull('broker_id'))
+    @if($reviewing->isNotEmpty())
+    <h2 class="font-semibold text-stone-800 mb-4">Requirements Review</h2>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-8">
+        @foreach($reviewing as $profile)
+        <div class="bg-white rounded-2xl border border-stone-200 p-5">
+            <p class="text-xs uppercase tracking-widest text-stone-500 font-semibold">With {{ $profile->broker?->name ?? 'your agent' }}</p>
+            <p class="text-lg font-semibold text-stone-800 mt-1">{{ ucfirst(str_replace('_', ' ', $profile->qualification_status)) }}</p>
             <p class="text-sm text-stone-500 mt-1">
-                @switch($client->qualification_status)
-                    @case('pending') Submit your requirements for the agent to review. @break
+                @switch($profile->qualification_status)
+                    @case('pending') Submit your requirements for this agent to review. @break
                     @case('under_review') Your requirements are being reviewed. A site visit may be scheduled. @break
-                    @case('approved') You are approved to proceed with a reservation. @break
-                    @case('rejected') Please contact your agent for more information. @break
+                    @case('approved') You are approved to reserve this agent's listings. @break
+                    @case('rejected') Please contact this agent for more information. @break
                 @endswitch
             </p>
         </div>
-        <a href="{{ route('client.account.documents') }}" class="text-sm text-teal-700 hover:underline">View documents</a>
+        @endforeach
     </div>
     @endif
 

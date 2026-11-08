@@ -39,23 +39,28 @@ class InquiryController extends Controller
     {
         abort_if($inquiry->broker_id !== auth()->id(), 403);
 
-        // Client emails are unique across all Brokers, so soft-deleted rows count too.
-        $existing = Client::withTrashed()->where('email', $inquiry->email)->first();
+        // Each agent keeps their own record of a buyer, so only this agent's records matter here.
+        $mine = Client::withTrashed()->where('email', $inquiry->email)->where('broker_id', auth()->id())->first();
 
-        if ($existing) {
-            if ((int) $existing->broker_id === (int) auth()->id() && ! $existing->trashed()) {
-                return redirect()->route('agent.clients.show', $existing);
+        if ($mine?->trashed()) {
+            // The agent removed this buyer before; adding them again brings back their old record.
+            $mine->restore();
+
+            return redirect()->route('agent.clients.show', $mine)->with('success', 'Client restored.');
+        }
+
+        if ($mine) {
+            return redirect()->route('agent.clients.show', $mine);
+        }
+
+        // A buyer who was signed in may have a record from sign-up with no agent yet. Claim that one.
+        // A typed email alone never links a record to someone's account.
+        if ($inquiry->user_id) {
+            $unclaimed = Client::where('user_id', $inquiry->user_id)->whereNull('broker_id')->value('id');
+
+            if ($unclaimed && Client::whereKey($unclaimed)->whereNull('broker_id')->update(['broker_id' => auth()->id()])) {
+                return redirect()->route('agent.clients.show', $unclaimed)->with('success', 'Inquiry added to your clients.');
             }
-
-            // A registered buyer has no agent yet. The where clause keeps two agents from claiming them at once.
-            $claimed = ! $existing->trashed()
-                && Client::whereKey($existing->id)->whereNull('broker_id')->update(['broker_id' => auth()->id()]);
-
-            if (! $claimed) {
-                return back()->with('error', 'This buyer cannot be added because their email is already linked to another account.');
-            }
-
-            return redirect()->route('agent.clients.show', $existing)->with('success', 'Inquiry added to your clients.');
         }
 
         [$firstName, $lastName] = $this->nameParts($inquiry);

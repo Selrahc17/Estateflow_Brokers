@@ -31,6 +31,14 @@
     {{-- Content --}}
     <div class="p-4">
         <h3 class="font-semibold text-stone-800 dark:text-white text-sm mb-1 group-hover:text-teal-700 dark:group-hover:text-teal-400 transition">{{ $property->name }}</h3>
+        @if($property->developer)
+        <p class="mb-1 flex items-center gap-1.5 text-xs text-stone-500 dark:text-stone-400">
+            @if($property->developer_logo)
+            <img src="{{ $property->developer_logo }}" alt="" class="h-4 w-4 shrink-0 rounded-sm bg-white object-contain" loading="lazy">
+            @endif
+            <span class="truncate">by {{ $property->developer }}</span>
+        </p>
+        @endif
         <p class="text-xs text-stone-400 flex items-center gap-1 mb-3">
             <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             {{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? 'Location TBA') }}

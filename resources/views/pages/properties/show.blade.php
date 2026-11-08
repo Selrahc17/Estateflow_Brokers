@@ -34,6 +34,12 @@
                 </dd></div>
                 <div><dt class="text-stone-400">Price</dt><dd class="font-medium">₱{{ number_format($property->price, 2) }}</dd></div>
                 <div><dt class="text-stone-400">Location</dt><dd class="font-medium">{{ $property->city }}, {{ $property->province }}</dd></div>
+                <div><dt class="text-stone-400">Developer</dt><dd class="flex items-center gap-2 font-medium">
+                    @if($property->developer_logo)
+                    <img src="{{ $property->developer_logo }}" alt="" class="h-6 w-6 rounded bg-white object-contain">
+                    @endif
+                    {{ $property->developer ?: 'Individually owned' }}
+                </dd></div>
                 @if($property->type === 'Condominium')
                     <div><dt class="text-stone-400">Units</dt><dd class="font-medium">{{ $property->lots->count() }} total</dd></div>
                 @elseif($property->type !== 'House and Lot')

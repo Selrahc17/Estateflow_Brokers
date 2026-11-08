@@ -17,6 +17,8 @@
                        class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
             </div>
 
+            @include('pages.properties._developer-fields', ['property' => $property])
+
             <div>
                 <div class="flex items-center justify-between mb-1">
                     <label class="block text-sm font-medium text-stone-700">Description</label>

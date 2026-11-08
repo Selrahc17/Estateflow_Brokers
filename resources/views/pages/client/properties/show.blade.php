@@ -39,10 +39,12 @@
                      @touchstart.passive="touchStartX = $event.changedTouches[0].clientX"
                      @touchend.passive="swipe($event.changedTouches[0].clientX)">
                     @forelse($imgs as $i => $img)
-                    <img src="{{ $img }}" alt="{{ $property->name }} photo {{ $i + 1 }}"
-                         x-show="activeImg === {{ $i }}"
-                         @if($i > 0) style="display: none" @endif
-                         class="absolute inset-0 w-full h-full object-contain" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" decoding="async">
+                    <div x-show="activeImg === {{ $i }}" @if($i > 0) style="display: none" @endif class="absolute inset-0 overflow-hidden">
+                        {{-- Blurred copy fills the frame, so tall or narrow photos never leave empty bars. --}}
+                        <img src="{{ $img }}" alt="" aria-hidden="true" class="absolute inset-0 h-full w-full scale-110 object-cover blur-2xl brightness-90" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" decoding="async">
+                        <img src="{{ $img }}" alt="{{ $property->name }} photo {{ $i + 1 }}"
+                             class="relative h-full w-full object-contain drop-shadow-xl" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" decoding="async">
+                    </div>
                     @empty
                     <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 text-stone-400">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -62,7 +64,7 @@
                           x-text="(activeImg + 1) + ' / ' + total">1 / {{ count($imgs) }}</span>
                     @endif
                     {{-- Badges --}}
-                    <div class="absolute top-4 left-4 flex gap-2">
+                    <div class="absolute top-4 left-4 z-10 flex gap-2 drop-shadow">
                         <span class="{{ $property->status === 'sold' ? 'bg-red-500' : ($property->status === 'coming_soon' ? 'bg-blue-500' : 'bg-teal-600') }} text-white text-xs font-semibold px-3 py-1 rounded-full">
                             {{ ucfirst(str_replace('_', ' ', $property->status)) }}
                         </span>
@@ -88,6 +90,16 @@
                 <div class="flex items-start justify-between mb-4">
                     <div>
                         <h1 class="text-2xl font-bold text-stone-800">{{ $property->name }}</h1>
+                        @if($property->developer)
+                        <div class="mt-2 flex items-center gap-2">
+                            @if($property->developer_logo)
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-stone-200 bg-white">
+                                <img src="{{ $property->developer_logo }}" alt="{{ $property->developer }} logo" class="h-full w-full object-contain p-0.5">
+                            </span>
+                            @endif
+                            <p class="text-sm text-stone-600">by <span class="font-semibold text-stone-800">{{ $property->developer }}</span></p>
+                        </div>
+                        @endif
                         <p class="text-stone-400 text-sm flex items-center gap-1 mt-1">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                             {{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? 'Location TBA') }}
@@ -224,23 +236,6 @@
                 {{-- Leaflet Map --}}
                 @if($property->latitude && $property->longitude)
                 <div id="property-map" style="height: 380px; width: 100%;"></div>
-                @endif
-            </div>
-
-            <div class="bg-white rounded-2xl border border-stone-200 p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-semibold text-stone-800">More Properties</h3>
-                    <a href="{{ route('client.properties') }}" class="text-sm text-teal-700 hover:underline">Browse all</a>
-                </div>
-
-                @if($relatedProperties->isNotEmpty())
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    @foreach($relatedProperties as $relatedProperty)
-                        @include('pages.client.properties._card', ['property' => $relatedProperty])
-                    @endforeach
-                </div>
-                @else
-                <p class="text-sm text-stone-500">No other properties are available right now. Please check back soon.</p>
                 @endif
             </div>
 
@@ -453,6 +448,23 @@
 
         </div>
     </div>
+
+    <section class="mt-8 bg-white rounded-2xl border border-stone-200 p-6" aria-label="More properties">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-stone-800">More Properties</h3>
+            <a href="{{ route('client.properties') }}" class="text-sm text-teal-700 hover:underline">Browse all</a>
+        </div>
+
+        @if($relatedProperties->isNotEmpty())
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            @foreach($relatedProperties as $relatedProperty)
+                @include('pages.client.properties._card', ['property' => $relatedProperty])
+            @endforeach
+        </div>
+        @else
+        <p class="text-sm text-stone-500">No other properties are available right now. Please check back soon.</p>
+        @endif
+    </section>
 
 </div>
 

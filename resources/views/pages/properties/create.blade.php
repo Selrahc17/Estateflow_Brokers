@@ -54,6 +54,8 @@
                     @error('name')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
                 </div>
 
+                @include('pages.properties._developer-fields')
+
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                         <label for="type" class="{{ $label }}">Property Type <span class="text-red-600" aria-hidden="true">*</span></label>

@@ -52,6 +52,7 @@ class PropertyController extends Controller
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
             'type'        => ['required', Rule::in(Property::TYPES)],
+            'developer'   => 'nullable|string|max:255',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
@@ -100,6 +101,7 @@ class PropertyController extends Controller
         }
 
         $data['images'] = $this->storeGalleryImages($request);
+        $data['developer_logo'] = $this->storeDeveloperLogo($request);
 
         Property::create($data);
 
@@ -129,6 +131,7 @@ class PropertyController extends Controller
             'city'        => 'nullable|string|max:255',
             'province'    => 'nullable|string|max:255',
             'type'        => ['required', Rule::in(Property::TYPES)],
+            'developer'   => 'nullable|string|max:255',
             'latitude'    => 'nullable|numeric|between:-90,90',
             'longitude'   => 'nullable|numeric|between:-180,180',
             'price'       => 'nullable|numeric|min:0',
@@ -162,6 +165,12 @@ class PropertyController extends Controller
         $keptImages = array_values(array_diff($property->images ?? [], $removedImages));
         $data['images'] = [...$keptImages, ...$this->storeGalleryImages($request, count($keptImages))];
 
+        if ($newLogo = $this->storeDeveloperLogo($request)) {
+            $data['developer_logo'] = $newLogo;
+        } elseif ($request->boolean('remove_developer_logo')) {
+            $data['developer_logo'] = null;
+        }
+
         // Only an admin can release a listing they hid or flagged.
         if (in_array($property->status, ['hidden', 'flagged'], true)) {
             unset($data['status']);
@@ -189,6 +198,24 @@ class PropertyController extends Controller
      *
      * @return array<int, string>
      */
+    /**
+     * SVG is left out on purpose: it can carry scripts.
+     */
+    private function storeDeveloperLogo(Request $request): ?string
+    {
+        if (! $request->hasFile('developer_logo')) {
+            return null;
+        }
+
+        $request->validate(['developer_logo' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048']]);
+
+        $logo = $request->file('developer_logo');
+        $filename = 'developer-logos/' . uniqid() . '.' . $logo->extension();
+        \Storage::disk('supabase')->put($filename, file_get_contents($logo->getRealPath()), 'public');
+
+        return rtrim(str_replace('/storage/v1/s3', '', config('filesystems.disks.supabase.endpoint')), '/') . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
+    }
+
     private function storeGalleryImages(Request $request, int $existingCount = 0): array
     {
         if (! $request->hasFile('images')) {

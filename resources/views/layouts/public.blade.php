@@ -12,7 +12,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="EstateFlow">
     <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="icon" href="/favicon.ico" sizes="32x32 48x48">
+    <link rel="icon" href="/icons/icon-192.png" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
     <title>EstateFlow — @yield('title', 'Find Your Dream Property')</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -289,7 +291,7 @@
     </footer>
 
     {{-- Floating AI Chatbot Widget --}}
-    <div class="fixed bottom-6 right-6 z-50" x-data="{ chatOpen: false, message: '', messages: [{from:'ai',text:'Hi there! 👋 I\'m EstateFlow AI. Ask me anything about properties, reservations, or payments!'}] }">
+    <div class="fixed bottom-6 right-6 z-50" x-data="estateflowChatbot(@js(route('api.chatbot')), @js(csrf_token()))">
 
         {{-- Chat Window --}}
         <div x-show="chatOpen"
@@ -339,19 +341,23 @@
                         </template>
                         <div :class="msg.from === 'user' ? 'bg-teal-700 text-white rounded-2xl rounded-br-none' : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-200 rounded-2xl rounded-bl-none'"
                              class="px-3 py-2 max-w-xs shadow-sm">
-                            <p class="text-xs leading-relaxed" x-text="msg.text"></p>
+                            <p x-show="msg.from === 'user'" class="text-xs leading-relaxed whitespace-pre-wrap" x-text="msg.text"></p>
+                            <div x-show="msg.from === 'ai'" class="chat-md text-xs leading-relaxed" x-html="msg.html"></div>
                         </div>
                     </div>
                 </template>
+                <div x-show="busy" style="display: none" class="flex items-end gap-2" role="status" aria-label="EstateFlow AI is typing">
+                    <div class="rounded-2xl rounded-bl-none border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2 text-xs text-stone-500 dark:text-stone-400 shadow-sm">Typing…</div>
+                </div>
             </div>
 
             {{-- Quick Replies --}}
             <div class="px-4 py-2 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
                 <div class="flex gap-1.5 flex-wrap">
-                    <button @click="messages.push({from:'user',text:'Payment due?'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Payment due?</button>
-                    <button @click="messages.push({from:'user',text:'My documents'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">My documents</button>
-                    <button @click="messages.push({from:'user',text:'Lot details'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Lot details</button>
-                    <button @click="messages.push({from:'user',text:'Contact agent'});setTimeout(()=>{messages.push({from:'ai',text:'Let me help you with that! For detailed information, please visit the relevant section in your account.'})},800)" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Contact agent</button>
+                    <button type="button" @click="send('Payment due?')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Payment due?</button>
+                    <button type="button" @click="send('My documents')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">My documents</button>
+                    <button type="button" @click="send('Lot details')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Lot details</button>
+                    <button type="button" @click="send('Contact agent')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Contact agent</button>
                 </div>
             </div>
 
@@ -360,12 +366,12 @@
                 <div class="flex gap-2">
                     <input
                         x-model="message"
-                        @keydown.enter="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
+                        @keydown.enter="send(message)"
                         type="text"
-                        placeholder="Ask anything..."
+                        placeholder="Ask anything..." maxlength="1000" :readonly="busy"
                         class="flex-1 border border-stone-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 bg-stone-50 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200 dark:placeholder:text-stone-500">
                     <button
-                        @click="if(message.trim()){messages.push({from:'user',text:message});message='';setTimeout(()=>{messages.push({from:'ai',text:'Thanks for your message! For detailed assistance, our team will get back to you shortly. You can also visit the AI Assistant page for more help.'})},800)}"
+                        @click="send(message)" :disabled="busy" aria-label="Send"
                         class="w-8 h-8 bg-teal-700 hover:bg-teal-800 text-white rounded-xl flex items-center justify-center transition shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                     </button>
@@ -393,6 +399,45 @@
         </button>
 
     </div>
+
+    <script>
+        function estateflowChatbot(url, token) {
+            return {
+                chatOpen: false,
+                busy: false,
+                message: '',
+                messages: [{ from: 'ai', html: '<p>Hi there! 👋 I\'m EstateFlow AI. Ask me about available properties, prices, reservations, or site visits.</p>' }],
+                async send(text) {
+                    text = (text || '').trim();
+                    if (!text || this.busy) return;
+                    this.messages.push({ from: 'user', text });
+                    this.message = '';
+                    this.busy = true;
+                    this.scrollDown();
+                    try {
+                        const response = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': token },
+                            body: JSON.stringify({ message: text }),
+                        });
+                        const data = await response.json().catch(() => ({}));
+                        this.messages.push({ from: 'ai', html: response.ok && data.html ? data.html : '<p>Sorry, I could not answer just now. Please try again in a moment.</p>' });
+                    } catch (error) {
+                        this.messages.push({ from: 'ai', html: '<p>Sorry, I could not reach the assistant. Check your connection and try again.</p>' });
+                    } finally {
+                        this.busy = false;
+                        this.scrollDown();
+                    }
+                },
+                scrollDown() {
+                    this.$nextTick(() => {
+                        const list = document.getElementById('chatbot-messages');
+                        if (list) list.scrollTop = list.scrollHeight;
+                    });
+                },
+            };
+        }
+    </script>
 
     @stack('scripts')
     <script>

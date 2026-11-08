@@ -45,6 +45,34 @@ class ChatMessage extends Model
         return $this->belongsTo(User::class, 'receiver_id');
     }
 
+    /**
+     * Messages a user sent to the AI have no receiver; AI replies are addressed to the user.
+     * Person-to-person messages always have both people set, so they never show up here.
+     */
+    public function scopeAiConversationFor($query, int $userId)
+    {
+        return $query->where(fn ($conversation) => $conversation
+            ->where(fn ($mine) => $mine->where('sender_type', 'user')->where('sender_id', $userId)->whereNull('receiver_id'))
+            ->orWhere(fn ($replies) => $replies->where('sender_type', 'ai')->where('receiver_id', $userId)));
+    }
+
+    /**
+     * @return array<int, array{role: string, content: string}>
+     */
+    public static function aiHistoryFor(int $userId, int $limit = 10): array
+    {
+        return static::aiConversationFor($userId)->latest('id')->limit($limit)->get(['sender_type', 'message'])
+            ->reverse()
+            ->map(fn (self $message) => ['role' => $message->sender_type === 'ai' ? 'assistant' : 'user', 'content' => (string) $message->message])
+            ->values()
+            ->all();
+    }
+
+    public function getMessageHtmlAttribute(): string
+    {
+        return \App\Support\ChatFormatter::toHtml($this->message);
+    }
+
     public function scopeUnread($query)
     {
         return $query->where('is_read', false);

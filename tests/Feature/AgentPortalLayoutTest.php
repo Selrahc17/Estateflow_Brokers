@@ -100,7 +100,7 @@ class AgentPortalLayoutTest extends TestCase
 
     public function test_ai_description_returns_nothing_when_no_key_is_set(): void
     {
-        config(['services.openai.key' => null]);
+        config(['services.openai.key' => null, 'services.ai.key' => null]);
 
         $this->postJson(route('agent.ai.describe'), ['name' => 'Vista Homes'])
             ->assertOk()

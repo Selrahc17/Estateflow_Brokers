@@ -1,102 +1,83 @@
 @extends('layouts.app')
 @section('title', 'AI Assistant')
-@section('page-title', 'AI Chat Assistant')
-@section('page-subtitle', 'AI-powered inquiry assistant for clients and brokers')
+@section('page-title', 'AI Assistant')
+@section('page-subtitle', 'Ask about your listings, leads, and site visits')
 
 @section('content')
+<div class="mx-auto flex max-w-4xl flex-col rounded-xl border border-stone-200 bg-white" style="height: calc(100vh - 220px); min-height: 28rem;">
 
-<div class="grid grid-cols-1 xl:grid-cols-4 gap-5 h-[calc(100vh-200px)]">
+    <div class="flex items-center gap-3 border-b border-stone-100 px-5 py-4">
+        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-teal-700" aria-hidden="true">
+            <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <div>
+            <p class="text-sm font-semibold text-stone-800">EstateFlow AI</p>
+            <p class="text-xs text-stone-500">Knows your own listings, leads, and upcoming site visits. Double-check anything important.</p>
+        </div>
+    </div>
 
-    {{-- Chat History Sidebar --}}
-    <div class="bg-white rounded-xl border border-stone-200 p-4 flex flex-col">
-        <h2 class="font-semibold text-stone-800 mb-3 text-sm">Recent Conversations</h2>
-        <div class="space-y-2 flex-1 overflow-y-auto">
-            @foreach([
-                ['Juan dela Cruz','What is the price of Lot 12-B?','2 min ago',true],
-                ['Pedro Reyes','Can I change my lot preference?','Yesterday',false],
-                ['Anonymous','What properties are available?','Yesterday',false],
-                ['Ana Lim','How do I submit documents?','2 days ago',false],
-            ] as $c)
-            <div class="p-3 rounded-lg cursor-pointer {{ $c[3] ? 'bg-teal-50 border border-teal-200' : 'hover:bg-stone-50' }} transition">
-                <div class="flex items-center justify-between mb-1">
-                    <p class="text-sm font-medium text-stone-700">{{ $c[0] }}</p>
-                    <span class="text-xs text-stone-400">{{ $c[2] }}</span>
+    <div id="chat-messages" class="flex-1 space-y-4 overflow-y-auto p-5">
+        @forelse($messages as $msg)
+            @if($msg->sender_type === 'user')
+            <div class="flex flex-row-reverse items-start gap-3">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-100 text-sm font-bold text-teal-800">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                <div class="max-w-md">
+                    <div class="rounded-2xl rounded-tr-none bg-teal-700 px-4 py-3">
+                        <p class="whitespace-pre-wrap text-sm text-white">{{ $msg->message }}</p>
+                    </div>
+                    <p class="mt-1 text-right text-xs text-stone-500">{{ $msg->created_at->format('M j, g:i A') }}</p>
                 </div>
-                <p class="text-xs text-stone-400 truncate">{{ $c[1] }}</p>
             </div>
+            @else
+            <div class="flex items-start gap-3">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-teal-700" aria-hidden="true">
+                    <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </div>
+                <div class="max-w-md">
+                    <div class="chat-md rounded-2xl rounded-tl-none bg-stone-100 px-4 py-3 text-sm text-stone-700">{!! $msg->message_html !!}</div>
+                    <p class="mt-1 text-xs text-stone-500">{{ $msg->created_at->format('M j, g:i A') }}</p>
+                </div>
+            </div>
+            @endif
+        @empty
+            <div class="flex h-full flex-col items-center justify-center text-center">
+                <p class="text-sm font-medium text-stone-700">Hi {{ auth()->user()->name }}! Ask me anything.</p>
+                <p class="mt-1 max-w-sm text-sm text-stone-500">For example, how many new leads you have, which listings still have open lots, or tips for a client follow-up.</p>
+            </div>
+        @endforelse
+    </div>
+
+    <div class="border-t border-stone-100 px-5 py-3">
+        <p class="mb-2 text-xs text-stone-500">Suggested questions:</p>
+        <div class="flex flex-wrap gap-2">
+            @foreach(['How many new leads do I have?', 'Which of my listings still have available lots?', 'Write a friendly follow-up message for a new lead.'] as $question)
+            <form method="POST" action="{{ route('agent.chat.store') }}">
+                @csrf
+                <input type="hidden" name="message" value="{{ $question }}">
+                <button type="submit" class="rounded-full bg-stone-100 px-3 py-1.5 text-xs text-stone-600 transition hover:bg-teal-50 hover:text-teal-800">{{ $question }}</button>
+            </form>
             @endforeach
         </div>
     </div>
 
-    {{-- Chat Window --}}
-    <div class="xl:col-span-3 bg-white rounded-xl border border-stone-200 flex flex-col" x-data="{ message: '' }">
-
-        {{-- Chat Header --}}
-        <div class="flex items-center gap-3 px-5 py-4 border-b border-stone-100">
-            <div class="w-9 h-9 bg-teal-100 rounded-full flex items-center justify-center text-teal-800 font-bold">J</div>
-            <div>
-                <p class="font-semibold text-stone-800 text-sm">Juan dela Cruz</p>
-                <p class="text-xs text-green-500 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-green-500 rounded-full inline-block"></span> Active now</p>
-            </div>
-        </div>
-
-        {{-- Messages --}}
-        <div class="flex-1 overflow-y-auto p-5 space-y-4">
-
-            {{-- AI Message --}}
-            <div class="flex items-start gap-3">
-                <div class="w-8 h-8 bg-teal-700 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
-                </div>
-                <div class="bg-stone-100 rounded-2xl rounded-tl-none px-4 py-3 max-w-md">
-                    <p class="text-sm text-stone-700">Hello! I'm EstateFlow AI. How can I help you today? You can ask me about property listings, lot availability, or document requirements.</p>
-                    <p class="text-xs text-stone-400 mt-1">9:00 AM</p>
-                </div>
-            </div>
-
-            {{-- Client Message --}}
-            <div class="flex items-start gap-3 flex-row-reverse">
-                <div class="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center shrink-0 text-teal-800 font-bold text-sm">J</div>
-                <div class="bg-teal-700 rounded-2xl rounded-tr-none px-4 py-3 max-w-md">
-                    <p class="text-sm text-white">What is the price of Lot 12-B in Palm Residences?</p>
-                    <p class="text-xs text-teal-300 mt-1">9:01 AM</p>
-                </div>
-            </div>
-
-            {{-- AI Response --}}
-            <div class="flex items-start gap-3">
-                <div class="w-8 h-8 bg-teal-700 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
-                </div>
-                <div class="bg-stone-100 rounded-2xl rounded-tl-none px-4 py-3 max-w-md">
-                    <p class="text-sm text-stone-700">Lot 12-B in Palm Residences is priced at <strong>₱1,200,000</strong>. It has an area of <strong>120 sqm</strong> and is currently <strong>reserved</strong>. Would you like to know about other available lots?</p>
-                    <p class="text-xs text-stone-400 mt-1">9:01 AM</p>
-                </div>
-            </div>
-
-        </div>
-
-        {{-- Suggested Questions --}}
-        <div class="px-5 py-2 border-t border-stone-100">
-            <p class="text-xs text-stone-400 mb-2">Suggested questions:</p>
-            <div class="flex flex-wrap gap-2">
-                @foreach(['What lots are available?','How to submit documents?','What are the requirements?'] as $q)
-                <button class="text-xs bg-stone-100 hover:bg-teal-50 hover:text-teal-800 text-stone-600 px-3 py-1.5 rounded-full transition">{{ $q }}</button>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Input --}}
-        <div class="p-4 border-t border-stone-100">
-            <div class="flex gap-3">
-                <input x-model="message" type="text" placeholder="Type your message..." class="flex-1 border border-stone-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                <button class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-2.5 rounded-xl transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                </button>
-            </div>
-        </div>
-
-    </div>
+    <form method="POST" action="{{ route('agent.chat.store') }}" class="flex gap-3 border-t border-stone-100 p-4" x-data="{ busy: false }" @submit="busy = true">
+        @csrf
+        <label for="ai-message" class="sr-only">Message</label>
+        <input id="ai-message" name="message" type="text" required maxlength="1000" autocomplete="off" :readonly="busy" placeholder="Type your question..."
+            class="flex-1 rounded-xl border border-stone-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
+        <button type="submit" :disabled="busy" class="rounded-xl bg-teal-700 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-teal-800 disabled:cursor-wait disabled:opacity-60">
+            <span x-show="!busy">Send</span>
+            <span x-show="busy" style="display: none">Thinking…</span>
+        </button>
+    </form>
 </div>
 
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const list = document.getElementById('chat-messages');
+        if (list) list.scrollTop = list.scrollHeight;
+    });
+</script>
+@endpush
 @endsection

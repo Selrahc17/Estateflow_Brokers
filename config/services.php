@@ -18,6 +18,16 @@ return [
         'key' => env('OPENAI_API_KEY'),
     ],
 
+    /*
+    | Any provider with an OpenAI-style chat API works here, such as OpenAI or Groq.
+    | Without AI_API_KEY, the OpenAI key is used, so older setups keep working.
+    */
+    'ai' => [
+        'key' => env('AI_API_KEY') ?: env('OPENAI_API_KEY'),
+        'base_url' => env('AI_BASE_URL', 'https://api.openai.com/v1'),
+        'model' => env('AI_MODEL', 'gpt-4o-mini'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

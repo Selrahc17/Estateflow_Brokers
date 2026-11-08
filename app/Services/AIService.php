@@ -3,50 +3,67 @@
 namespace App\Services;
 
 use App\Models\Property;
-use App\Models\Reservation;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AIService
 {
+    public const HISTORY_LIMIT = 10;
+
     private string $apiKey;
-    private string $model = 'gpt-3.5-turbo';
+    private string $model;
+
+    private string $endpoint;
 
     public function __construct()
     {
-        $this->apiKey = config('services.openai.key') ?? '';
+        $this->apiKey = (string) config('services.ai.key');
+        $this->model = (string) config('services.ai.model');
+        $this->endpoint = rtrim((string) config('services.ai.base_url'), '/') . '/chat/completions';
     }
 
-    public function chat(string $userMessage, int $userId, string $role = 'client'): string
+    /**
+     * @param  array<int, array{role: string, content: string}>  $history  Earlier turns, oldest first.
+     */
+    public function chat(string $userMessage, int $userId, string $role = 'client', array $history = []): string
     {
         if (empty($this->apiKey)) {
             return $this->fallbackResponse($userMessage);
         }
 
-        $systemPrompt = $this->buildSystemPrompt($userId, $role);
-
         try {
+            $user = $userId ? User::find($userId) : null;
+            $messages = [['role' => 'system', 'content' => app(AIContext::class)->build($user, $role, $userMessage)]];
+
+            foreach (array_slice($history, -self::HISTORY_LIMIT) as $turn) {
+                if (in_array($turn['role'] ?? null, ['user', 'assistant'], true) && filled($turn['content'] ?? null)) {
+                    $messages[] = ['role' => $turn['role'], 'content' => mb_substr((string) $turn['content'], 0, 2000)];
+                }
+            }
+            $messages[] = ['role' => 'user', 'content' => $userMessage];
+
             $response = Http::withToken($this->apiKey)
-                ->timeout(15)
-                ->post('https://api.openai.com/v1/chat/completions', [
+                ->timeout(30)
+                ->post($this->endpoint, [
                     'model'       => $this->model,
-                    'max_tokens'  => 400,
-                    'temperature' => 0.7,
-                    'messages'    => [
-                        ['role' => 'system', 'content' => $systemPrompt],
-                        ['role' => 'user',   'content' => $userMessage],
-                    ],
+                    // Reasoning models spend part of this budget thinking before they answer.
+                    'max_tokens'  => 1200,
+                    'temperature' => 0.3,
+                    'messages'    => $messages,
                 ]);
 
             if ($response->successful()) {
-                return $response->json('choices.0.message.content') ?? $this->fallbackResponse($userMessage);
+                $reply = trim((string) $response->json('choices.0.message.content'));
+
+                return $reply !== '' ? $reply : $this->fallbackResponse($userMessage);
             }
 
-            Log::warning('OpenAI API error', ['status' => $response->status(), 'body' => $response->body()]);
+            Log::warning('AI provider error', ['status' => $response->status(), 'body' => mb_substr($response->body(), 0, 500)]);
             return $this->fallbackResponse($userMessage);
         } catch (\Throwable $e) {
-            Log::error('OpenAI request failed', ['error' => $e->getMessage()]);
+            Log::error('AI provider request failed', ['error' => $e->getMessage()]);
             return $this->fallbackResponse($userMessage);
         }
     }
@@ -62,7 +79,7 @@ class AIService
         try {
             $response = Http::withToken($this->apiKey)
                 ->timeout(15)
-                ->post('https://api.openai.com/v1/chat/completions', [
+                ->post($this->endpoint, [
                     'model'      => $this->model,
                     'max_tokens' => 250,
                     'messages'   => [
@@ -124,7 +141,7 @@ class AIService
 
                 $response = Http::withToken($this->apiKey)
                     ->timeout(15)
-                    ->post('https://api.openai.com/v1/chat/completions', [
+                    ->post($this->endpoint, [
                         'model' => $this->model,
                         'temperature' => 0,
                         'messages' => [
@@ -154,30 +171,6 @@ class AIService
             if (!empty($preferences['bedrooms']) && $property->bedrooms >= $preferences['bedrooms']) $score += 10;
             return $score;
         })->values();
-    }
-
-    private function buildSystemPrompt(int $userId, string $role): string
-    {
-        $context = "You are EstateFlow AI, a helpful real estate assistant for a Philippine property portal. ";
-        $context .= "Be concise, friendly, and professional. Answer in 1-3 sentences unless more detail is needed. ";
-        $context .= "You help with property inquiries, reservation details, site visits, and document requirements. ";
-        $context .= "If asked something outside real estate, politely redirect to relevant topics.";
-
-        if ($role === 'client') {
-            $reservation = Reservation::whereHas('client', fn($q) => $q->where('user_id', $userId))
-                ->with('lot.property')
-                ->latest()
-                ->first();
-
-            if ($reservation) {
-                $context .= " The client has a reservation: {$reservation->reservation_code}, ";
-                $context .= "status: {$reservation->status}, ";
-                $context .= "property: " . ($reservation->lot?->property?->name ?? 'N/A') . ", ";
-                $context .= "lot: " . ($reservation->lot?->lot_number ?? 'N/A') . ".";
-            }
-        }
-
-        return $context;
     }
 
     private function fallbackResponse(string $message): string

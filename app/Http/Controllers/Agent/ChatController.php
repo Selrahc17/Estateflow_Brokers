@@ -15,14 +15,7 @@ class ChatController extends Controller
 
     public function index(): View
     {
-        $messages = ChatMessage::where(function ($q) {
-                $q->where('sender_id', auth()->id())
-                  ->orWhere('receiver_id', auth()->id());
-            })
-            ->whereIn('sender_type', ['user', 'ai'])
-            ->with('sender')
-            ->oldest()
-            ->get();
+        $messages = ChatMessage::aiConversationFor(auth()->id())->oldest('id')->get();
 
         return view('pages.chat.index', compact('messages'));
     }
@@ -31,13 +24,16 @@ class ChatController extends Controller
     {
         $data = $request->validate(['message' => 'required|string|max:1000']);
 
+        // Earlier turns, read before this message is saved.
+        $history = ChatMessage::aiHistoryFor(auth()->id());
+
         ChatMessage::create([
             'sender_id'   => auth()->id(),
             'message'     => $data['message'],
             'sender_type' => 'user',
         ]);
 
-        $aiReply = $this->ai->chat($data['message'], auth()->id(), 'agent');
+        $aiReply = $this->ai->chat($data['message'], auth()->id(), 'agent', $history);
 
         ChatMessage::create([
             'sender_id'   => null,

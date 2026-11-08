@@ -87,7 +87,7 @@
                     </div>
                     <div class="max-w-sm">
                         <div class="bg-teal-700 rounded-2xl rounded-tr-none px-4 py-3">
-                            <p class="text-sm text-white">{{ $msg->message }}</p>
+                            <p class="whitespace-pre-wrap text-sm text-white">{{ $msg->message }}</p>
                         </div>
                         <p class="text-xs text-stone-400 mt-1 text-right">{{ $msg->created_at->format('g:i A') }}</p>
                     </div>
@@ -99,7 +99,7 @@
                     </div>
                     <div class="max-w-sm">
                         <div class="bg-white border border-stone-200 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
-                            <p class="text-sm text-stone-700">{{ $msg->message }}</p>
+                            <div class="chat-md text-sm text-stone-700">{!! $msg->message_html !!}</div>
                         </div>
                         <p class="text-xs text-stone-400 mt-1">{{ $msg->created_at->format('g:i A') }}</p>
                     </div>
@@ -112,14 +112,14 @@
 
             {{-- Input --}}
             <div class="p-4 border-t border-stone-100 bg-white">
-                <form method="POST" action="{{ route('client.account.chat.store') }}" class="flex gap-3 items-end">
+                <form method="POST" action="{{ route('client.account.chat.store') }}" class="flex gap-3 items-end" x-data="{ busy: false }" @submit="busy = true">
                     @csrf
                     <div class="flex-1 border border-stone-200 rounded-2xl px-4 py-3 focus-within:ring-2 focus-within:ring-amber-400 transition bg-stone-50">
                         <input name="message" type="text" placeholder="Ask me anything about your reservation or property..."
                             class="w-full bg-transparent text-sm outline-none text-stone-700 placeholder:text-stone-400"
-                            autocomplete="off" required>
+                            autocomplete="off" maxlength="1000" required :readonly="busy">
                     </div>
-                    <button type="submit" class="w-11 h-11 bg-teal-700 hover:bg-teal-800 text-white rounded-2xl flex items-center justify-center transition shrink-0 shadow-sm">
+                    <button type="submit" :disabled="busy" :aria-label="busy ? 'Waiting for the reply' : 'Send'" aria-label="Send" class="w-11 h-11 bg-teal-700 hover:bg-teal-800 text-white rounded-2xl flex items-center justify-center transition shrink-0 shadow-sm disabled:cursor-wait disabled:opacity-60">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                     </button>
                 </form>
@@ -137,4 +137,12 @@
 </script>
 @endpush
 
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const list = document.getElementById('chat-messages');
+        if (list) list.scrollTop = list.scrollHeight;
+    });
+</script>
+@endpush
 @endsection

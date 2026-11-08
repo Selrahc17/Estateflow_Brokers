@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\PrivateFileController;
 use App\Http\Controllers\Admin\BackupController as AdminBackupController;
 use App\Http\Controllers\Admin\BrokerController as AdminBrokerController;
@@ -77,13 +78,7 @@ Route::middleware(['auth', 'audit'])->group(function () {
 });
 
 // ===================== PUBLIC CLIENT ROUTES =====================
-Route::post('/api/chatbot', function (Request $request, AIService $ai) {
-    $data = $request->validate(['message' => 'required|string|max:1000']);
-
-    return response()->json([
-        'message' => $ai->chat($data['message'], 0, 'guest'),
-    ]);
-})->middleware('throttle:30,1')->name('api.chatbot');
+Route::post('/api/chatbot', ChatbotController::class)->middleware('throttle:30,1')->name('api.chatbot');
 
 Route::middleware('role.redirect')->group(function () {
 Route::get('/', [ClientPropertyController::class, 'index'])->name('home');

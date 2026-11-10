@@ -12,6 +12,11 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
+
     protected $fillable = [
         'name', 'email', 'password', 'role', 'broker_id', 'is_active', 'is_approved', 'phone', 'avatar', 'license_number',
         'prc_id_expires_at', 'dhsud_registration_number', 'dhsud_registration_expires_at', 'tin', 'privacy_consented_at',

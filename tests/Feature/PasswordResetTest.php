@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Notifications\ResetPasswordNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
@@ -32,7 +32,7 @@ class PasswordResetTest extends TestCase
             ->assertRedirect(route('auth.forgot'))
             ->assertSessionHas('success');
 
-        Notification::assertSentTo($user, ResetPassword::class);
+        Notification::assertSentTo($user, ResetPasswordNotification::class);
     }
 
     public function test_unknown_email_gets_the_same_reply_as_a_registered_one(): void
@@ -49,7 +49,7 @@ class PasswordResetTest extends TestCase
                 ->assertSessionHasNoErrors();
         }
 
-        Notification::assertSentTimes(ResetPassword::class, 1);
+        Notification::assertSentTimes(ResetPasswordNotification::class, 1);
     }
 
     public function test_repeat_request_for_a_registered_email_reads_the_same(): void

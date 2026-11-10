@@ -24,7 +24,9 @@ class AgentInvitation extends Notification
     {
         return (new MailMessage)
             ->subject('You have been invited to join EstateFlow')
-            ->line("{$this->brokerName} has invited you to join their team as an agent.")
+            ->greeting('Hi there!')
+            ->line("{$this->brokerName} has invited you to join their team as an agent on EstateFlow.")
+            ->line('Click the button below to set up your account.')
             ->action('Accept Invitation', $this->url)
             ->line('This link expires on '.$this->expiresAt->format('M j, Y').'.');
     }

@@ -5,14 +5,14 @@
 
 @section('content')
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-    <form method="GET" class="flex gap-2">
-        <select name="property_id" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
+    <form method="GET" class="flex min-w-0 flex-col gap-2 sm:flex-row">
+        <select name="property_id" class="w-full min-w-0 sm:w-auto sm:max-w-xs border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
             <option value="">All Properties</option>
             @foreach($properties as $p)
                 <option value="{{ $p->id }}" {{ request('property_id') == $p->id ? 'selected' : '' }}>{{ $p->name }}</option>
             @endforeach
         </select>
-        <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
+        <select name="status" class="w-full min-w-0 sm:w-auto border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
             <option value="">All Status</option>
             <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
             <option value="reserved" {{ request('status') == 'reserved' ? 'selected' : '' }}>Reserved</option>

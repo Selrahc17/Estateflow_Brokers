@@ -5,14 +5,14 @@
 
 <div class="bg-gradient-to-r from-[#112E3B] to-[#1A6B79] text-white">
     <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div class="flex items-center gap-5">
+        <div class="flex min-w-0 items-center gap-5">
             <div class="w-16 h-16 bg-teal-600 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shrink-0">
                 {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
             </div>
-            <div>
+            <div class="min-w-0">
                 <p class="text-teal-500 text-xs uppercase tracking-widest font-semibold mb-1">Welcome back</p>
-                <h1 class="text-2xl font-bold">{{ auth()->user()->name }}</h1>
-                <p class="text-stone-300 text-sm mt-0.5">{{ auth()->user()->email }} · Client since {{ auth()->user()->created_at->format('F Y') }}</p>
+                <h1 class="break-words text-2xl font-bold">{{ auth()->user()->name }}</h1>
+                <p class="break-all text-stone-300 text-sm mt-0.5">{{ auth()->user()->email }} · Client since {{ auth()->user()->created_at->format('F Y') }}</p>
             </div>
         </div>
         <a href="{{ route('client.account.profile') }}" class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition">

@@ -193,9 +193,9 @@
                         <p class="text-xs font-medium text-stone-500 mb-2">Manual Coordinates <span class="text-stone-400 font-normal">(or paste from Google Maps)</span></p>
                         <div class="flex gap-2 items-center">
                             <input type="number" step="any" x-model="manualLat" placeholder="Latitude"
-                                   class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
+                                   class="min-w-0 flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
                             <input type="number" step="any" x-model="manualLng" placeholder="Longitude"
-                                   class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
+                                   class="min-w-0 flex-1 border border-stone-200 rounded-lg px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400 font-mono">
                             <button type="button" @click="applyManualCoords"
                                     class="bg-stone-700 hover:bg-stone-800 text-white px-3 py-2 rounded-lg text-xs font-medium transition whitespace-nowrap">
                                 Go

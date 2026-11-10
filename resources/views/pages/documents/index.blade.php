@@ -10,6 +10,7 @@
 @endif
 
 <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
+    <div class="overflow-x-auto">
     <table class="w-full text-sm">
         <thead class="bg-stone-50 border-b border-stone-200">
             <tr class="text-left text-stone-500">
@@ -79,6 +80,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
     <div class="px-5 py-4 border-t border-stone-100">{{ $documents->withQueryString()->links() }}</div>
 </div>
 

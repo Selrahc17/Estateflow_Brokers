@@ -1,23 +1,25 @@
 @extends('layouts.app')
 @section('title', 'Inquiry Details')
+@section('page-title', 'Inquiry Details')
+@section('page-subtitle', 'Review the lead and update its status')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+<div class="max-w-4xl mx-auto">
     {{-- Header --}}
-    <div class="flex items-center justify-between mb-8">
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
             <a href="{{ route('agent.inquiries.index') }}" class="text-teal-700 hover:text-teal-800 text-sm font-medium mb-2 inline-flex items-center gap-1">
                 ← Back to Inquiries
             </a>
-            <h1 class="text-3xl font-bold text-stone-800">Inquiry from {{ $inquiry->contact_label }}</h1>
+            <h1 class="break-words text-2xl font-bold text-stone-800 sm:text-3xl">Inquiry from {{ $inquiry->contact_label }}</h1>
         </div>
         <div>
-            <form action="{{ route('agent.inquiries.status', $inquiry->id) }}" method="POST" class="inline">
+            <form action="{{ route('agent.inquiries.status', $inquiry->id) }}" method="POST" class="block">
                 @csrf
                 @method('PATCH')
                 <div class="flex gap-2">
                     <select name="status" onchange="this.form.submit()" 
-                            class="px-3 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-400 font-medium">
+                            class="w-full sm:w-auto px-3 py-2 rounded-lg border border-stone-200 focus:outline-none focus:ring-2 focus:ring-teal-400 font-medium">
                         @php
                             $statuses = ['new' => 'New', 'contacted' => 'Contacted', 'site_visit_scheduled' => 'Site Visit Scheduled', 'negotiating' => 'Negotiating', 'closed' => 'Closed', 'lost' => 'Lost'];
                         @endphp
@@ -43,16 +45,16 @@
                         <p class="text-xs text-stone-400 font-semibold uppercase">Full Name</p>
                         <p class="text-lg font-semibold text-stone-800 mt-1">{{ $inquiry->contact_label }}</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="min-w-0">
                             <p class="text-xs text-stone-400 font-semibold uppercase">Email</p>
-                            <a href="mailto:{{ $inquiry->email }}" class="text-teal-700 hover:text-teal-800 font-medium mt-1">
+                            <a href="mailto:{{ $inquiry->email }}" class="mt-1 block break-all font-medium text-teal-700 hover:text-teal-800">
                                 {{ $inquiry->email }}
                             </a>
                         </div>
                         <div>
                             <p class="text-xs text-stone-400 font-semibold uppercase">Phone</p>
-                            <a href="tel:{{ $inquiry->phone }}" class="text-teal-700 hover:text-teal-800 font-medium mt-1">
+                            <a href="tel:{{ $inquiry->phone }}" class="mt-1 block font-medium text-teal-700 hover:text-teal-800">
                                 {{ $inquiry->phone }}
                             </a>
                         </div>

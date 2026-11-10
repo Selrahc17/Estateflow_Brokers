@@ -28,8 +28,8 @@
 </div>
 
 <div class="flex flex-col sm:flex-row gap-3 justify-between mb-5">
-    <form method="GET" class="flex gap-2">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search client or lot..." class="border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 w-56">
+    <form method="GET" class="flex flex-wrap gap-2">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search client or lot..." class="min-w-0 flex-1 sm:flex-none border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 w-56">
         <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
             <option value="">All Status</option>
             @foreach(['pending','confirmed','cancelled','completed'] as $s)
@@ -44,6 +44,7 @@
 </div>
 
 <div class="bg-white rounded-xl border border-stone-200 overflow-hidden">
+    <div class="overflow-x-auto">
     <table class="w-full text-sm">
         <thead class="bg-stone-50 border-b border-stone-200">
             <tr class="text-left text-stone-500">
@@ -82,6 +83,7 @@
             @endforelse
         </tbody>
     </table>
+    </div>
     <div class="px-5 py-4 border-t border-stone-100">{{ $reservations->withQueryString()->links() }}</div>
 </div>
 

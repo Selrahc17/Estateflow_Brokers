@@ -12,7 +12,7 @@
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                 </div>
                 <p class="font-bold text-base mb-1">EstateFlow AI</p>
-                <p class="text-stone-300 text-xs leading-relaxed">Your 24/7 assistant for property inquiries, site visits, and document guidance.</p>
+                <p class="text-stone-300 text-xs leading-relaxed">Your 24/7 assistant for property inquiries, site visits, and payment terms.</p>
                 <div class="flex items-center gap-2 mt-3">
                     <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                     <span class="text-xs text-green-400 font-medium">Online now</span>
@@ -22,7 +22,7 @@
                 <p class="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-3">Quick Topics</p>
                 <div class="space-y-1.5">
                     @foreach([
-                        'What documents do I need?',
+                        'How much is the reservation fee?',
                         'Tell me about my reservation',
                         'What properties are available?',
                         'How do I contact my broker?',
@@ -74,7 +74,7 @@
                         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-2"/></svg>
                     </div>
                     <div class="bg-white border border-stone-200 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-sm">
-                        <p class="text-sm text-stone-700">Hi {{ auth()->user()->name }}! 👋 I'm your EstateFlow AI Assistant. Ask me anything about your reservation, site visits, documents, or available properties.</p>
+                        <p class="text-sm text-stone-700">Hi {{ auth()->user()->name }}! 👋 I'm your EstateFlow AI Assistant. Ask me anything about your reservation, site visits, payment terms, or available properties.</p>
                         <p class="text-xs text-stone-400 mt-1">Just now</p>
                     </div>
                 </div>

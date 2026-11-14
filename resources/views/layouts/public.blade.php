@@ -139,10 +139,6 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     My Reservation
                                 </a>
-                                <a href="{{ route('client.account.documents') }}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-600 hover:bg-[var(--color-accent)] hover:text-[var(--color-primary)] dark:hover:text-teal-400 transition {{ request()->routeIs('client.account.documents') ? 'bg-[var(--color-accent)] text-[var(--color-primary)]' : '' }}">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    My Documents
-                                </a>
                                 @php
                                     $unreadCount = \App\Models\AppNotification::where('user_id', auth()->id())->where('is_read', false)->count();
                                 @endphp
@@ -210,7 +206,6 @@
                 @if(auth()->check() && auth()->user()->role === 'client')
                 <p class="text-xs text-stone-400 uppercase tracking-widest font-semibold px-1 pb-2">My Account</p>
                 <a href="{{ route('client.account.reservation') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Reservation</a>
-                <a href="{{ route('client.account.documents') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Documents</a>
                 <a href="{{ route('client.account.notifications') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">Notifications</a>
                 <a href="{{ route('client.account.feedback') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">Feedback & Ratings</a>
                 <a href="{{ route('client.account.profile') }}" class="block text-sm text-stone-600 dark:text-stone-300 hover:text-teal-600 py-2 px-1">My Profile</a>
@@ -355,7 +350,7 @@
             <div class="px-4 py-2 border-t border-stone-100 dark:border-stone-800 bg-white dark:bg-stone-900">
                 <div class="flex gap-1.5 flex-wrap">
                     <button type="button" @click="send('Payment due?')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Payment due?</button>
-                    <button type="button" @click="send('My documents')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">My documents</button>
+                    <button type="button" @click="send('How much is the reservation fee?')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Reservation fee?</button>
                     <button type="button" @click="send('Lot details')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Lot details</button>
                     <button type="button" @click="send('Contact agent')" :disabled="busy" class="text-xs bg-stone-100 dark:bg-stone-800 hover:bg-teal-50 dark:hover:bg-stone-700 hover:text-teal-700 dark:hover:text-teal-400 text-stone-500 dark:text-stone-400 px-2.5 py-1 rounded-full transition border border-transparent hover:border-teal-200 dark:hover:border-stone-600">Contact agent</button>
                 </div>

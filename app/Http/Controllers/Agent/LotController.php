@@ -82,6 +82,16 @@ class LotController extends Controller
         return redirect()->route('agent.lots.index')->with('success', 'Lot deleted successfully.');
     }
 
+    /** Marks one lot as sold, which adds it to the broker's commission table. */
+    public function markSold(Lot $lot): RedirectResponse
+    {
+        $this->ensureOwnership($lot);
+
+        $lot->update(['status' => 'sold']);
+
+        return back()->with('success', "{$lot->lot_number} is marked as sold and was added to your broker's commission records.");
+    }
+
     private function ensureOwnership(Lot $lot): void
     {
         abort_unless($lot->property?->broker_id === auth()->id(), 403);

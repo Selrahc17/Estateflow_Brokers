@@ -15,7 +15,9 @@ class DocumentController extends Controller
 {
     public function index(): View
     {
-        $documents = Document::with('broker', 'client', 'uploader')->latest()->paginate(15);
+        // Broker and agent documents only. Buyer requirements are handled by the
+        // developer's coordinator, so older buyer uploads stay stored but hidden.
+        $documents = Document::whereNull('client_id')->with('broker', 'uploader')->latest()->paginate(15);
         $brokers = User::where('role', 'broker')->orderBy('name')->get();
         return view('pages.admin.documents.index', compact('documents', 'brokers'));
     }
@@ -103,11 +105,10 @@ class DocumentController extends Controller
 
     private function notifyOwner(Document $document, string $message): void
     {
-        $userId = $document->client_id ? $document->client?->user_id : $document->broker_id;
-
-        if ($userId) {
+        // Only broker documents are reviewed here; buyers no longer submit documents.
+        if ($document->broker_id && ! $document->client_id) {
             AppNotification::create([
-                'user_id' => $userId,
+                'user_id' => $document->broker_id,
                 'type' => 'document_review',
                 'title' => 'Document review update',
                 'message' => $message,

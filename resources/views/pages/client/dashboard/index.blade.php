@@ -34,7 +34,7 @@
 <div class="max-w-6xl mx-auto px-6 py-8">
     @php($reviewing = $profiles->whereNotNull('broker_id'))
     @if($reviewing->isNotEmpty())
-    <h2 class="font-semibold text-stone-800 mb-4">Requirements Review</h2>
+    <h2 class="font-semibold text-stone-800 mb-4">Your Status with Each Agent</h2>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-8">
         @foreach($reviewing as $profile)
         <div class="bg-white rounded-2xl border border-stone-200 p-5">
@@ -42,8 +42,8 @@
             <p class="text-lg font-semibold text-stone-800 mt-1">{{ ucfirst(str_replace('_', ' ', $profile->qualification_status)) }}</p>
             <p class="text-sm text-stone-500 mt-1">
                 @switch($profile->qualification_status)
-                    @case('pending') Submit your requirements for this agent to review. @break
-                    @case('under_review') Your requirements are being reviewed. A site visit may be scheduled. @break
+                    @case('pending') This agent will contact you about your inquiry. @break
+                    @case('under_review') This agent is assisting you. A site visit may be scheduled. @break
                     @case('approved') You are approved to reserve this agent's listings. @break
                     @case('rejected') Please contact this agent for more information. @break
                 @endswitch
@@ -57,7 +57,6 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         @foreach([
             ['My Reservation','client.account.reservation','M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
-            ['My Documents','client.account.documents','M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
                 ['Find Your Match','client.recommendations','M9 3v2m6-2v2M4 9h16M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
             ['Feedback','client.account.feedback','M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
         ] as $nav)

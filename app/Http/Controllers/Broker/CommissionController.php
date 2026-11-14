@@ -3,167 +3,135 @@
 namespace App\Http\Controllers\Broker;
 
 use App\Http\Controllers\Controller;
-use App\Models\CommissionAgreement;
-use App\Models\CommissionPayment;
-use App\Models\CommissionPaymentNote;
+use App\Models\Lot;
 use App\Models\Property;
+use App\Models\Sale;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\SalesExport;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
+/**
+ * The broker's commission table: one row per sale by their agents.
+ * Rows appear when an agent marks a listing or lot as Sold, or are added here.
+ */
 class CommissionController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $agreementIds = CommissionAgreement::where('broker_id', auth()->id())
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('property_id')
-            ->pluck('id');
+        $query = $this->filtered($request);
+        $totals = (clone $query)->toBase()->selectRaw('count(*) as sales, coalesce(sum(selling_price), 0) as selling, coalesce(sum(agent_commission), 0) as agent, coalesce(sum(broker_commission), 0) as broker')->first();
 
-        $agreements = CommissionAgreement::whereIn('id', $agreementIds)
-            ->with(['agent', 'property', 'payments'])
-            ->latest()
-            ->paginate(10);
+        $sales = $query->with(['agent', 'property', 'lot'])->orderByDesc('sold_at')->orderByDesc('id')->paginate(20)->withQueryString();
+        $agents = $this->agents();
 
-        $totalExpected = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->sum('amount_due'));
-        $totalPaid = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'paid')->sum('amount_paid'));
-        $totalDisputed = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'disputed')->sum('amount_due'));
-
-        return view('pages.broker.commission.index', compact('agreements', 'totalExpected', 'totalPaid', 'totalDisputed'));
+        return view('pages.broker.commission.index', compact('sales', 'totals', 'agents'));
     }
 
     public function create(): View
     {
-        $brokerId = auth()->id();
-        $agentIds = User::where('role', 'agent')
-            ->where('broker_id', $brokerId)
-            ->pluck('id');
-
-        $properties = Property::where(function ($query) use ($brokerId, $agentIds) {
-            $query->where('broker_id', $brokerId)
-                ->orWhereIn('broker_id', $agentIds);
-        })->get();
-
-        $agents = User::where('role', 'agent')
-            ->where('broker_id', $brokerId)
-            ->get();
-
-        return view('pages.broker.commission.create', compact('agents', 'properties'));
+        return view('pages.broker.commission.form', $this->formData(new Sale(['sold_at' => now(), 'status' => 'pending'])));
     }
 
     public function store(Request $request): RedirectResponse
     {
-        $brokerId = auth()->id();
-        $agentIds = User::where('role', 'agent')
-            ->where('broker_id', $brokerId)
-            ->pluck('id');
+        Sale::create([...$this->validated($request), 'broker_id' => auth()->id(), 'source' => 'manual']);
+
+        return redirect()->route('broker.commissions.index')->with('success', 'Sale recorded.');
+    }
+
+    public function edit(Sale $sale): View
+    {
+        $this->ensureMine($sale);
+
+        return view('pages.broker.commission.form', $this->formData($sale));
+    }
+
+    public function update(Request $request, Sale $sale): RedirectResponse
+    {
+        $this->ensureMine($sale);
+        $sale->update($this->validated($request));
+
+        return redirect()->route('broker.commissions.index')->with('success', 'Sale updated.');
+    }
+
+    public function destroy(Sale $sale): RedirectResponse
+    {
+        $this->ensureMine($sale);
+        $sale->delete();
+
+        return redirect()->route('broker.commissions.index')->with('success', 'Sale removed from the commission table.');
+    }
+
+    /** Downloads the rows on screen, with every page, as an Excel file. */
+    public function export(Request $request, SalesExport $export): BinaryFileResponse
+    {
+        $sales = $this->filtered($request)->with(['agent', 'property', 'lot'])->orderByDesc('sold_at')->orderByDesc('id')->get();
+
+        return $export->download($sales, auth()->user()->name, 'commission-records-' . now()->format('Y-m-d') . '.xlsx');
+    }
+
+    private function filtered(Request $request): Builder
+    {
+        return Sale::forBroker(auth()->user())
+            ->when($request->filled('agent'), fn ($query) => $query->where('agent_id', $request->integer('agent')))
+            ->when(array_key_exists((string) $request->input('status'), Sale::STATUSES), fn ($query) => $query->where('status', $request->input('status')))
+            ->when($request->filled('search'), fn ($query) => $query->whereHas('property', fn ($property) => $property->withTrashed()
+                ->where('name', 'like', '%' . $request->input('search') . '%')));
+    }
+
+    private function agents()
+    {
+        return User::where('role', 'agent')->where('broker_id', auth()->id())->orderBy('name')->get(['id', 'name']);
+    }
+
+    private function formData(Sale $sale): array
+    {
+        $agents = $this->agents();
+        $properties = Property::whereIn('broker_id', $agents->pluck('id'))
+            ->with(['lots' => fn ($query) => $query->orderBy('lot_number')])
+            ->orderBy('name')
+            ->get(['id', 'name', 'broker_id', 'price']);
+
+        return compact('sale', 'agents', 'properties');
+    }
+
+    private function validated(Request $request): array
+    {
+        $agentIds = $this->agents()->pluck('id');
+        $propertyIds = Property::whereIn('broker_id', $agentIds)->pluck('id');
 
         $data = $request->validate([
-            'agent_id' => ['required', Rule::exists('users', 'id')->where(fn($query) => $query->where('role', 'agent')->where('broker_id', $brokerId))],
-            'property_id' => ['nullable', Rule::exists('properties', 'id')->where(function ($query) use ($brokerId, $agentIds) {
-                $query->where('broker_id', $brokerId)
-                    ->orWhereIn('broker_id', $agentIds);
-            })],
-            'commission_rate' => ['required', 'numeric', 'min:0', 'max:100'],
-            'agent_share' => ['required', 'numeric', 'min:0', 'max:100'],
-            'broker_share' => ['required', 'numeric', 'min:0', 'max:100'],
-            'payment_schedule' => ['required', 'in:monthly,every_15th,quarterly,annual,custom'],
-            'payment_day' => ['nullable', 'integer', 'min:1', 'max:31'],
-            'start_date' => ['required', 'date'],
-            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'agent_id' => ['required', Rule::in($agentIds->all())],
+            'property_id' => ['required', Rule::in($propertyIds->all())],
+            'lot_id' => ['nullable', Rule::exists('lots', 'id')->where('property_id', $request->input('property_id'))->whereNull('deleted_at')],
+            'sold_at' => ['required', 'date', 'before_or_equal:today'],
+            'selling_price' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
+            'agent_commission' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
+            'broker_commission' => ['nullable', 'numeric', 'min:0', 'max:999999999999'],
+            'status' => ['required', Rule::in(array_keys(Sale::STATUSES))],
+            'show_status_to_agent' => ['nullable', 'boolean'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'agent_id.in' => 'Choose one of your agents.',
+            'property_id.in' => "Choose one of your agents' listings.",
+            'lot_id.exists' => 'That lot is not part of the chosen listing.',
+            'sold_at.before_or_equal' => 'The date of sale cannot be in the future.',
         ]);
 
-        $data['broker_id'] = auth()->id();
-        $data['status'] = 'active';
+        $data['show_status_to_agent'] = $request->boolean('show_status_to_agent');
 
-        $agreement = CommissionAgreement::create($data);
-        $agreement->generateScheduledPayments();
-
-        return redirect()->route('broker.commissions.index')->with('success', 'Commission agreement created successfully.');
+        // The form is the whole record: an optional field left out is cleared, not kept.
+        return array_merge(array_fill_keys(['lot_id', 'selling_price', 'agent_commission', 'broker_commission', 'notes'], null), $data);
     }
 
-    public function show(CommissionAgreement $agreement): View
+    /** Another broker's sale looks like it does not exist. */
+    private function ensureMine(Sale $sale): void
     {
-        $this->ensureOwnership($agreement);
-        $agreement->load(['agent', 'broker', 'property', 'payments.notes']);
-        $currentPayment = $this->currentPayment($agreement);
-
-        return view('pages.broker.commission.show', compact('agreement', 'currentPayment'))->with('paymentMode', false);
-    }
-
-    public function pay(CommissionAgreement $agreement): View
-    {
-        $this->ensureOwnership($agreement);
-        $agreement->load(['agent', 'broker', 'property', 'payments.notes']);
-        $currentPayment = $this->currentPayment($agreement);
-
-        return view('pages.broker.commission.pay', compact('agreement', 'currentPayment'));
-    }
-
-    public function updatePayment(Request $request, CommissionAgreement $agreement): RedirectResponse
-    {
-        $this->ensureOwnership($agreement);
-
-        $data = $request->validate([
-            'payment_id' => ['required', 'integer', Rule::exists('commission_payments', 'id')->where(fn ($query) => $query->where('commission_agreement_id', $agreement->id))],
-            'amount_paid' => ['required', 'numeric', 'gt:0'],
-            'payment_method' => ['required', 'in:cash,bank_transfer,gcash,maya,check,other'],
-            'payment_message' => ['nullable', 'string', 'max:1000'],
-            'proof' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
-        ]);
-
-        $payment = $agreement->payments()->findOrFail($data['payment_id']);
-
-        if ($payment->payment_status === 'paid') {
-            return back()->withErrors(['payment' => 'This payment has already been recorded.']);
-        }
-
-        if (!$payment->due_date || !Carbon::parse($payment->due_date)->isSameMonth(now())) {
-            return back()->withErrors(['payment' => 'This payment can only be submitted during its due month.']);
-        }
-
-        if ((float) $data['amount_paid'] !== (float) $payment->amount_due) {
-            return back()->withErrors(['amount_paid' => 'The amount paid must match the monthly amount due.'])->withInput();
-        }
-
-        $path = $request->file('proof')->store('commission-proof', 'local');
-
-        $payment->update([
-            'payment_status' => 'paid',
-            'amount_paid' => $data['amount_paid'],
-            'payment_method' => $data['payment_method'],
-            'proof_path' => $path,
-            'payment_message' => $data['payment_message'] ?? $payment->payment_message,
-            'paid_at' => now(),
-        ]);
-
-        if (!empty($data['payment_message'])) {
-            CommissionPaymentNote::create([
-                'commission_payment_id' => $payment->id,
-                'sender_type' => 'broker',
-                'sender_id' => auth()->id(),
-                'message' => $data['payment_message'],
-                'proof_path' => $payment->proof_path,
-            ]);
-        }
-
-        return redirect()->route('broker.commissions.show', $agreement)->with('success', 'Commission payment status updated successfully.');
-    }
-
-    private function ensureOwnership(CommissionAgreement $agreement): void
-    {
-        abort_unless((int) $agreement->broker_id === (int) auth()->id(), 403);
-    }
-
-    private function currentPayment(CommissionAgreement $agreement): ?CommissionPayment
-    {
-        return $agreement->payments
-            ->where('payment_status', '!=', 'paid')
-            ->filter(fn ($payment) => $payment->due_date && Carbon::parse($payment->due_date)->isSameMonth(now()))
-            ->first();
+        abort_unless((int) $sale->broker_id === (int) auth()->id(), 404);
     }
 }

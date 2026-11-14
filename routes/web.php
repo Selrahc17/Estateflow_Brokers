@@ -33,7 +33,6 @@ use App\Http\Controllers\Agent\ChatController as BrokerChatController;
 use App\Http\Controllers\Agent\CommissionController as AgentCommissionController;
 use App\Http\Controllers\Agent\ClientController as BrokerClientController;
 use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
-use App\Http\Controllers\Agent\DocumentController as BrokerDocumentController;
 use App\Http\Controllers\Agent\InquiryController as BrokerInquiryController;
 use App\Http\Controllers\Agent\LotController;
 use App\Http\Controllers\Agent\NotificationController as AgentNotificationController;
@@ -44,7 +43,6 @@ use App\Http\Controllers\Agent\SettingController as AgentSettingController;
 use App\Http\Controllers\Agent\SiteVisitController;
 use App\Http\Controllers\Client\ChatController as ClientChatController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
-use App\Http\Controllers\Client\DocumentController as ClientDocumentController;
 use App\Http\Controllers\Client\FavoriteController as ClientFavoriteController;
 use App\Http\Controllers\Client\FeedbackController as ClientFeedbackController;
 use App\Http\Controllers\Client\InquiryController as ClientInquiryController;
@@ -73,7 +71,6 @@ Route::get('/invitations/{token}', [AgentInvitationController::class, 'show'])->
 Route::post('/invitations/{token}', [AgentInvitationController::class, 'accept'])->middleware('throttle:register')->name('auth.invitation.accept');
 
 Route::middleware(['auth', 'audit'])->group(function () {
-    Route::get('/files/commission-proofs/{payment}', [PrivateFileController::class, 'commissionProof'])->name('files.commission-proof');
     Route::get('/files/chat-photos/{message}', [PrivateFileController::class, 'chatPhoto'])->name('files.chat-photo');
 });
 
@@ -105,9 +102,6 @@ Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client',
     Route::post('/site-visits/{property}', [ClientSiteVisitController::class, 'store'])->name('site-visits.store');
     Route::patch('/site-visits/{siteVisit}/reschedule', [ClientSiteVisitController::class, 'reschedule'])->name('site-visits.reschedule');
     Route::patch('/site-visits/{siteVisit}/cancel', [ClientSiteVisitController::class, 'cancel'])->name('site-visits.cancel');
-    Route::get('/documents', [ClientDocumentController::class, 'index'])->name('documents');
-    Route::post('/documents', [ClientDocumentController::class, 'store'])->name('documents.store');
-    Route::get('/documents/{document}/download', [ClientDocumentController::class, 'download'])->name('documents.download');
     Route::get('/notifications', [ClientNotificationController::class, 'index'])->name('notifications');
     Route::post('/notifications/read-all', [ClientNotificationController::class, 'markAllRead'])->name('notifications.read-all');
     Route::get('/chat', [ClientChatController::class, 'index'])->name('chat');
@@ -193,11 +187,12 @@ Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'au
     Route::get('/property-lists', [BrokerDashboardController::class, 'propertyLists'])->name('property-lists');
     Route::patch('/property-lists/{property}/terms', [BrokerDashboardController::class, 'updatePropertyTerms'])->name('property-lists.terms');
     Route::get('/commissions', [BrokerCommissionController::class, 'index'])->name('commissions.index');
+    Route::get('/commissions/export', [BrokerCommissionController::class, 'export'])->name('commissions.export');
     Route::get('/commissions/create', [BrokerCommissionController::class, 'create'])->name('commissions.create');
     Route::post('/commissions', [BrokerCommissionController::class, 'store'])->name('commissions.store');
-    Route::get('/commissions/{agreement}/pay', [BrokerCommissionController::class, 'pay'])->name('commissions.pay');
-    Route::get('/commissions/{agreement}', [BrokerCommissionController::class, 'show'])->name('commissions.show');
-    Route::post('/commissions/{agreement}/payment', [BrokerCommissionController::class, 'updatePayment'])->name('commissions.update-payment');
+    Route::get('/commissions/{sale}/edit', [BrokerCommissionController::class, 'edit'])->name('commissions.edit');
+    Route::put('/commissions/{sale}', [BrokerCommissionController::class, 'update'])->name('commissions.update');
+    Route::delete('/commissions/{sale}', [BrokerCommissionController::class, 'destroy'])->name('commissions.destroy');
     Route::get('/reports', [BrokerReportController::class, 'index'])->name('reports.index');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
@@ -253,8 +248,6 @@ Route::get('/api/geocode/reverse', function () {
 Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit'])->group(function () {
     Route::get('/dashboard', [AgentDashboardController::class, 'index'])->name('dashboard');
     Route::get('/commission', [AgentCommissionController::class, 'index'])->name('commission');
-    Route::get('/commission/{agreement}', [AgentCommissionController::class, 'show'])->name('commission.show');
-    Route::post('/commission/{agreement}/payment', [AgentCommissionController::class, 'updatePayment'])->name('commission.update-payment');
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
@@ -264,12 +257,14 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::get('/properties/{property}/edit', [PropertyController::class, 'edit'])->name('properties.edit');
     Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
     Route::delete('/properties/{property}', [PropertyController::class, 'destroy'])->name('properties.destroy');
+    Route::patch('/properties/{property}/mark-sold', [PropertyController::class, 'markSold'])->name('properties.mark-sold');
     Route::get('/lots', [LotController::class, 'index'])->name('lots.index');
     Route::get('/lots/create', [LotController::class, 'create'])->name('lots.create');
     Route::post('/lots', [LotController::class, 'store'])->name('lots.store');
     Route::get('/lots/{lot}/edit', [LotController::class, 'edit'])->name('lots.edit');
     Route::put('/lots/{lot}', [LotController::class, 'update'])->name('lots.update');
     Route::delete('/lots/{lot}', [LotController::class, 'destroy'])->name('lots.destroy');
+    Route::patch('/lots/{lot}/mark-sold', [LotController::class, 'markSold'])->name('lots.mark-sold');
     Route::get('/inquiries', [BrokerInquiryController::class, 'index'])->name('inquiries.index');
     Route::get('/inquiries/{inquiry}', [BrokerInquiryController::class, 'show'])->name('inquiries.show');
     Route::patch('/inquiries/{inquiry}/status', [BrokerInquiryController::class, 'updateStatus'])->name('inquiries.status');
@@ -293,11 +288,6 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::get('/clients/{client}/edit', [BrokerClientController::class, 'edit'])->name('clients.edit');
     Route::put('/clients/{client}', [BrokerClientController::class, 'update'])->name('clients.update');
     Route::patch('/clients/{client}/qualification-status', [BrokerClientController::class, 'updateQualificationStatus'])->name('clients.qualification-status');
-    Route::get('/documents', [BrokerDocumentController::class, 'index'])->name('documents.index');
-    Route::post('/documents/{document}/check', [BrokerDocumentController::class, 'check'])->name('documents.check');
-    Route::get('/documents/{document}/download', [BrokerDocumentController::class, 'download'])->name('documents.download');
-    Route::post('/documents/{document}/verify', [BrokerDocumentController::class, 'verify'])->name('documents.verify');
-    Route::post('/documents/{document}/reject', [BrokerDocumentController::class, 'reject'])->name('documents.reject');
     Route::get('/notifications', [AgentNotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [AgentNotificationController::class, 'markRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [AgentNotificationController::class, 'markAllRead'])->name('notifications.read-all');

@@ -55,11 +55,6 @@ class Client extends Authenticatable
         return $this->hasMany(Payment::class);
     }
 
-    public function documents()
-    {
-        return $this->hasMany(Document::class);
-    }
-
     public function notifications()
     {
         return $this->hasManyThrough(AppNotification::class, User::class, 'id', 'user_id', 'user_id', 'id');

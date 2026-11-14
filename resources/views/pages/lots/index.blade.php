@@ -53,7 +53,17 @@
                             {{ ucfirst($lot->status) }}
                         </span>
                     </td>
-                    <td class="px-4 py-3"><a href="{{ route('agent.lots.edit', $lot) }}" class="text-teal-700 hover:underline text-xs">Edit</a></td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center gap-3">
+                            <a href="{{ route('agent.lots.edit', $lot) }}" class="text-teal-700 hover:underline text-xs">Edit</a>
+                            @if($lot->status !== 'sold')
+                            <form method="POST" action="{{ route('agent.lots.mark-sold', $lot) }}" onsubmit="return confirm('Mark {{ e(addslashes($lot->lot_number)) }} as sold? It will be added to your broker\'s commission records.')">
+                                @csrf @method('PATCH')
+                                <button type="submit" class="whitespace-nowrap rounded-md border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-800 hover:bg-amber-100">Mark as Sold</button>
+                            </form>
+                            @endif
+                        </div>
+                    </td>
                 </tr>
             @empty
                 <tr><td colspan="7" class="px-4 py-8 text-center text-stone-400">No lots found.</td></tr>

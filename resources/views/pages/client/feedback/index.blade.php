@@ -76,10 +76,9 @@
                         ['📋','Property Information','Was the property information accurate and complete?'],
                         ['📅','Reservation Process','How smooth was the reservation process?'],
                         ['💳','Payment Experience','How easy was it to manage your payments?'],
-                        ['📄','Document Handling','How well were your documents managed?'],
                         ['🤖','AI Assistant','How helpful was the AI Assistant?'],
                     ] as $i => $cat)
-                    <div x-data="{ rating: 0, hover: 0 }" class="{{ $i < 5 ? 'pb-5 border-b border-stone-100' : '' }}">
+                    <div x-data="{ rating: 0, hover: 0 }" class="{{ $i < 4 ? 'pb-5 border-b border-stone-100' : '' }}">
                         <div class="flex items-start justify-between mb-2">
                             <div class="flex items-center gap-2">
                                 <span class="text-lg">{{ $cat[0] }}</span>
@@ -113,7 +112,7 @@
                 <div class="mb-5">
                     <p class="text-xs font-semibold text-stone-600 uppercase tracking-widest mb-3">✅ What went well?</p>
                     <div class="flex flex-wrap gap-2">
-                        @foreach(['Fast Response','Professional Broker','Easy Process','Clear Communication','Good Property Info','Helpful AI','Smooth Payment','Quick Document Review','Friendly Staff','Transparent Pricing'] as $tag)
+                        @foreach(['Fast Response','Professional Broker','Easy Process','Clear Communication','Good Property Info','Helpful AI','Smooth Payment','Friendly Staff','Transparent Pricing'] as $tag)
                         <button
                             @click="selected.includes('{{ $tag }}') ? selected.splice(selected.indexOf('{{ $tag }}'), 1) : selected.push('{{ $tag }}')"
                             :class="selected.includes('{{ $tag }}') ? 'bg-teal-700 text-white border-teal-700' : 'bg-white text-stone-600 border-stone-200 hover:border-teal-500 hover:text-teal-700'"
@@ -128,7 +127,7 @@
                 <div class="mb-5" x-data="{ issues: [] }">
                     <p class="text-xs font-semibold text-stone-600 uppercase tracking-widest mb-3">⚠️ What can be improved?</p>
                     <div class="flex flex-wrap gap-2">
-                        @foreach(['Faster Response','More Property Options','Clearer Payment Terms','Better Document Guidance','More AI Features','Easier Navigation','More Updates'] as $issue)
+                        @foreach(['Faster Response','More Property Options','Clearer Payment Terms','More AI Features','Easier Navigation','More Updates'] as $issue)
                         <button
                             @click="issues.includes('{{ $issue }}') ? issues.splice(issues.indexOf('{{ $issue }}'), 1) : issues.push('{{ $issue }}')"
                             :class="issues.includes('{{ $issue }}') ? 'bg-red-500 text-white border-red-500' : 'bg-white text-stone-600 border-stone-200 hover:border-red-300 hover:text-red-500'"
@@ -271,7 +270,6 @@
                         ['Property Info','4.7'],
                         ['Reservation','4.8'],
                         ['Payments','4.6'],
-                        ['Documents','4.5'],
                         ['AI Assistant','4.8'],
                     ] as $cat)
                     <div class="flex items-center justify-between">

@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\AppNotification;
 use App\Models\Client;
-use App\Models\CommissionAgreement;
 use App\Models\Property;
+use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -57,28 +57,20 @@ class AgentPortalLayoutTest extends TestCase
         $response = $this->get(route('agent.properties.create'))
             ->assertOk()
             ->assertSee('Agent Portal')
-            ->assertSeeInOrder(['Overview', 'Dashboard', 'Reports', 'Listings', 'Properties', 'Lot Availability', 'Clients and Sales', 'Inquiries', 'My Commission', 'Communication', 'Messages', 'AI Assistant']);
+            ->assertSeeInOrder(['Overview', 'Dashboard', 'Reports', 'Listings', 'Properties', 'Lot Availability', 'Clients and Sales', 'Inquiries', 'My Sales', 'Communication', 'Messages', 'AI Assistant']);
 
         $this->assertSame(['Properties'], $this->activeLinks($response->getContent()));
         $response->assertDontSee('aria-label="Add Property"', false);
     }
 
-    public function test_commission_stays_highlighted_on_its_detail_page(): void
+    public function test_my_sales_is_highlighted_on_its_page(): void
     {
-        $agreement = CommissionAgreement::create([
-            'broker_id' => $this->agent->broker_id,
-            'agent_id' => $this->agent->id,
-            'commission_rate' => 5,
-            'agent_share' => 60,
-            'broker_share' => 40,
-            'payment_schedule' => 'monthly',
-            'start_date' => now()->toDateString(),
-            'status' => 'active',
-        ]);
+        $property = $this->property();
+        Sale::create(['broker_id' => $this->agent->broker_id, 'agent_id' => $this->agent->id, 'property_id' => $property->id, 'sold_at' => now(), 'status' => 'pending']);
 
-        $response = $this->get(route('agent.commission.show', $agreement))->assertOk();
+        $response = $this->get(route('agent.commission'))->assertOk()->assertSee('Vista Homes');
 
-        $this->assertSame(['My Commission'], $this->activeLinks($response->getContent()));
+        $this->assertSame(['My Sales'], $this->activeLinks($response->getContent()));
     }
 
     public function test_sidebar_shows_unread_notification_count(): void

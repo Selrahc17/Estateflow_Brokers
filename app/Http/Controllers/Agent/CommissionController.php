@@ -3,88 +3,25 @@
 namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
-use App\Models\CommissionAgreement;
-use App\Models\CommissionPaymentNote;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rule;
+use App\Models\Sale;
 use Illuminate\View\View;
 
+/**
+ * The agent's own sales. Read only: commission amounts stay private to the
+ * broker, and the status shows only when the broker allowed it for that sale.
+ */
 class CommissionController extends Controller
 {
     public function index(): View
     {
-        $agreementIds = CommissionAgreement::where('agent_id', auth()->id())
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('property_id')
-            ->pluck('id');
+        $sales = Sale::where('agent_id', auth()->id())
+            ->with(['property', 'lot'])
+            ->orderByDesc('sold_at')
+            ->orderByDesc('id')
+            ->paginate(20);
 
-        $agreements = CommissionAgreement::whereIn('id', $agreementIds)
-            ->with(['broker', 'property', 'payments'])
-            ->latest()
-            ->paginate(10);
+        $soldCount = Sale::where('agent_id', auth()->id())->count();
 
-        $totalExpected = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->sum('agent_amount'));
-        $totalPaid = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'paid')->sum('agent_amount'));
-        $totalDisputed = $agreements->getCollection()->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'disputed')->sum('agent_amount'));
-
-        return view('pages.agent.commission.index', compact('agreements', 'totalExpected', 'totalPaid', 'totalDisputed'));
-    }
-
-    public function show(CommissionAgreement $agreement): View
-    {
-        abort_unless((int) $agreement->agent_id === (int) auth()->id(), 403);
-        $agreement->load(['agent', 'broker', 'property', 'payments.notes']);
-
-        return view('pages.agent.commission.show', compact('agreement'));
-    }
-
-    public function updatePayment(Request $request, CommissionAgreement $agreement): RedirectResponse
-    {
-        abort_unless((int) $agreement->agent_id === (int) auth()->id(), 403);
-
-        $data = $request->validate([
-            'payment_id' => ['nullable', 'integer', Rule::exists('commission_payments', 'id')->where(fn ($query) => $query->where('commission_agreement_id', $agreement->id))],
-            'payment_status' => ['required', 'in:pending,scheduled,sent,confirmed,disputed,paid'],
-            'payment_message' => ['nullable', 'string', 'max:1000'],
-            'proof' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:4096'],
-        ]);
-
-        $payment = $agreement->payments()->find($data['payment_id'] ?? null) ?? $agreement->payments()->latest()->first();
-
-        if (!$payment) {
-            $payment = $agreement->payments()->create([
-                'due_date' => now()->toDateString(),
-                'amount_due' => 0,
-                'agent_amount' => 0,
-                'broker_amount' => 0,
-                'amount_paid' => 0,
-                'payment_status' => 'pending',
-            ]);
-        }
-
-        if ($request->hasFile('proof')) {
-            $path = $request->file('proof')->store('commission-proof', 'local');
-            $payment->update(['proof_path' => $path]);
-        }
-
-        $payment->update([
-            'payment_status' => $data['payment_status'],
-            'payment_message' => $data['payment_message'] ?? $payment->payment_message,
-            'paid_at' => $data['payment_status'] === 'paid' ? now() : $payment->paid_at,
-        ]);
-
-        if (!empty($data['payment_message'])) {
-            CommissionPaymentNote::create([
-                'commission_payment_id' => $payment->id,
-                'sender_type' => 'agent',
-                'sender_id' => auth()->id(),
-                'message' => $data['payment_message'],
-                'proof_path' => $payment->proof_path,
-            ]);
-        }
-
-        return redirect()->route('agent.commission.show', $agreement)->with('success', 'Payment status updated successfully.');
+        return view('pages.agent.commission.index', compact('sales', 'soldCount'));
     }
 }

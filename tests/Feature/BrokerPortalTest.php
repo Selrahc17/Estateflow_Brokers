@@ -5,12 +5,12 @@ namespace Tests\Feature;
 use App\Models\AppNotification;
 use App\Models\AuditLog;
 use App\Models\Client;
-use App\Models\CommissionAgreement;
 use App\Models\Document;
 use App\Models\Inquiry;
 use App\Models\Lot;
 use App\Models\Property;
 use App\Models\Reservation;
+use App\Models\Sale;
 use App\Models\User;
 use App\Notifications\AgentInvitation;
 use App\Services\AgentInvitationService;
@@ -453,22 +453,12 @@ class BrokerPortalTest extends TestCase
     public function test_performance_page_shows_real_commission(): void
     {
         $agent = $this->makeAgent();
-        $agreement = CommissionAgreement::create([
-            'broker_id' => $this->broker->id,
-            'agent_id' => $agent->id,
-            'commission_rate' => 5,
-            'agent_share' => 60,
-            'broker_share' => 40,
-            'payment_schedule' => 'monthly',
-            'start_date' => now()->toDateString(),
-            'status' => 'active',
-        ]);
-        $agreement->payments()->create(['due_date' => now()->toDateString(), 'amount_due' => 1000, 'agent_amount' => 600, 'broker_amount' => 400, 'amount_paid' => 1000, 'payment_status' => 'paid']);
-        $agreement->payments()->create(['due_date' => now()->addMonth()->toDateString(), 'amount_due' => 1000, 'agent_amount' => 600, 'broker_amount' => 400, 'amount_paid' => 0, 'payment_status' => 'pending']);
+        Sale::create(['broker_id' => $this->broker->id, 'agent_id' => $agent->id, 'sold_at' => now(), 'agent_commission' => 600, 'broker_commission' => 400, 'status' => 'received']);
+        Sale::create(['broker_id' => $this->broker->id, 'agent_id' => $agent->id, 'sold_at' => now(), 'agent_commission' => 600, 'broker_commission' => 400, 'status' => 'pending']);
 
         $this->get(route('broker.performance'))
-            ->assertSee('₱600.00 paid')
-            ->assertSee('of ₱1,200.00 expected')
+            ->assertSee('₱600.00 received')
+            ->assertSee('of ₱1,200.00 agent commission')
             ->assertDontSee('Not tracked');
     }
 

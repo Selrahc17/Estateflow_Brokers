@@ -17,9 +17,9 @@
 
 <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
     @foreach([
-        ['Commission Expected', '₱' . number_format($data['commission_expected'] ?? 0, 2), 'amber'],
-        ['Commission Paid', '₱' . number_format($data['commission_paid'] ?? 0, 2), 'green'],
-        ['Commission Disputed', '₱' . number_format($data['commission_disputed'] ?? 0, 2), 'red'],
+        ['Commission Pending', '₱' . number_format($data['commission_pending'] ?? 0, 2), 'amber'],
+        ['Commission Transferred', '₱' . number_format($data['commission_transferred'] ?? 0, 2), null],
+        ['Commission Received', '₱' . number_format($data['commission_received'] ?? 0, 2), 'green'],
     ] as [$label, $value, $tone])
         @include('layouts.partials.stat-tile', compact('label', 'value', 'tone'))
     @endforeach

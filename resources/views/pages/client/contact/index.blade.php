@@ -93,7 +93,6 @@
                         <option value="">Select a topic</option>
                         <option>Property Inquiry</option>
                         <option>Reservation Question</option>
-                        <option>Document Submission</option>
                         <option>General Inquiry</option>
                         <option>Complaint / Feedback</option>
                     </select>

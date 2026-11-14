@@ -31,8 +31,8 @@
                     <td class="px-5 py-4 font-semibold text-teal-700 dark:text-teal-300">{{ $agent->viewings_count }}</td>
                     <td class="px-5 py-4 font-semibold text-green-600 dark:text-green-300">{{ $agent->sales_count }}</td>
                     <td class="px-5 py-4">
-                        <p class="font-semibold text-stone-700 dark:text-stone-200">₱{{ number_format($agent->commission_paid, 2) }} paid</p>
-                        <p class="text-xs text-stone-500 dark:text-stone-400">of ₱{{ number_format($agent->commission_expected, 2) }} expected</p>
+                        <p class="font-semibold text-stone-700 dark:text-stone-200">₱{{ number_format($agent->commission_paid, 2) }} received</p>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">of ₱{{ number_format($agent->commission_expected, 2) }} agent commission</p>
                     </td>
                 </tr>
                 @empty

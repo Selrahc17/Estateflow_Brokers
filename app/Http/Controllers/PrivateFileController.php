@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChatMessage;
-use App\Models\CommissionPayment;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -13,20 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PrivateFileController extends Controller
 {
-    public function commissionProof(CommissionPayment $payment): Response
-    {
-        $user = auth()->user();
-        $agreement = $payment->agreement;
-
-        abort_unless($agreement && (
-            $user->role === 'admin'
-            || (int) $agreement->broker_id === (int) $user->id
-            || (int) $agreement->agent_id === (int) $user->id
-        ), 404);
-
-        return $this->serve($payment->proof_path);
-    }
-
     public function chatPhoto(ChatMessage $message): Response
     {
         abort_unless(in_array((int) auth()->id(), [(int) $message->sender_id, (int) $message->receiver_id], true), 404);

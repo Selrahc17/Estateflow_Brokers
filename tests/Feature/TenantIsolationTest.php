@@ -5,13 +5,12 @@ namespace Tests\Feature;
 use App\Models\AppNotification;
 use App\Models\ChatMessage;
 use App\Models\Client;
-use App\Models\CommissionAgreement;
-use App\Models\CommissionPayment;
 use App\Models\Document;
 use App\Models\Inquiry;
 use App\Models\Lot;
 use App\Models\Property;
 use App\Models\Reservation;
+use App\Models\Sale;
 use App\Models\SiteVisit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -62,9 +61,7 @@ class TenantIsolationTest extends TestCase
         $reservation = Reservation::create(['client_id' => $client->id, 'broker_id' => $agent->id, 'lot_id' => $lot->id, 'reservation_code' => "RES-{$tag}", 'status' => 'pending', 'total_price' => 1000000]);
         $inquiry = Inquiry::create(['user_id' => $clientUser->id, 'broker_id' => $agent->id, 'property_id' => $property->id, 'message' => "Inquiry{$tag}", 'email' => "inquiry{$tag}@example.com", 'status' => 'new']);
         $visit = SiteVisit::create(['client_id' => $client->id, 'property_id' => $property->id, 'broker_id' => $agent->id, 'scheduled_at' => now()->addDay(), 'status' => 'pending']);
-        $agreement = CommissionAgreement::create(['broker_id' => $broker->id, 'agent_id' => $agent->id, 'property_id' => $property->id, 'commission_rate' => 5, 'broker_share' => 40, 'agent_share' => 60, 'payment_schedule' => 'monthly', 'payment_day' => 15, 'start_date' => now()->startOfYear()->toDateString(), 'status' => 'active']);
-        $payment = $agreement->payments()->create(['due_date' => now()->toDateString(), 'amount_due' => 200000, 'agent_amount' => 120000, 'broker_amount' => 80000, 'amount_paid' => 200000, 'payment_status' => 'paid', 'proof_path' => "commission-proof/{$tag}.pdf"]);
-        Storage::disk('local')->put("commission-proof/{$tag}.pdf", 'receipt');
+        $sale = Sale::create(['broker_id' => $broker->id, 'agent_id' => $agent->id, 'property_id' => $property->id, 'sold_at' => now()->toDateString(), 'selling_price' => 1000000, 'agent_commission' => 30000, 'broker_commission' => 20000, 'status' => 'pending']);
         Storage::disk('local')->put("documents/{$tag}.pdf", 'id');
         $clientDocument = Document::create(['client_id' => $client->id, 'name' => "ClientDoc{$tag}", 'type' => 'id', 'file_path' => "documents/{$tag}.pdf", 'status' => 'pending']);
         $agentDocument = Document::create(['agent_id' => $agent->id, 'broker_id' => $broker->id, 'name' => "AgentDoc{$tag}", 'type' => 'national_id', 'file_path' => "documents/{$tag}.pdf", 'status' => 'pending']);
@@ -72,7 +69,7 @@ class TenantIsolationTest extends TestCase
         $brokerNotification = AppNotification::create(['user_id' => $broker->id, 'type' => 'info', 'title' => "Notice{$tag}", 'is_read' => false]);
         $agentNotification = AppNotification::create(['user_id' => $agent->id, 'type' => 'info', 'title' => "NoticeAgent{$tag}", 'is_read' => false]);
 
-        return compact('agent', 'clientUser', 'client', 'property', 'lot', 'reservation', 'inquiry', 'visit', 'agreement', 'payment', 'clientDocument', 'agentDocument', 'brokerDocument', 'brokerNotification', 'agentNotification');
+        return compact('agent', 'clientUser', 'client', 'property', 'lot', 'reservation', 'inquiry', 'visit', 'sale', 'clientDocument', 'agentDocument', 'brokerDocument', 'brokerNotification', 'agentNotification');
     }
 
     private function assertBlocked(User $actor, string $method, string $routeName, mixed $parameters, array $data = []): void
@@ -89,12 +86,8 @@ class TenantIsolationTest extends TestCase
             ['GET', 'agent.clients.edit', $target['client']],
             ['PUT', 'agent.clients.update', $target['client'], ['first_name' => 'Changed', 'last_name' => 'Name', 'email' => 'changed@example.com']],
             ['PATCH', 'agent.clients.qualification-status', $target['client'], ['qualification_status' => 'rejected']],
-            ['GET', 'agent.commission.show', $target['agreement']],
-            ['POST', 'agent.commission.update-payment', $target['agreement'], ['payment_id' => $target['payment']->id, 'payment_status' => 'disputed']],
-            ['GET', 'agent.documents.download', $target['clientDocument']],
-            ['POST', 'agent.documents.check', $target['clientDocument']],
-            ['POST', 'agent.documents.verify', $target['clientDocument']],
-            ['POST', 'agent.documents.reject', $target['clientDocument'], ['notes' => 'No']],
+            ['PATCH', 'agent.properties.mark-sold', $target['property']],
+            ['PATCH', 'agent.lots.mark-sold', $target['lot']],
             ['GET', 'agent.inquiries.show', $target['inquiry']],
             ['PATCH', 'agent.inquiries.status', $target['inquiry'], ['status' => 'closed']],
             ['GET', 'agent.lots.edit', $target['lot']],
@@ -126,9 +119,9 @@ class TenantIsolationTest extends TestCase
             ['DELETE', 'broker.agents.destroy', $target['agent']],
             ['GET', 'broker.agents.documents.download', [$target['agent'], $target['agentDocument']]],
             ['GET', 'broker.agents.documents.download', [$this->mine['agent'], $target['agentDocument']]],
-            ['GET', 'broker.commissions.show', $target['agreement']],
-            ['GET', 'broker.commissions.pay', $target['agreement']],
-            ['POST', 'broker.commissions.update-payment', $target['agreement'], ['payment_id' => $target['payment']->id, 'amount_paid' => 200000, 'payment_method' => 'cash']],
+            ['GET', 'broker.commissions.edit', $target['sale']],
+            ['PUT', 'broker.commissions.update', $target['sale'], ['agent_id' => $target['agent']->id, 'property_id' => $target['property']->id, 'sold_at' => now()->toDateString(), 'status' => 'received']],
+            ['DELETE', 'broker.commissions.destroy', $target['sale']],
             ['POST', 'broker.notifications.read', $target['brokerNotification']],
             ['PATCH', 'broker.property-lists.terms', $target['property'], ['agent_commission' => 50]],
             ['GET', 'broker.settings.documents.download', $target['brokerDocument']],
@@ -141,6 +134,9 @@ class TenantIsolationTest extends TestCase
 
         $this->assertDatabaseHas('users', ['id' => $target['agent']->id, 'name' => 'AgentTheirs', 'is_active' => true]);
         $this->assertNull($target['property']->fresh()->agent_commission);
+        $this->assertDatabaseHas('sales', ['id' => $target['sale']->id, 'status' => 'pending']);
+        $this->assertSame('hidden', $target['property']->fresh()->status);
+        $this->assertSame('available', $target['lot']->fresh()->status);
     }
 
     public function test_an_agent_cannot_reach_another_brokers_records(): void
@@ -167,7 +163,6 @@ class TenantIsolationTest extends TestCase
         $client = $this->mine['clientUser'];
         $target = $this->theirs;
 
-        $this->assertBlocked($client, 'GET', 'client.account.documents.download', $target['clientDocument']);
         $this->assertBlocked($client, 'GET', 'client.account.inquiries.show', $target['inquiry']);
         $this->assertBlocked($client, 'PATCH', 'client.account.site-visits.reschedule', $target['visit'], ['scheduled_at' => now()->addDays(3)->toDateTimeString()]);
         $this->assertBlocked($client, 'PATCH', 'client.account.site-visits.cancel', $target['visit']);
@@ -180,7 +175,7 @@ class TenantIsolationTest extends TestCase
         $agent = $this->mine['agent'];
         $broker = $this->mine['broker'];
         $target = $this->theirs;
-        $commission = ['commission_rate' => 5, 'agent_share' => 60, 'broker_share' => 40, 'payment_schedule' => 'monthly', 'payment_day' => 15, 'start_date' => now()->toDateString()];
+        $commission = ['sold_at' => now()->toDateString(), 'status' => 'pending'];
         $reservation = ['total_price' => 1, 'payment_schedule' => 'monthly', 'payment_terms_months' => 12];
 
         $this->actingAs($agent)->post(route('agent.reservations.store'), $reservation + ['client_id' => $this->mine['client']->id, 'lot_id' => $target['lot']->id])->assertSessionHasErrors('lot_id');
@@ -192,7 +187,7 @@ class TenantIsolationTest extends TestCase
         $this->actingAs($broker)->post(route('broker.commissions.store'), $commission + ['agent_id' => $this->mine['agent']->id, 'property_id' => $target['property']->id])->assertSessionHasErrors('property_id');
 
         $this->assertSame(1, Reservation::where('lot_id', $target['lot']->id)->count());
-        $this->assertSame(2, CommissionAgreement::count());
+        $this->assertSame(2, Sale::count());
     }
 
     public function test_list_pages_never_show_another_teams_data(): void
@@ -254,54 +249,16 @@ class TenantIsolationTest extends TestCase
         $this->get($url)->assertRedirect(route('auth.login'));
     }
 
-    public function test_commission_proofs_open_only_for_the_people_on_the_agreement(): void
+
+
+    public function test_older_public_files_move_to_private_storage(): void
     {
-        $url = route('files.commission-proof', $this->mine['payment']);
-        $admin = User::factory()->create(['role' => 'admin', 'is_active' => true, 'is_approved' => true]);
-
-        $this->actingAs($this->mine['broker'])->get($url)->assertOk();
-        $this->actingAs($this->mine['agent'])->get($url)->assertOk();
-        $this->actingAs($admin)->get($url)->assertOk();
-        $this->actingAs($this->theirs['broker'])->get($url)->assertNotFound();
-        $this->actingAs($this->theirs['agent'])->get($url)->assertNotFound();
-        $this->actingAs($this->mine['clientUser'])->get($url)->assertNotFound();
-
-        auth()->logout();
-        $this->get($url)->assertRedirect(route('auth.login'));
-    }
-
-    public function test_new_commission_proofs_are_saved_privately(): void
-    {
-        $this->travelTo(now()->startOfMonth()->addDays(14));
-        $agreement = $this->mine['agreement'];
-        $payment = $agreement->payments()->create(['due_date' => now()->toDateString(), 'amount_due' => 5000, 'agent_amount' => 3000, 'broker_amount' => 2000, 'amount_paid' => 0, 'payment_status' => 'pending']);
-
-        $this->actingAs($this->mine['broker'])->post(route('broker.commissions.update-payment', $agreement), [
-            'payment_id' => $payment->id,
-            'amount_paid' => 5000,
-            'payment_method' => 'cash',
-            'proof' => UploadedFile::fake()->create('receipt.pdf', 10, 'application/pdf'),
-        ])->assertRedirect(route('broker.commissions.show', $agreement));
-
-        $path = $payment->fresh()->proof_path;
-        Storage::disk('local')->assertExists($path);
-        Storage::disk('public')->assertMissing($path);
-    }
-
-    public function test_older_public_files_move_to_private_storage_and_still_open(): void
-    {
-        $payment = CommissionPayment::find($this->mine['payment']->id);
-        Storage::disk('local')->delete($payment->proof_path);
-        Storage::disk('public')->put($payment->proof_path, 'receipt');
-
-        $url = route('files.commission-proof', $payment);
-        $this->actingAs($this->mine['broker'])->get($url)->assertOk();
+        Storage::disk('public')->put('commission-proof/old-receipt.pdf', 'receipt');
 
         $this->artisan('files:make-private')->assertExitCode(0);
 
-        Storage::disk('local')->assertExists($payment->proof_path);
-        Storage::disk('public')->assertMissing($payment->proof_path);
-        $this->actingAs($this->mine['broker'])->get($url)->assertOk();
+        Storage::disk('local')->assertExists('commission-proof/old-receipt.pdf');
+        Storage::disk('public')->assertMissing('commission-proof/old-receipt.pdf');
     }
 
     public function test_moving_files_twice_changes_nothing(): void

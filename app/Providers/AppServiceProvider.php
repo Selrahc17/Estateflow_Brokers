@@ -7,7 +7,10 @@ use App\Models\AuditLog;
 use App\Models\ContactMessage;
 use App\Models\Document;
 use App\Models\Feedback;
+use App\Models\Lot;
+use App\Models\Property;
 use App\Models\Reservation;
+use App\Models\Sale;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\Totals;
@@ -38,6 +41,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
         $this->recordSignInsAndSignOuts();
+        $this->recordSalesWhenMarkedSold();
 
         View::composer(['layouts.app', 'layouts.broker', 'layouts.client', 'layouts.public', 'layouts.auth'], function ($view) {
             $view->with('appLogo', Setting::get('logo_url', null));
@@ -49,7 +53,7 @@ class AppServiceProvider extends ServiceProvider
                 // The sidebar badges, fetched in one round trip instead of six.
                 $view->with(['appLogo' => $appLogo, ...Totals::of([
                     'pendingReservations' => Reservation::where('status', 'pending')->selectRaw('count(*)'),
-                    'pendingDocuments' => Document::where('status', 'pending')->selectRaw('count(*)'),
+                    'pendingDocuments' => Document::whereNull('client_id')->where('status', 'pending')->selectRaw('count(*)'),
                     'unreadNotifs' => AppNotification::where('user_id', Auth::id())->where('is_read', false)->selectRaw('count(*)'),
                     'pendingBrokers' => User::where('role', 'broker')->where('is_approved', false)->selectRaw('count(*)'),
                     'pendingFeedback' => Feedback::where('status', 'pending')->selectRaw('count(*)'),
@@ -65,6 +69,36 @@ class AppServiceProvider extends ServiceProvider
                     'pendingFeedback' => 0,
                     'newContactMessages' => 0,
                 ]);
+            }
+        });
+    }
+
+    /**
+     * Marking a listing or lot as Sold adds it to the broker's commission table;
+     * undoing Sold removes that row while the broker has not worked on it yet.
+     * A listing with lots is sold lot by lot, so only its lots create rows.
+     */
+    private function recordSalesWhenMarkedSold(): void
+    {
+        Property::updated(function (Property $property) {
+            if (! $property->wasChanged('status')) {
+                return;
+            }
+            if ($property->status === 'sold' && ! $property->lots()->exists()) {
+                Sale::recordFromListing($property);
+            } elseif ($property->getOriginal('status') === 'sold') {
+                Sale::undoFromListing($property);
+            }
+        });
+
+        Lot::updated(function (Lot $lot) {
+            if (! $lot->wasChanged('status') || ! $lot->property) {
+                return;
+            }
+            if ($lot->status === 'sold') {
+                Sale::recordFromListing($lot->property, $lot);
+            } elseif ($lot->getOriginal('status') === 'sold') {
+                Sale::undoFromListing($lot->property, $lot);
             }
         });
     }

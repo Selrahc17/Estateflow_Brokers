@@ -81,6 +81,13 @@
                     <button type="submit" class="w-full text-center text-xs bg-red-50 hover:bg-red-100 text-red-600 py-1.5 rounded-lg transition font-medium">Delete</button>
                 </form>
             </div>
+            {{-- Listings with lots are sold lot by lot in Lot Availability. --}}
+            @if(in_array($property->status, ['available', 'coming_soon'], true) && ! $property->lots_count)
+            <form method="POST" action="{{ route('agent.properties.mark-sold', $property) }}" onsubmit="return confirm('Mark {{ e(addslashes($property->name)) }} as sold? It will be added to your broker\'s commission records.')" class="mt-2">
+                @csrf @method('PATCH')
+                <button type="submit" class="w-full rounded-lg border border-amber-300 bg-amber-50 py-1.5 text-center text-xs font-semibold text-amber-800 transition hover:bg-amber-100">Mark as Sold</button>
+            </form>
+            @endif
         </div>
     </div>
     @empty

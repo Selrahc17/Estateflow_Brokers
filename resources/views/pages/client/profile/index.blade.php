@@ -66,11 +66,6 @@
                         @php $activeRes = $client->reservations()->whereIn('status', ['active','approved','pending'])->exists(); @endphp
                         <span class="font-medium {{ $activeRes ? 'text-green-600' : 'text-stone-400' }}">{{ $activeRes ? 'Active' : 'None' }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <span class="text-stone-400">Documents</span>
-                        @php $docCount = $client->documents()->count(); @endphp
-                        <span class="font-medium text-stone-700">{{ $docCount }} uploaded</span>
-                    </div>
                     @endif
                 </div>
             </div>
@@ -178,7 +173,6 @@
                         ['Email Notifications','Receive alerts and updates via email',true],
                         ['SMS Notifications','Receive alerts via text message',false],
                         ['Payment Reminders','Get reminded before payment due dates',true],
-                        ['Document Alerts','Alerts when documents are missing or approved',true],
                         ['Reservation Updates','Updates on your reservation status',true],
                     ] as $pref)
                     <div class="flex items-center justify-between py-2 border-b border-stone-100 last:border-0" x-data="{ on: {{ $pref[2] ? 'true' : 'false' }} }">

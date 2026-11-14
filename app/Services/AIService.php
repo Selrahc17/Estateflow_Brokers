@@ -177,8 +177,8 @@ class AIService
     {
         $message = strtolower($message);
 
-        if (str_contains($message, 'document')) {
-            return 'You can upload and view your documents in the My Documents section of your account.';
+        if (str_contains($message, 'document') || str_contains($message, 'requirement')) {
+            return 'Buying requirements are handled by the developer. Send an inquiry on the property and an agent will connect you with the developer\'s coordinator.';
         }
         if (str_contains($message, 'reservation') || str_contains($message, 'lot')) {
             return 'Your reservation details are available in the My Reservation section of your dashboard.';

@@ -30,13 +30,24 @@ class PropertyController extends Controller
         return view('pages.properties.index', compact('properties'));
     }
 
-    public function commission(): View
+    /**
+     * Marks a listing as sold, which adds it to the broker's commission table.
+     * Listings with lots are sold lot by lot from Lot Availability.
+     */
+    public function markSold(Property $property): RedirectResponse
     {
-        $properties = Property::where('broker_id', auth()->id())
-            ->latest()
-            ->paginate(12);
+        $this->ensureOwnership($property);
 
-        return view('pages.commission.index', compact('properties'));
+        if (in_array($property->status, ['hidden', 'flagged'], true)) {
+            return back()->with('error', 'An admin is reviewing this listing, so it cannot be marked as sold right now.');
+        }
+        if ($property->lots()->exists()) {
+            return back()->with('error', 'This listing has lots. Mark each sold lot in Lot Availability instead.');
+        }
+
+        $property->update(['status' => 'sold']);
+
+        return back()->with('success', "{$property->name} is marked as sold and was added to your broker's commission records.");
     }
 
     public function create(): View

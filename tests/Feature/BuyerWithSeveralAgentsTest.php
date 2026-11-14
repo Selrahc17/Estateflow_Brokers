@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Client;
-use App\Models\Document;
 use App\Models\Lot;
 use App\Models\Property;
 use App\Models\Reservation;
@@ -121,17 +120,6 @@ class BuyerWithSeveralAgentsTest extends TestCase
         $this->assertSame(2, Client::where('civil_status', 'married')->count());
 
         $this->assertSame(2, Client::where('first_name', 'Ana Maria')->where('phone', '09998887777')->count());
-    }
-
-    public function test_the_buyer_can_download_documents_from_any_of_their_records_but_no_one_elses(): void
-    {
-        Storage::disk('local')->put('documents/mine.pdf', 'id');
-        $mine = Document::create(['client_id' => $this->teamB['client']->id, 'name' => 'ID', 'type' => 'id', 'file_path' => 'documents/mine.pdf', 'status' => 'pending']);
-        $stranger = Client::create(['broker_id' => $this->teamB['agent']->id, 'first_name' => 'Other', 'last_name' => 'Buyer', 'email' => 'other@example.com', 'password' => 'secret', 'status' => 'active']);
-        $theirs = Document::create(['client_id' => $stranger->id, 'name' => 'ID', 'type' => 'id', 'file_path' => 'documents/mine.pdf', 'status' => 'pending']);
-
-        $this->actingAs($this->buyer)->get(route('client.account.documents.download', $mine))->assertOk();
-        $this->get(route('client.account.documents.download', $theirs))->assertForbidden();
     }
 
     public function test_an_agent_can_add_a_buyer_another_team_already_has(): void

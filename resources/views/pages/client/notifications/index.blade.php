@@ -9,7 +9,7 @@
         <div>
             <p class="text-teal-500 text-xs uppercase tracking-widest font-semibold mb-1">Notifications</p>
             <h1 class="text-2xl font-bold">Your Alerts & Updates</h1>
-            <p class="text-stone-300 text-sm mt-1">Stay updated on your reservation, payments, and documents</p>
+            <p class="text-stone-300 text-sm mt-1">Stay updated on your inquiries, site visits, and reservations</p>
         </div>
         @php
             $unread = $notifications->where('is_read', false)->count();

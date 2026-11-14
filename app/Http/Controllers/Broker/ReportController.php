@@ -8,6 +8,7 @@ use App\Models\Inquiry;
 use App\Models\Payment;
 use App\Models\Property;
 use App\Models\Reservation;
+use App\Models\Sale;
 use App\Models\SiteVisit;
 use App\Support\Totals;
 use Carbon\Carbon;
@@ -19,10 +20,6 @@ class ReportController extends Controller
     public function index(): View
     {
         $agentIds = auth()->user()->agents()->pluck('users.id');
-        $agreements = \App\Models\CommissionAgreement::where('broker_id', auth()->id())
-            ->with('payments')
-            ->get();
-
         $totals = Totals::of([
             'total_properties' => Property::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
             'total_clients' => Client::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
@@ -30,13 +27,14 @@ class ReportController extends Controller
             'total_revenue' => Payment::whereIn('broker_id', $agentIds)->where('status', 'verified')->selectRaw('coalesce(sum(amount), 0)'),
             'total_leads' => Inquiry::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
             'total_viewings' => SiteVisit::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
+            // Agent plus broker commission from the commission records, by status.
+            'commission_pending' => Sale::forBroker(auth()->user())->where('status', 'pending')->selectRaw('coalesce(sum(coalesce(agent_commission, 0) + coalesce(broker_commission, 0)), 0)'),
+            'commission_transferred' => Sale::forBroker(auth()->user())->where('status', 'transferred')->selectRaw('coalesce(sum(coalesce(agent_commission, 0) + coalesce(broker_commission, 0)), 0)'),
+            'commission_received' => Sale::forBroker(auth()->user())->where('status', 'received')->selectRaw('coalesce(sum(coalesce(agent_commission, 0) + coalesce(broker_commission, 0)), 0)'),
         ]);
 
         $data = [
             ...$totals,
-            'commission_expected' => $agreements->sum(fn ($agreement) => $agreement->payments->sum('amount_due')),
-            'commission_paid' => $agreements->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'paid')->sum('amount_paid')),
-            'commission_disputed' => $agreements->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'disputed')->sum('amount_due')),
             'reservations_by_status' => Reservation::whereIn('broker_id', $agentIds)
                 ->selectRaw('status, COUNT(*) as count')->groupBy('status')->pluck('count', 'status'),
             'monthly_revenue' => $this->monthlyRevenue($agentIds),
@@ -47,7 +45,7 @@ class ReportController extends Controller
             ->selectRaw('broker_id, count(*) as total')->groupBy('broker_id')->pluck('total', 'broker_id');
         $leads = $countByAgent(Inquiry::query());
         $viewings = $countByAgent(SiteVisit::query());
-        $sales = $countByAgent(Reservation::whereIn('status', ['confirmed', 'completed']));
+        $sales = Sale::forBroker(auth()->user())->selectRaw('agent_id, count(*) as total')->groupBy('agent_id')->pluck('total', 'agent_id');
 
         $agents = auth()->user()->agents()->get()->map(function ($agent) use ($leads, $viewings, $sales) {
             $agent->leads_count = (int) $leads->get($agent->id, 0);

@@ -13,7 +13,7 @@
             <div class="flex justify-between gap-3"><dt class="text-stone-500 dark:text-stone-400">Email</dt><dd class="break-all text-right text-stone-700 dark:text-stone-200">{{ $client->email }}</dd></div>
             <div class="flex justify-between gap-3"><dt class="text-stone-500 dark:text-stone-400">Phone</dt><dd class="text-right text-stone-700 dark:text-stone-200">{{ $client->phone ?? '—' }}</dd></div>
             <div class="flex justify-between gap-3"><dt class="text-stone-500 dark:text-stone-400">Agent</dt><dd class="text-right text-stone-700 dark:text-stone-200">{{ $client->broker?->name ?? '—' }}</dd></div>
-            <div class="flex justify-between gap-3"><dt class="text-stone-500 dark:text-stone-400">Requirements</dt><dd class="text-right text-stone-700 dark:text-stone-200">{{ ucfirst(str_replace('_', ' ', $client->qualification_status ?? 'pending')) }}</dd></div>
+            <div class="flex justify-between gap-3"><dt class="text-stone-500 dark:text-stone-400">Status</dt><dd class="text-right text-stone-700 dark:text-stone-200">{{ ucfirst(str_replace('_', ' ', $client->qualification_status ?? 'pending')) }}</dd></div>
             <div class="flex justify-between gap-3"><dt class="text-stone-500 dark:text-stone-400">Added</dt><dd class="text-right text-stone-700 dark:text-stone-200">{{ $client->created_at->format('M d, Y') }}</dd></div>
         </dl>
     </div>

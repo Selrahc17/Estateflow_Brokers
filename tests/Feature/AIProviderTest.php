@@ -56,7 +56,7 @@ class AIProviderTest extends TestCase
 
         $reply = app(AIService::class)->chat('Where are my documents?', 0, 'guest');
 
-        $this->assertStringContainsString('My Documents', $reply);
+        $this->assertStringContainsString('handled by the developer', $reply);
         Http::assertNothingSent();
     }
 

@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Broker;
 
 use App\Http\Controllers\Controller;
-use App\Models\CommissionAgreement;
 use App\Models\Inquiry;
 use App\Models\Property;
-use App\Models\Reservation;
+use App\Models\Sale;
 use App\Models\SiteVisit;
 use App\Services\BrokerComplianceService;
 use Carbon\Carbon;
@@ -36,7 +35,8 @@ class DashboardController extends Controller
 
         $agentIds = $broker->agents()->select('users.id');
         $allMonths = collect(range(11, 0))->map(fn ($monthsAgo) => Carbon::now()->subMonths($monthsAgo));
-        $sales    = $this->monthlyCounts($allMonths, Reservation::class, $agentIds, fn ($query) => $query->whereIn('status', ['confirmed', 'completed']));
+        // Sales are the commission records, counted by date of sale.
+        $sales    = $this->monthlyCounts($allMonths, Sale::class, null, fn ($query) => $query->forBroker($broker), 'sold_at');
         $leads    = $this->monthlyCounts($allMonths, Inquiry::class, $agentIds);
         $viewings = $this->monthlyCounts($allMonths, SiteVisit::class, $agentIds);
 
@@ -58,42 +58,40 @@ class DashboardController extends Controller
     /**
      * Records per month for the chart, from one query instead of one per month.
      */
-    private function monthlyCounts($months, string $model, $agentIds, ?callable $filter = null)
+    private function monthlyCounts($months, string $model, $agentIds, ?callable $filter = null, string $dateColumn = 'created_at')
     {
-        $query = $model::whereIn('broker_id', $agentIds)
-            ->whereBetween('created_at', [$months->first()->copy()->startOfMonth(), $months->last()->copy()->endOfMonth()]);
+        $query = $model::query()
+            ->when($agentIds !== null, fn ($query) => $query->whereIn('broker_id', $agentIds))
+            ->whereBetween($dateColumn, [$months->first()->copy()->startOfMonth(), $months->last()->copy()->endOfMonth()]);
         if ($filter) {
             $filter($query);
         }
 
-        $perMonth = $query->pluck('created_at')->countBy(fn ($createdAt) => Carbon::parse($createdAt)->format('Y-m'));
+        $perMonth = $query->pluck($dateColumn)->countBy(fn ($date) => Carbon::parse($date)->format('Y-m'));
 
         return $months->map(fn ($month) => $perMonth->get($month->format('Y-m'), 0));
     }
 
     public function performance(): View
     {
-        $agreements = CommissionAgreement::where('broker_id', auth()->id())
-            ->with('payments')
-            ->get()
-            ->groupBy('agent_id');
-
         // Counts for every agent at once, instead of three queries per agent.
         $agentIds = auth()->user()->agents()->select('users.id');
         $countByAgent = fn ($query) => $query->whereIn('broker_id', $agentIds)
             ->selectRaw('broker_id, count(*) as total')->groupBy('broker_id')->pluck('total', 'broker_id');
         $leads = $countByAgent(Inquiry::query());
         $viewings = $countByAgent(SiteVisit::query());
-        $sales = $countByAgent(Reservation::whereIn('status', ['confirmed', 'completed']));
 
-        $agents = auth()->user()->agents()->get()->map(function ($agent) use ($agreements, $leads, $viewings, $sales) {
+        // Sales and agent commission come from the commission records.
+        $sales = Sale::forBroker(auth()->user())->toBase()
+            ->selectRaw("agent_id, count(*) as sales, coalesce(sum(agent_commission), 0) as commission, coalesce(sum(case when status = 'received' then agent_commission else 0 end), 0) as received")
+            ->groupBy('agent_id')->get()->keyBy('agent_id');
+
+        $agents = auth()->user()->agents()->get()->map(function ($agent) use ($leads, $viewings, $sales) {
             $agent->leads_count = (int) $leads->get($agent->id, 0);
             $agent->viewings_count = (int) $viewings->get($agent->id, 0);
-            $agent->sales_count = (int) $sales->get($agent->id, 0);
-
-            $payments = $agreements->get($agent->id, collect())->flatMap->payments;
-            $agent->commission_expected = $payments->sum('agent_amount');
-            $agent->commission_paid = $payments->where('payment_status', 'paid')->sum('agent_amount');
+            $agent->sales_count = (int) ($sales->get($agent->id)->sales ?? 0);
+            $agent->commission_expected = (float) ($sales->get($agent->id)->commission ?? 0);
+            $agent->commission_paid = (float) ($sales->get($agent->id)->received ?? 0);
 
             return $agent;
         });

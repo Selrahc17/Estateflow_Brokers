@@ -16,7 +16,7 @@
                 <tr class="text-left text-stone-500 dark:text-stone-400">
                     <th class="px-5 py-3 font-medium">Client</th>
                     <th class="px-5 py-3 font-medium">Agent</th>
-                    <th class="px-5 py-3 font-medium">Requirements</th>
+                    <th class="px-5 py-3 font-medium">Status</th>
                     <th class="px-5 py-3 font-medium">Reservations</th>
                     <th class="px-5 py-3 font-medium">Added</th>
                 </tr>

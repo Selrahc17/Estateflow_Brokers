@@ -7,7 +7,7 @@
     <div class="max-w-4xl mx-auto px-6 py-12">
         <p class="text-teal-500 text-xs uppercase tracking-widest font-semibold mb-2">Legal</p>
         <h1 class="text-3xl font-bold mb-2">Privacy Policy</h1>
-        <p class="text-stone-300 text-sm">Last updated: July 1, 2025</p>
+        <p class="text-stone-300 text-sm">Last updated: November 14, 2026</p>
     </div>
 </div>
 
@@ -55,7 +55,7 @@
                     <div>
                         <p class="font-semibold text-stone-700 mb-2">Personal Information</p>
                         <ul class="space-y-1.5 list-none">
-                            @foreach(['Full name, email address, phone number','Date of birth and civil status','Home address and government IDs','Payment information and transaction history','Documents submitted for reservation requirements'] as $item)
+                            @foreach(['Full name, email address, phone number','Date of birth and civil status','Home address','Payment information and transaction history'] as $item)
                             <li class="flex items-start gap-2"><span class="w-1.5 h-1.5 bg-teal-600 rounded-full mt-1.5 shrink-0"></span>{{ $item }}</li>
                             @endforeach
                         </ul>
@@ -80,7 +80,7 @@
                     @foreach([
                         'Process and manage your property reservations',
                         'Send payment reminders and transaction confirmations',
-                        'Verify your identity and submitted documents',
+                        'Pass your inquiries to the right agent and, for developer projects, to the developer',
                         'Provide AI-powered assistance and property recommendations',
                         'Improve our platform features and user experience',
                         'Comply with legal and regulatory requirements',
@@ -100,6 +100,7 @@
                 <div class="space-y-3">
                     @foreach([
                         ['Your Assigned Broker/Agent','To process your reservation and manage your account.'],
+                        ['Property Developers','For developer projects, your inquiry may be passed to the developer\'s coordinator, who handles the buying requirements.'],
                         ['Payment Processors','To securely handle your payment transactions.'],
                         ['Legal Authorities','When required by law or court order.'],
                         ['Service Providers','Third-party tools that help us operate the platform (under strict confidentiality agreements).'],

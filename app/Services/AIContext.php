@@ -93,7 +93,7 @@ TEXT;
         }
 
         foreach ($profiles->whereNotNull('broker_id') as $profile) {
-            $lines[] = "- Requirements review with agent {$profile->broker?->name}: " . str_replace('_', ' ', $profile->qualification_status);
+            $lines[] = "- Status with agent {$profile->broker?->name}: " . str_replace('_', ' ', $profile->qualification_status);
         }
 
         $ids = $profiles->pluck('id');

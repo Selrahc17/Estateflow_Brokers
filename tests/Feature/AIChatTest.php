@@ -130,7 +130,7 @@ class AIChatTest extends TestCase
         $prompt = app(AIContext::class)->build($this->buyer, 'client', 'my reservation');
 
         $this->assertStringContainsString('RES-MINE', $prompt);
-        $this->assertStringContainsString('Requirements review with agent Agent Ana: approved', $prompt);
+        $this->assertStringContainsString('Status with agent Agent Ana: approved', $prompt);
         $this->assertStringNotContainsString('RES-NOT-MINE', $prompt);
         $this->assertStringNotContainsString('else@example.com', $prompt);
     }

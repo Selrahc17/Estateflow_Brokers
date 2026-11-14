@@ -10,6 +10,7 @@ use App\Models\Feedback;
 use App\Models\Reservation;
 use App\Models\Setting;
 use App\Models\User;
+use App\Support\Totals;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -45,19 +46,15 @@ class AppServiceProvider extends ServiceProvider
         View::composer('layouts.admin', function ($view) {
             $appLogo = Setting::get('logo_url', null);
             if (Auth::check() && Auth::user()->role === 'admin') {
-                $pendingReservations = Reservation::where('status', 'pending')->count();
-                $pendingDocuments = Document::where('status', 'pending')->count();
-                $unreadNotifs = AppNotification::where('user_id', Auth::id())->where('is_read', false)->count();
-
-                $view->with([
-                    'appLogo' => $appLogo,
-                    'pendingReservations' => $pendingReservations,
-                    'pendingDocuments' => $pendingDocuments,
-                    'unreadNotifs' => $unreadNotifs,
-                    'pendingBrokers' => User::where('role', 'broker')->where('is_approved', false)->count(),
-                    'pendingFeedback' => Feedback::where('status', 'pending')->count(),
-                    'newContactMessages' => ContactMessage::where('status', 'new')->count(),
-                ]);
+                // The sidebar badges, fetched in one round trip instead of six.
+                $view->with(['appLogo' => $appLogo, ...Totals::of([
+                    'pendingReservations' => Reservation::where('status', 'pending')->selectRaw('count(*)'),
+                    'pendingDocuments' => Document::where('status', 'pending')->selectRaw('count(*)'),
+                    'unreadNotifs' => AppNotification::where('user_id', Auth::id())->where('is_read', false)->selectRaw('count(*)'),
+                    'pendingBrokers' => User::where('role', 'broker')->where('is_approved', false)->selectRaw('count(*)'),
+                    'pendingFeedback' => Feedback::where('status', 'pending')->selectRaw('count(*)'),
+                    'newContactMessages' => ContactMessage::where('status', 'new')->selectRaw('count(*)'),
+                ])]);
             } else {
                 $view->with([
                     'appLogo' => $appLogo,
@@ -74,7 +71,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function recordSignInsAndSignOuts(): void
     {
-        $record = fn (?User $user, string $action, string $route) => $user && AuditLog::create([
+        $record = fn (?User $user, string $action, string $route) => $user && User::whereKey($user->getKey())->exists() && AuditLog::create([
             'actor_id' => $user->id,
             'actor_role' => $user->role,
             'method' => 'POST',

@@ -13,13 +13,13 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $stats = [
-            'total_users'       => User::count(),
-            'total_brokers'     => User::where('role', 'broker')->count(),
-            'total_clients'     => Client::count(),
-            'total_properties'  => Property::count(),
-            'total_reservations' => Reservation::count(),
-        ];
+        $stats = \App\Support\Totals::of([
+            'total_users'       => User::selectRaw('count(*)'),
+            'total_brokers'     => User::where('role', 'broker')->selectRaw('count(*)'),
+            'total_clients'     => Client::selectRaw('count(*)'),
+            'total_properties'  => Property::selectRaw('count(*)'),
+            'total_reservations' => Reservation::selectRaw('count(*)'),
+        ]);
 
         $recentUsers = User::latest()->take(5)->get();
         $recentReservations = Reservation::with(['client', 'broker'])->latest()->take(5)->get();

@@ -15,13 +15,13 @@ class DashboardController extends Controller
     {
         $brokerId = auth()->id();
 
-        $stats = [
-            'total_properties'  => Property::where('broker_id', $brokerId)->count(),
-            'total_clients'     => Client::where('broker_id', $brokerId)->count(),
-            'active_reservations' => Reservation::where('broker_id', $brokerId)->where('status', 'confirmed')->count(),
-            'pending_inquiries' => Inquiry::where('broker_id', $brokerId)->where('status', 'new')->count(),
-            'pending_site_visits' => SiteVisit::where('broker_id', $brokerId)->where('status', 'pending')->count(),
-        ];
+        $stats = \App\Support\Totals::of([
+            'total_properties'  => Property::where('broker_id', $brokerId)->selectRaw('count(*)'),
+            'total_clients'     => Client::where('broker_id', $brokerId)->selectRaw('count(*)'),
+            'active_reservations' => Reservation::where('broker_id', $brokerId)->where('status', 'confirmed')->selectRaw('count(*)'),
+            'pending_inquiries' => Inquiry::where('broker_id', $brokerId)->where('status', 'new')->selectRaw('count(*)'),
+            'pending_site_visits' => SiteVisit::where('broker_id', $brokerId)->where('status', 'pending')->selectRaw('count(*)'),
+        ]);
 
         $recentReservations = Reservation::where('broker_id', $brokerId)
             ->with(['client', 'lot.property'])

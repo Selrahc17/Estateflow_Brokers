@@ -9,6 +9,8 @@ use App\Models\Payment;
 use App\Models\Property;
 use App\Models\Reservation;
 use App\Models\SiteVisit;
+use App\Support\Totals;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
@@ -21,13 +23,17 @@ class ReportController extends Controller
             ->with('payments')
             ->get();
 
+        $totals = Totals::of([
+            'total_properties' => Property::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
+            'total_clients' => Client::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
+            'total_reservations' => Reservation::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
+            'total_revenue' => Payment::whereIn('broker_id', $agentIds)->where('status', 'verified')->selectRaw('coalesce(sum(amount), 0)'),
+            'total_leads' => Inquiry::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
+            'total_viewings' => SiteVisit::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
+        ]);
+
         $data = [
-            'total_properties' => Property::whereIn('broker_id', $agentIds)->count(),
-            'total_clients' => Client::whereIn('broker_id', $agentIds)->count(),
-            'total_reservations' => Reservation::whereIn('broker_id', $agentIds)->count(),
-            'total_revenue' => Payment::whereIn('broker_id', $agentIds)->where('status', 'verified')->sum('amount'),
-            'total_leads' => Inquiry::whereIn('broker_id', $agentIds)->count(),
-            'total_viewings' => SiteVisit::whereIn('broker_id', $agentIds)->count(),
+            ...$totals,
             'commission_expected' => $agreements->sum(fn ($agreement) => $agreement->payments->sum('amount_due')),
             'commission_paid' => $agreements->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'paid')->sum('amount_paid')),
             'commission_disputed' => $agreements->sum(fn ($agreement) => $agreement->payments->where('payment_status', 'disputed')->sum('amount_due')),
@@ -36,26 +42,36 @@ class ReportController extends Controller
             'monthly_revenue' => $this->monthlyRevenue($agentIds),
         ];
 
-        $agents = auth()->user()->agents()->get()->map(function ($agent) {
-            $agent->leads_count = Inquiry::where('broker_id', $agent->id)->count();
-            $agent->viewings_count = SiteVisit::where('broker_id', $agent->id)->count();
-            $agent->sales_count = Reservation::where('broker_id', $agent->id)
-                ->whereIn('status', ['confirmed', 'completed'])->count();
+        // Counts for every agent at once, instead of three queries per agent.
+        $countByAgent = fn ($query) => $query->whereIn('broker_id', $agentIds)
+            ->selectRaw('broker_id, count(*) as total')->groupBy('broker_id')->pluck('total', 'broker_id');
+        $leads = $countByAgent(Inquiry::query());
+        $viewings = $countByAgent(SiteVisit::query());
+        $sales = $countByAgent(Reservation::whereIn('status', ['confirmed', 'completed']));
+
+        $agents = auth()->user()->agents()->get()->map(function ($agent) use ($leads, $viewings, $sales) {
+            $agent->leads_count = (int) $leads->get($agent->id, 0);
+            $agent->viewings_count = (int) $viewings->get($agent->id, 0);
+            $agent->sales_count = (int) $sales->get($agent->id, 0);
             return $agent;
         })->sortByDesc('sales_count')->values();
 
         return view('pages.broker.reports.index', compact('data', 'agents'));
     }
 
+    /**
+     * Verified payments per month this year, from one query instead of twelve.
+     */
     private function monthlyRevenue(Collection $agentIds): Collection
     {
         $start = now()->startOfYear();
-        return collect(range(1, 12))->mapWithKeys(function (int $month) use ($agentIds, $start) {
-            $amount = Payment::whereIn('broker_id', $agentIds)
-                ->where('status', 'verified')
-                ->whereBetween('paid_at', [$start->copy()->month($month)->startOfMonth(), $start->copy()->month($month)->endOfMonth()])
-                ->sum('amount');
-            return [$month => $amount];
-        });
+        $byMonth = Payment::whereIn('broker_id', $agentIds)
+            ->where('status', 'verified')
+            ->whereBetween('paid_at', [$start, $start->copy()->endOfYear()])
+            ->get(['paid_at', 'amount'])
+            ->groupBy(fn ($payment) => Carbon::parse($payment->paid_at)->month)
+            ->map(fn ($payments) => $payments->sum('amount'));
+
+        return collect(range(1, 12))->mapWithKeys(fn (int $month) => [$month => $byMonth->get($month, 0)]);
     }
 }

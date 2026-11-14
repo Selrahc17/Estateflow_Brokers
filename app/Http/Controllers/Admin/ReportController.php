@@ -8,6 +8,7 @@ use App\Models\Payment;
 use App\Models\Property;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Support\Totals;
 use Illuminate\View\View;
 
 class ReportController extends Controller
@@ -20,24 +21,23 @@ class ReportController extends Controller
                 'properties',
                 'clients',
                 'reservations',
+                'reservations as pending_res' => fn ($query) => $query->where('status', 'pending'),
+                'reservations as confirmed_res' => fn ($query) => $query->whereIn('status', ['confirmed', 'completed']),
             ])
+            // Each broker's totals come with the list, instead of three queries per broker.
+            ->withSum(['payments as total_sales' => fn ($query) => $query->where('status', 'paid')], 'amount')
             ->orderByDesc('reservations_count')
             ->get()
-            ->map(function ($broker) {
-                $broker->total_sales    = Payment::where('broker_id', $broker->id)->where('status', 'paid')->sum('amount');
-                $broker->pending_res    = Reservation::where('broker_id', $broker->id)->where('status', 'pending')->count();
-                $broker->confirmed_res  = Reservation::where('broker_id', $broker->id)->whereIn('status', ['confirmed', 'completed'])->count();
-                return $broker;
-            });
+            ->each(fn ($broker) => $broker->total_sales = (float) $broker->total_sales);
 
-        $summary = [
-            'total_brokers'      => User::where('role', 'broker')->count(),
-            'total_agents'       => User::where('role', 'agent')->count(),
-            'total_clients'      => Client::count(),
-            'total_properties'   => Property::count(),
-            'total_reservations' => Reservation::count(),
-            'total_sales'        => Payment::where('status', 'paid')->sum('amount'),
-        ];
+        $summary = Totals::of([
+            'total_brokers'      => User::where('role', 'broker')->selectRaw('count(*)'),
+            'total_agents'       => User::where('role', 'agent')->selectRaw('count(*)'),
+            'total_clients'      => Client::selectRaw('count(*)'),
+            'total_properties'   => Property::selectRaw('count(*)'),
+            'total_reservations' => Reservation::selectRaw('count(*)'),
+            'total_sales'        => Payment::where('status', 'paid')->selectRaw('coalesce(sum(amount), 0)'),
+        ]);
 
         $reservationsByStatus = Reservation::selectRaw('status, COUNT(*) as count')
             ->groupBy('status')->pluck('count', 'status');

@@ -94,8 +94,19 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'search_path' => 'public',
+            // Empty DB_SEARCH_PATH skips the "set search_path" query on every connect;
+            // Supabase already looks in "public" by default.
+            'search_path' => env('DB_SEARCH_PATH', 'public') ?: null,
             'sslmode' => env('DB_SSLMODE', 'require'),
+            // For a far-away database such as Supabase: DB_PERSISTENT keeps the connection
+            // open between requests instead of reconnecting every time, and
+            // DB_ONE_ROUND_TRIP sends each query with its values in one round trip
+            // instead of preparing it first. (PDO's "emulate prepares" is not used: it
+            // turns true/false into 1/0, which PostgreSQL refuses for boolean columns.)
+            'options' => extension_loaded('pdo_pgsql') ? array_filter([
+                PDO::ATTR_PERSISTENT => (bool) env('DB_PERSISTENT', false),
+                PDO::PGSQL_ATTR_DISABLE_PREPARES => (bool) env('DB_ONE_ROUND_TRIP', false),
+            ]) : [],
         ],
 
         'sqlsrv' => [

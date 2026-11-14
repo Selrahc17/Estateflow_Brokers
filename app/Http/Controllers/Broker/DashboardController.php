@@ -21,10 +21,12 @@ class DashboardController extends Controller
         $broker = auth()->user();
         $agentsQuery = $broker->agents();
 
+        // One query for all three counts; each query is a round trip to the database.
+        $team = (clone $agentsQuery)->get(['users.id', 'is_active', 'is_approved']);
         $stats = [
-            'total_agents' => (clone $agentsQuery)->count(),
-            'active_agents' => (clone $agentsQuery)->where('is_active', true)->where('is_approved', true)->count(),
-            'pending_invites' => (clone $agentsQuery)->where('is_approved', false)->count(),
+            'total_agents' => $team->count(),
+            'active_agents' => $team->filter(fn ($agent) => $agent->is_active && $agent->is_approved)->count(),
+            'pending_invites' => $team->reject(fn ($agent) => $agent->is_approved)->count(),
         ];
 
         $agents = $agentsQuery
@@ -53,16 +55,20 @@ class DashboardController extends Controller
         return view('pages.broker.dashboard', compact('stats', 'agents', 'chart', 'renewals'));
     }
 
+    /**
+     * Records per month for the chart, from one query instead of one per month.
+     */
     private function monthlyCounts($months, string $model, $agentIds, ?callable $filter = null)
     {
-        return $months->map(function ($month) use ($model, $agentIds, $filter) {
-            $query = $model::whereIn('broker_id', $agentIds)
-                ->whereBetween('created_at', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()]);
-            if ($filter) {
-                $filter($query);
-            }
-            return $query->count();
-        });
+        $query = $model::whereIn('broker_id', $agentIds)
+            ->whereBetween('created_at', [$months->first()->copy()->startOfMonth(), $months->last()->copy()->endOfMonth()]);
+        if ($filter) {
+            $filter($query);
+        }
+
+        $perMonth = $query->pluck('created_at')->countBy(fn ($createdAt) => Carbon::parse($createdAt)->format('Y-m'));
+
+        return $months->map(fn ($month) => $perMonth->get($month->format('Y-m'), 0));
     }
 
     public function performance(): View
@@ -72,12 +78,18 @@ class DashboardController extends Controller
             ->get()
             ->groupBy('agent_id');
 
-        $agents = auth()->user()->agents()->get()->map(function ($agent) use ($agreements) {
-            $agent->leads_count = Inquiry::where('broker_id', $agent->id)->count();
-            $agent->viewings_count = SiteVisit::where('broker_id', $agent->id)->count();
-            $agent->sales_count = Reservation::where('broker_id', $agent->id)
-                ->whereIn('status', ['confirmed', 'completed'])
-                ->count();
+        // Counts for every agent at once, instead of three queries per agent.
+        $agentIds = auth()->user()->agents()->select('users.id');
+        $countByAgent = fn ($query) => $query->whereIn('broker_id', $agentIds)
+            ->selectRaw('broker_id, count(*) as total')->groupBy('broker_id')->pluck('total', 'broker_id');
+        $leads = $countByAgent(Inquiry::query());
+        $viewings = $countByAgent(SiteVisit::query());
+        $sales = $countByAgent(Reservation::whereIn('status', ['confirmed', 'completed']));
+
+        $agents = auth()->user()->agents()->get()->map(function ($agent) use ($agreements, $leads, $viewings, $sales) {
+            $agent->leads_count = (int) $leads->get($agent->id, 0);
+            $agent->viewings_count = (int) $viewings->get($agent->id, 0);
+            $agent->sales_count = (int) $sales->get($agent->id, 0);
 
             $payments = $agreements->get($agent->id, collect())->flatMap->payments;
             $agent->commission_expected = $payments->sum('agent_amount');

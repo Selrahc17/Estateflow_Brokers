@@ -104,6 +104,9 @@
                 </div>
             </div>
 
+            {{-- Payment terms, amenities, landmarks and house models (all optional) --}}
+            @include('pages.properties._selling-details', ['property' => $property])
+
             {{-- Location Section --}}
             <div class="border border-stone-200 rounded-xl overflow-hidden">
                 <div class="px-4 py-3 bg-stone-50 border-b border-stone-200 flex items-center justify-between">

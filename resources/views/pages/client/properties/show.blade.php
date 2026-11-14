@@ -69,6 +69,9 @@
                             {{ ucfirst(str_replace('_', ' ', $property->status)) }}
                         </span>
                         <span class="bg-white/90 text-stone-700 text-xs font-medium px-3 py-1 rounded-full">{{ $property->type }}</span>
+                        @if($property->selling_stage_label)
+                        <span class="bg-amber-400 text-amber-950 text-xs font-semibold px-3 py-1 rounded-full">{{ $property->selling_stage_label }}</span>
+                        @endif
                     </div>
                 </div>
                 {{-- Thumbnails --}}
@@ -107,7 +110,7 @@
                     </div>
                     <div class="text-right">
                         <p class="text-xs text-stone-400">Starting at</p>
-                        <p class="text-2xl font-bold text-teal-700">{{ $property->price ? '₱' . number_format($property->price, 0) : 'Price on request' }}</p>
+                        <p class="text-2xl font-bold text-teal-700">{{ ($headlinePrice = (float) $property->price ?: $property->lowest_model_price) ? '₱' . number_format($headlinePrice, 0) : 'Price on request' }}</p>
                     </div>
                 </div>
 
@@ -205,6 +208,9 @@
                 </div>
                 @endif
             </div>
+
+            {{-- Payment terms, house models, amenities and landmarks the agent added --}}
+            @include('pages.properties._selling-display', ['property' => $property])
 
             {{-- Location Map --}}
             <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden">

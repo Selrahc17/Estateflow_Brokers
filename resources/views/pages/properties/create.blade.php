@@ -146,11 +146,14 @@
             </div>
         </section>
 
+        {{-- Payment terms, amenities, landmarks and house models (all optional) --}}
+        @include('pages.properties._selling-details', ['startNumber' => 4])
+
         {{-- Location --}}
         <section class="rounded-xl border border-stone-200 bg-white" aria-labelledby="section-location">
             <div class="{{ $sectionHeader }} justify-between">
                 <div class="flex items-start gap-3">
-                    <span class="{{ $sectionNumber }}" aria-hidden="true">4</span>
+                    <span class="{{ $sectionNumber }}" aria-hidden="true">8</span>
                     <div>
                         <h2 id="section-location" class="font-semibold text-stone-800">Location</h2>
                         <p class="text-xs text-stone-500">Search or click the map to fill in the address.</p>
@@ -276,7 +279,7 @@
         {{-- Photos --}}
         <section class="rounded-xl border border-stone-200 bg-white" aria-labelledby="section-photos">
             <div class="{{ $sectionHeader }}">
-                <span class="{{ $sectionNumber }}" aria-hidden="true">5</span>
+                <span class="{{ $sectionNumber }}" aria-hidden="true">9</span>
                 <div>
                     <h2 id="section-photos" class="font-semibold text-stone-800">Photos</h2>
                     <p class="text-xs text-stone-500">The featured image is the one clients see on the listing card.</p>

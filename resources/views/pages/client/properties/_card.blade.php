@@ -13,8 +13,11 @@
             <svg class="w-12 h-12 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
         </div>
         @endif
-        <div class="absolute top-3 left-3">
+        <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
             <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500 text-white">Available</span>
+            @if($property->selling_stage_label)
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-400 text-amber-950">{{ $property->selling_stage_label }}</span>
+            @endif
         </div>
         @if($property->type !== 'House and Lot' && $property->lots_count > 0)
         <div class="absolute top-3 right-3 space-y-1 text-right">
@@ -77,11 +80,14 @@
         {{-- Price --}}
         <div class="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800">
             <div>
-                @if($property->price)
+                @if($cardPrice = (float) $property->price ?: $property->lowest_model_price)
                 <p class="text-xs text-stone-400">Starting at</p>
-                <p class="text-base font-bold text-teal-700 dark:text-teal-400">₱{{ number_format($property->price, 0) }}</p>
+                <p class="text-base font-bold text-teal-700 dark:text-teal-400">₱{{ number_format($cardPrice, 0) }}</p>
                 @else
                 <p class="text-sm font-medium text-stone-400">Price on request</p>
+                @endif
+                @if((float) $property->reservation_fee > 0)
+                <p class="mt-0.5 text-xs text-stone-500 dark:text-stone-400">₱{{ number_format((float) $property->reservation_fee, 0) }} reservation</p>
                 @endif
             </div>
             <span class="text-xs text-teal-700 dark:text-teal-400 font-medium group-hover:underline">View Details →</span>

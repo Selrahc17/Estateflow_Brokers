@@ -64,6 +64,8 @@
             @endif
         </div>
 
+        @include('pages.properties._selling-display', ['property' => $property, 'card' => 'bg-white rounded-xl border border-stone-200 p-6'])
+
         @if($property->type !== 'House and Lot')
         {{-- Lot or unit inventory table --}}
         <div class="bg-white rounded-xl border border-stone-200 p-6">

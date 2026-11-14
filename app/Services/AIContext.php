@@ -55,7 +55,9 @@ TEXT;
             ->withCount(['lots as available_lots_count' => fn ($query) => $query->where('status', 'available')])
             ->latest()
             ->limit(200)
-            ->get(['id', 'name', 'slug', 'type', 'city', 'province', 'price', 'developer', 'created_at']);
+            ->get(['id', 'name', 'slug', 'type', 'city', 'province', 'price', 'developer', 'created_at',
+                'selling_stage', 'reservation_fee', 'downpayment_percent', 'payment_options', 'installment_terms',
+                'cash_discount_type', 'cash_discount', 'transfer_fee', 'transfer_fee_percent', 'house_models', 'amenities', 'buyer_requirements']);
 
         if ($available->isEmpty()) {
             return 'Available listings: none right now.';
@@ -74,6 +76,7 @@ TEXT;
             $property->price ? '₱' . number_format((float) $property->price, 0) : 'price on request',
             $property->developer ? 'developer: ' . $property->developer : null,
             $property->available_lots_count ? "available lots or units: {$property->available_lots_count}" : null,
+            $property->sellingTermsSummary(),
             'page: ' . route('client.property.show', $property->slug),
         ])));
 

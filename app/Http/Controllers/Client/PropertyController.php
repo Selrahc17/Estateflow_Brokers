@@ -32,7 +32,15 @@ class PropertyController extends Controller
 
     public function index(): View
     {
+        // The "Pre-Selling" and "Ready for Occupancy" menu links pass ?status=Pre-Selling or ?status=RFO.
+        $stage = match (request('status')) {
+            'Pre-Selling' => 'pre_selling',
+            'RFO' => 'ready_for_occupancy',
+            default => null,
+        };
+
         $properties = Property::where('status', 'available')
+            ->when($stage, fn($q) => $q->where('selling_stage', $stage))
             ->when(request('search'), fn($q) => $q->where(function ($query) {
                 $query->where('name', 'like', '%'.request('search').'%')
                     ->orWhere('description', 'like', '%'.request('search').'%');

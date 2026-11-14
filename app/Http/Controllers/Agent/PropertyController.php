@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class PropertyController extends Controller
@@ -66,9 +67,9 @@ class PropertyController extends Controller
             'frontage'    => 'nullable|numeric|min:0',
             'stories'     => 'nullable|integer|min:0',
             'parking_slots' => 'nullable|integer|min:0',
-            'amenities'   => 'nullable|array',
             'confirm_duplicate' => 'nullable|boolean',
         ]);
+        $data = [...$data, ...$this->sellingDetails($request)];
 
         // Check for potential duplicates
         $existingDuplicate = Property::where('broker_id', '!=', auth()->id())
@@ -145,8 +146,8 @@ class PropertyController extends Controller
             'frontage'    => 'nullable|numeric|min:0',
             'stories'     => 'nullable|integer|min:0',
             'parking_slots' => 'nullable|integer|min:0',
-            'amenities'   => 'nullable|array',
         ]);
+        $data = [...$data, ...$this->sellingDetails($request)];
 
         if ($request->hasFile('featured_image')) {
             $request->validate(['featured_image' => 'image|max:4096']);
@@ -186,6 +187,98 @@ class PropertyController extends Controller
         $this->ensureOwnership($property);
         $property->delete();
         return redirect()->route('agent.properties.index')->with('success', 'Property deleted successfully.');
+    }
+
+    /**
+     * The optional selling details: payment terms, transfer fee, amenities, landmarks,
+     * house models and requirements. Empty rows are dropped and empty lists saved as
+     * null, so unticking everything on the edit form clears it.
+     */
+    private function sellingDetails(Request $request): array
+    {
+        $listOrNull = fn (?array $items) => $items ? array_values($items) : null;
+        $text = 'nullable|string|max:255';
+
+        $data = $request->validate([
+            'selling_stage' => ['nullable', Rule::in(array_keys(Property::SELLING_STAGES))],
+            'reservation_fee' => 'nullable|numeric|min:0|max:999999999',
+            'downpayment_percent' => 'nullable|numeric|min:0|max:100',
+            'payment_options' => 'nullable|array',
+            'payment_options.*' => [Rule::in(array_keys(Property::PAYMENT_OPTIONS))],
+            'installment_terms' => $text,
+            'cash_discount_type' => ['nullable', 'required_with:cash_discount', 'in:percent,amount'],
+            'cash_discount' => ['nullable', 'numeric', 'min:0', 'max:999999999', Rule::when($request->input('cash_discount_type') === 'percent', 'max:100')],
+            'transfer_fee' => ['nullable', Rule::in(array_keys(Property::TRANSFER_FEE_OPTIONS))],
+            'transfer_fee_percent' => 'nullable|numeric|min:0|max:100',
+            'amenities' => 'nullable|array',
+            'amenities.*' => 'string|max:100',
+            'amenities_other' => 'nullable|string|max:500',
+            'selling_points' => 'nullable|array',
+            'selling_points.*' => 'string|max:100',
+            'selling_points_other' => 'nullable|string|max:500',
+            'landmarks' => 'nullable|array|max:' . Property::MAX_LANDMARKS,
+            'landmarks.*.name' => 'nullable|string|max:120',
+            'landmarks.*.travel_time' => 'nullable|string|max:60',
+            'house_models' => 'nullable|array|max:' . Property::MAX_HOUSE_MODELS,
+            'house_models.*.name' => ['nullable', 'string', 'max:100'],
+            'house_models.*.position' => ['nullable', Rule::in(Property::UNIT_POSITIONS)],
+            'house_models.*.lot_area' => 'nullable|numeric|min:0|max:99999999',
+            'house_models.*.floor_area' => 'nullable|numeric|min:0|max:99999999',
+            'house_models.*.bedrooms' => 'nullable|integer|min:0|max:100',
+            'house_models.*.bathrooms' => 'nullable|integer|min:0|max:100',
+            'house_models.*.parking_slots' => 'nullable|integer|min:0|max:100',
+            'house_models.*.price' => 'nullable|numeric|min:0|max:999999999999',
+            'house_models.*.features' => $text,
+            'buyer_requirements' => 'nullable|string|max:2000',
+        ], [
+            'cash_discount.max' => 'A percentage discount cannot be more than 100%.',
+            'cash_discount_type.required_with' => 'Choose whether the discount is a percentage or a peso amount.',
+            'landmarks.max' => 'A listing can have up to ' . Property::MAX_LANDMARKS . ' landmarks.',
+            'house_models.max' => 'A listing can have up to ' . Property::MAX_HOUSE_MODELS . ' house models.',
+        ]);
+
+        // Ticked choices plus anything typed in "Other", separated by commas.
+        $withOther = function (string $field) use ($data): ?array {
+            $typed = array_map('trim', explode(',', (string) ($data["{$field}_other"] ?? '')));
+            $all = array_unique(array_filter([...($data[$field] ?? []), ...$typed], fn ($item) => $item !== ''));
+
+            return $all ? array_values($all) : null;
+        };
+
+        $landmarks = collect($data['landmarks'] ?? [])
+            ->map(fn ($row) => ['name' => trim((string) ($row['name'] ?? '')), 'travel_time' => trim((string) ($row['travel_time'] ?? ''))])
+            ->filter(fn ($row) => $row['name'] !== '')
+            ->all();
+
+        $modelFields = ['name', 'position', 'lot_area', 'floor_area', 'bedrooms', 'bathrooms', 'parking_slots', 'price', 'features'];
+        $models = collect($data['house_models'] ?? [])
+            ->map(fn ($row) => collect($modelFields)->mapWithKeys(fn ($field) => [$field => is_string($row[$field] ?? null) ? trim($row[$field]) : ($row[$field] ?? null)])
+                ->map(fn ($value) => $value === '' ? null : $value)->all())
+            ->filter(fn ($row) => array_filter($row, fn ($value) => $value !== null));
+
+        $unnamed = $models->filter(fn ($row) => $row['name'] === null)->keys()->first();
+        if ($unnamed !== null) {
+            throw ValidationException::withMessages(["house_models.{$unnamed}.name" => 'Give this house model a name, like "Type A".']);
+        }
+
+        $hasDiscount = (float) ($data['cash_discount'] ?? 0) > 0;
+
+        return [
+            'selling_stage' => $data['selling_stage'] ?? null,
+            'reservation_fee' => $data['reservation_fee'] ?? null,
+            'downpayment_percent' => $data['downpayment_percent'] ?? null,
+            'payment_options' => $listOrNull(array_unique($data['payment_options'] ?? [])),
+            'installment_terms' => $data['installment_terms'] ?? null,
+            'cash_discount_type' => $hasDiscount ? $data['cash_discount_type'] : null,
+            'cash_discount' => $hasDiscount ? $data['cash_discount'] : null,
+            'transfer_fee' => $data['transfer_fee'] ?? null,
+            'transfer_fee_percent' => ($data['transfer_fee'] ?? null) === 'excluded' ? ($data['transfer_fee_percent'] ?? null) : null,
+            'amenities' => $withOther('amenities'),
+            'selling_points' => $withOther('selling_points'),
+            'landmarks' => $listOrNull($landmarks),
+            'house_models' => $listOrNull($models->all()),
+            'buyer_requirements' => filled($data['buyer_requirements'] ?? null) ? trim($data['buyer_requirements']) : null,
+        ];
     }
 
     private function ensureOwnership(Property $property): void

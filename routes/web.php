@@ -165,6 +165,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'audit
     Route::get('/backups', [AdminBackupController::class, 'index'])->name('backups');
     Route::post('/backups', [AdminBackupController::class, 'store'])->name('backups.store');
     Route::post('/backups/{backup}/download', [AdminBackupController::class, 'download'])->where('backup', '[a-z0-9-]+\.zip')->name('backups.download');
+    Route::post('/backups/import', [AdminBackupController::class, 'import'])->name('backups.import');
+    Route::post('/backups/{backup}/download-sql', [AdminBackupController::class, 'downloadSql'])->where('backup', '[a-z0-9-]+\.zip')->name('backups.download-sql');
     Route::delete('/backups/{backup}', [AdminBackupController::class, 'destroy'])->where('backup', '[a-z0-9-]+\.zip')->name('backups.destroy');
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports');
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings');

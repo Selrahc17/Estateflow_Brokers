@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Broker;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Inquiry;
-use App\Models\Payment;
 use App\Models\Property;
 use App\Models\Reservation;
 use App\Models\Sale;
@@ -24,7 +23,7 @@ class ReportController extends Controller
             'total_properties' => Property::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
             'total_clients' => Client::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
             'total_reservations' => Reservation::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
-            'total_revenue' => Payment::whereIn('broker_id', $agentIds)->where('status', 'verified')->selectRaw('coalesce(sum(amount), 0)'),
+            'total_revenue' => Sale::forBroker(auth()->user())->selectRaw('coalesce(sum(selling_price), 0)'),
             'total_leads' => Inquiry::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
             'total_viewings' => SiteVisit::whereIn('broker_id', $agentIds)->selectRaw('count(*)'),
             // Agent plus broker commission from the commission records, by status.
@@ -58,17 +57,17 @@ class ReportController extends Controller
     }
 
     /**
-     * Verified payments per month this year, from one query instead of twelve.
+     * Selling price of this year's sales per month. Sales are processed by the
+     * developer, so the commission records are where sales are tracked.
      */
     private function monthlyRevenue(Collection $agentIds): Collection
     {
         $start = now()->startOfYear();
-        $byMonth = Payment::whereIn('broker_id', $agentIds)
-            ->where('status', 'verified')
-            ->whereBetween('paid_at', [$start, $start->copy()->endOfYear()])
-            ->get(['paid_at', 'amount'])
-            ->groupBy(fn ($payment) => Carbon::parse($payment->paid_at)->month)
-            ->map(fn ($payments) => $payments->sum('amount'));
+        $byMonth = Sale::forBroker(auth()->user())
+            ->whereBetween('sold_at', [$start->toDateString(), $start->copy()->endOfYear()->toDateString()])
+            ->get(['sold_at', 'selling_price'])
+            ->groupBy(fn ($sale) => Carbon::parse($sale->sold_at)->month)
+            ->map(fn ($sales) => $sales->sum('selling_price'));
 
         return collect(range(1, 12))->mapWithKeys(fn (int $month) => [$month => $byMonth->get($month, 0)]);
     }

@@ -27,6 +27,7 @@ use App\Http\Controllers\Broker\SettingController as BrokerSettingController;
 use App\Http\Controllers\Broker\TeamController as BrokerTeamController;
 use App\Http\Controllers\Broker\AuditController as BrokerAuditController;
 use App\Http\Controllers\Broker\CommissionController as BrokerCommissionController;
+use App\Http\Controllers\Broker\PerformanceController as BrokerPerformanceController;
 use App\Http\Controllers\Broker\NotificationController as BrokerNotificationController;
 use App\Http\Controllers\Broker\ReportController as BrokerReportController;
 use App\Http\Controllers\Agent\ChatController as BrokerChatController;
@@ -183,7 +184,8 @@ Route::prefix('broker/application')->name('broker.application.')->middleware(['a
 // ===================== NOMINATIM PROXY =====================
 Route::prefix('broker')->name('broker.')->middleware(['auth', 'role:broker', 'audit'])->group(function () {
     Route::get('/dashboard', [BrokerDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/performance', [BrokerDashboardController::class, 'performance'])->name('performance');
+    Route::get('/performance', [BrokerPerformanceController::class, 'index'])->name('performance');
+    Route::get('/performance/export', [BrokerPerformanceController::class, 'export'])->name('performance.export');
     Route::get('/property-lists', [BrokerDashboardController::class, 'propertyLists'])->name('property-lists');
     Route::patch('/property-lists/{property}/terms', [BrokerDashboardController::class, 'updatePropertyTerms'])->name('property-lists.terms');
     Route::get('/commissions', [BrokerCommissionController::class, 'index'])->name('commissions.index');

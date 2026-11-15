@@ -6,7 +6,7 @@
 @section('content')
 <div class="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
     @foreach([
-        ['Revenue', '₱' . number_format($data['total_revenue'], 2), 'green'],
+        ['Sales Value', '₱' . number_format($data['total_revenue'], 2), 'green'],
         ['Properties', $data['total_properties'], null],
         ['Clients', $data['total_clients'], null],
         ['Reservations', $data['total_reservations'], null],
@@ -27,7 +27,7 @@
 
 <div class="grid grid-cols-1 gap-5 xl:grid-cols-2">
     <div class="rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 p-5">
-        <h2 class="mb-4 font-semibold text-stone-800 dark:text-stone-100">Monthly Revenue</h2>
+        <h2 class="mb-4 font-semibold text-stone-800 dark:text-stone-100">Monthly Sales Value ({{ now()->year }})</h2>
         @php $maxRevenue = max(1, $data['monthly_revenue']->max()); @endphp
         <div class="flex h-44 items-end gap-2">
             @foreach($data['monthly_revenue'] as $month => $amount)

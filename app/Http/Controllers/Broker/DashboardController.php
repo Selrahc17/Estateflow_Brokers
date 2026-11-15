@@ -72,33 +72,6 @@ class DashboardController extends Controller
         return $months->map(fn ($month) => $perMonth->get($month->format('Y-m'), 0));
     }
 
-    public function performance(): View
-    {
-        // Counts for every agent at once, instead of three queries per agent.
-        $agentIds = auth()->user()->agents()->select('users.id');
-        $countByAgent = fn ($query) => $query->whereIn('broker_id', $agentIds)
-            ->selectRaw('broker_id, count(*) as total')->groupBy('broker_id')->pluck('total', 'broker_id');
-        $leads = $countByAgent(Inquiry::query());
-        $viewings = $countByAgent(SiteVisit::query());
-
-        // Sales and agent commission come from the commission records.
-        $sales = Sale::forBroker(auth()->user())->toBase()
-            ->selectRaw("agent_id, count(*) as sales, coalesce(sum(agent_commission), 0) as commission, coalesce(sum(case when status = 'received' then agent_commission else 0 end), 0) as received")
-            ->groupBy('agent_id')->get()->keyBy('agent_id');
-
-        $agents = auth()->user()->agents()->get()->map(function ($agent) use ($leads, $viewings, $sales) {
-            $agent->leads_count = (int) $leads->get($agent->id, 0);
-            $agent->viewings_count = (int) $viewings->get($agent->id, 0);
-            $agent->sales_count = (int) ($sales->get($agent->id)->sales ?? 0);
-            $agent->commission_expected = (float) ($sales->get($agent->id)->commission ?? 0);
-            $agent->commission_paid = (float) ($sales->get($agent->id)->received ?? 0);
-
-            return $agent;
-        });
-
-        return view('pages.broker.performance', compact('agents'));
-    }
-
     public function propertyLists(): View
     {
         $agentIds = auth()->user()->agents()->select('users.id');

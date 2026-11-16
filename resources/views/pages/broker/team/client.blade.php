@@ -26,7 +26,7 @@
                 <div class="flex items-center justify-between gap-3 border-b border-stone-100 dark:border-stone-800 pb-3 text-sm last:border-0 last:pb-0">
                     <div>
                         <p class="font-medium text-stone-700 dark:text-stone-200">{{ $reservation->lot?->property?->name ?? 'Property removed' }}</p>
-                        <p class="text-xs text-stone-500 dark:text-stone-400">{{ $reservation->reservation_code }} · Lot {{ $reservation->lot?->lot_number ?? '—' }}</p>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">{{ $reservation->reservation_code }} · {{ $reservation->lot?->label ?? '—' }}</p>
                     </div>
                     <span class="shrink-0 text-stone-600 dark:text-stone-300">{{ ucfirst($reservation->status) }}</span>
                 </div>

@@ -69,12 +69,4 @@ class AIProviderTest extends TestCase
 
         $this->assertNotSame('', $reply);
     }
-
-    public function test_the_property_description_helper_uses_the_same_provider(): void
-    {
-        $this->useProvider('test-key');
-        Http::fake(['api.groq.com/*' => Http::response(['choices' => [['message' => ['content' => 'A bright family home.']]]])]);
-
-        $this->assertSame('A bright family home.', app(AIService::class)->generatePropertyDescription(['type' => 'House and Lot']));
-    }
 }

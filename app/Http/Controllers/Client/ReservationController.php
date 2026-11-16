@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\AppNotification;
 use App\Models\Lot;
 use App\Models\Reservation;
+use App\Notifications\NewReservationRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -29,55 +30,51 @@ class ReservationController extends Controller
             'notes' => 'nullable|string|max:1000',
         ]);
 
-        // Each agent reviews the buyer separately, so only this listing's agent's approval counts.
+        // Only the listing's agent works with this buyer, so their client record is the one that counts.
         $client = auth()->user()->clientProfiles()->where('broker_id', $lot->property?->broker_id)->first();
         if (!$client) {
-            return back()->withErrors([
-                'reservation' => 'Send an inquiry for this property first. Its agent needs to review your requirements before you can reserve.',
-            ]);
+            return back()->with('error', 'Send an inquiry for this property first. Once the agent adds you as their client, you can request a lot.');
         }
 
-        if ($client->qualification_status !== 'approved') {
-            return back()->withErrors([
-                'reservation' => 'Your requirements must be approved before requesting a reservation.',
-            ]);
+        $lot->loadMissing('property');
+        if ($lot->status !== 'available' || ! $lot->property || $lot->property->status !== 'available') {
+            return back()->with('error', "{$lot->lot_number} is no longer available.");
         }
 
-        $reservation = DB::transaction(function () use ($lot, $client, $request) {
-            $lot = Lot::with('property')
-                ->whereKey($lot->id)
-                ->where('status', 'available')
-                ->lockForUpdate()
-                ->first();
-
-            if (!$lot || !$lot->property || $lot->property->status !== 'available') {
-                return null;
-            }
-
-            $reservation = Reservation::create([
-                'client_id' => $client->id,
-                'agent_id' => $client->agent_id,
-                'lot_id' => $lot->id,
-                'broker_id' => $lot->property->broker_id,
-                'reservation_code' => 'RES-' . strtoupper(Str::random(8)),
-                'status' => 'pending',
-                'total_price' => $lot->price ?? $lot->property->price,
-                'notes' => $request->input('notes'),
-                'reserved_at' => now(),
-                'expires_at' => now()->addDays(30),
-            ]);
-
-            $lot->update(['status' => 'reserved']);
-
-            return $reservation;
-        });
-
-        if (!$reservation) {
-            return back()->withErrors([
-                'reservation' => 'This lot is no longer available for reservation.',
-            ]);
+        $alreadyAsked = Reservation::where('client_id', $client->id)->where('lot_id', $lot->id)
+            ->whereIn('status', ['requested', ...Reservation::HOLDING])->exists();
+        if ($alreadyAsked) {
+            return back()->with('error', "You already asked for {$lot->lot_number}. The agent will confirm it with you.");
         }
 
-        return back()->with('success', 'Reservation request submitted successfully.');
+        // A request does not hold the lot. The agent confirms it, and only then is the lot reserved.
+        $reservation = Reservation::create([
+            'client_id' => $client->id,
+            'agent_id' => $lot->property->broker_id,
+            'lot_id' => $lot->id,
+            'broker_id' => $lot->property->broker_id,
+            'reservation_code' => 'RES-' . strtoupper(Str::random(8)),
+            'status' => 'requested',
+            'total_price' => $lot->price ?? $lot->property->price,
+            'notes' => $request->input('notes'),
+            'reserved_at' => now(),
+            'expires_at' => now()->addDays(30),
+        ]);
+
+        AppNotification::create([
+            'user_id' => $lot->property->broker_id,
+            'type' => 'reservation',
+            'title' => 'New reservation request',
+            'message' => auth()->user()->name . " asked to reserve {$lot->lot_number} at {$lot->property->name}.",
+            'link' => route('agent.reservations.show', $reservation),
+            'is_read' => false,
+        ]);
+
+        // Also email the agent, after the buyer's page has loaded.
+        $this->emailAgent($lot->property->broker, new NewReservationRequest($reservation->load(['client', 'lot.property'])));
+
+        $agent = $lot->property->broker?->name ?? 'The agent';
+
+        return back()->with('success', "Reservation request sent for {$lot->lot_number}. {$agent} will confirm it with you.");
     }
 }

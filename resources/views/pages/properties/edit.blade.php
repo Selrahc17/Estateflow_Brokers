@@ -20,12 +20,8 @@
             @include('pages.properties._developer-fields', ['property' => $property])
 
             <div>
-                <div class="flex items-center justify-between mb-1">
-                    <label class="block text-sm font-medium text-stone-700">Description</label>
-                    <button type="button" data-ai-describe class="text-xs text-teal-800 hover:underline">Generate with AI</button>
-                </div>
+                <label for="property-description" class="block text-sm font-medium text-stone-700 mb-1">Description</label>
                 <textarea id="property-description" name="description" rows="3" class="w-full border border-stone-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">{{ old('description', $property->description) }}</textarea>
-                <p data-ai-status role="status" class="mt-1 text-xs text-stone-600"></p>
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -233,8 +229,6 @@
             <a href="{{ route('agent.properties.index') }}" class="text-stone-500 hover:text-stone-700 text-sm">Cancel</a>
         </div>
     </form>
-
-    @include('pages.properties._ai-describe-script')
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>

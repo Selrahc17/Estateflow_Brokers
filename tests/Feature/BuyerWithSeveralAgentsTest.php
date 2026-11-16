@@ -54,13 +54,15 @@ class BuyerWithSeveralAgentsTest extends TestCase
         $this->assertSame(2, $this->buyer->clientProfiles()->count());
     }
 
-    public function test_one_teams_approval_does_not_let_the_buyer_reserve_with_another(): void
+    public function test_each_request_goes_to_that_listings_agent_whatever_the_client_status(): void
     {
-        $this->actingAs($this->buyer)->post(route('client.account.reservation.store', $this->teamA['lot']))->assertSessionHasNoErrors();
-        $this->assertDatabaseHas('reservations', ['lot_id' => $this->teamA['lot']->id, 'client_id' => $this->teamA['client']->id, 'broker_id' => $this->teamA['agent']->id]);
+        // Team A has the buyer as Approved, team B as Pending; neither status blocks a request any more.
+        $this->actingAs($this->buyer)->post(route('client.account.reservation.store', $this->teamA['lot']))->assertSessionHas('success');
+        $this->post(route('client.account.reservation.store', $this->teamB['lot']))->assertSessionHas('success');
 
-        $this->post(route('client.account.reservation.store', $this->teamB['lot']))->assertSessionHasErrors('reservation');
-        $this->assertDatabaseMissing('reservations', ['lot_id' => $this->teamB['lot']->id]);
+        $this->assertDatabaseHas('reservations', ['lot_id' => $this->teamA['lot']->id, 'client_id' => $this->teamA['client']->id, 'broker_id' => $this->teamA['agent']->id, 'status' => 'requested']);
+        $this->assertDatabaseHas('reservations', ['lot_id' => $this->teamB['lot']->id, 'client_id' => $this->teamB['client']->id, 'broker_id' => $this->teamB['agent']->id, 'status' => 'requested']);
+        $this->assertSame('available', $this->teamA['lot']->fresh()->status, 'A request does not hold the lot');
     }
 
     public function test_a_buyer_with_no_record_for_that_agent_is_told_to_inquire_first(): void
@@ -70,19 +72,19 @@ class BuyerWithSeveralAgentsTest extends TestCase
 
         $this->actingAs($this->buyer)
             ->post(route('client.account.reservation.store', $outsider['lot']))
-            ->assertSessionHasErrors(['reservation' => 'Send an inquiry for this property first. Its agent needs to review your requirements before you can reserve.']);
+            ->assertSessionHas('error', 'Send an inquiry for this property first. Once the agent adds you as their client, you can request a lot.');
+        $this->assertDatabaseMissing('reservations', ['lot_id' => $outsider['lot']->id]);
         $this->post(route('client.account.site-visits.store', $outsider['property']), ['scheduled_at' => now()->addDay()->toDateTimeString()])
             ->assertSessionHasErrors('site_visit');
     }
 
-    public function test_site_visits_use_the_review_of_that_listings_agent(): void
+    public function test_site_visit_requests_go_to_that_listings_agent_whatever_the_client_status(): void
     {
-        $this->teamB['client']->update(['qualification_status' => 'under_review']);
-
         $this->actingAs($this->buyer)->post(route('client.account.site-visits.store', $this->teamB['property']), ['scheduled_at' => now()->addDay()->toDateTimeString()])->assertSessionHasNoErrors();
-        $this->assertDatabaseHas('site_visits', ['client_id' => $this->teamB['client']->id, 'broker_id' => $this->teamB['agent']->id]);
+        $this->post(route('client.account.site-visits.store', $this->teamA['property']), ['scheduled_at' => now()->addDay()->toDateTimeString()])->assertSessionHasNoErrors();
 
-        $this->post(route('client.account.site-visits.store', $this->teamA['property']), ['scheduled_at' => now()->addDay()->toDateTimeString()])->assertSessionHasErrors('site_visit');
+        $this->assertDatabaseHas('site_visits', ['client_id' => $this->teamB['client']->id, 'broker_id' => $this->teamB['agent']->id]);
+        $this->assertDatabaseHas('site_visits', ['client_id' => $this->teamA['client']->id, 'broker_id' => $this->teamA['agent']->id]);
     }
 
     public function test_the_portal_lists_reservations_and_visits_from_every_agent(): void

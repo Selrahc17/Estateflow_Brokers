@@ -241,7 +241,10 @@
 
                 {{-- Leaflet Map --}}
                 @if($property->latitude && $property->longitude)
-                <div id="property-map" style="height: 380px; width: 100%;"></div>
+                <div id="property-map" style="height: 380px; width: 100%;"
+                     data-lat="{{ $property->latitude }}" data-lng="{{ $property->longitude }}"
+                     data-name="{{ $property->name }}"
+                     data-place="{{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? '') }}"></div>
                 @endif
             </div>
 
@@ -256,15 +259,23 @@
                         <span class="flex items-center gap-1"><span class="w-3 h-3 bg-red-400 rounded inline-block"></span> Sold</span>
                     </div>
                 </div>
+                {{-- Compact tiles so projects with many lots stay short; the size shows on the tile, the price on hover. --}}
                 <div class="grid grid-cols-4 sm:grid-cols-6 gap-2">
                     @foreach($property->lots as $lot)
+                    @php
+                        $lotArea = (float) $lot->square_meters > 0 ? rtrim(rtrim(number_format((float) $lot->square_meters, 2), '0'), '.') . ' sqm' : null;
+                        $lotPrice = (float) $lot->price > 0 ? '₱' . number_format((float) $lot->price, 0) : null;
+                    @endphp
                     <div class="relative group">
-                        <div class="w-full aspect-square {{ $lot->status === 'available' ? 'bg-green-400 hover:bg-green-500 cursor-pointer' : ($lot->status === 'reserved' ? 'bg-teal-500' : 'bg-red-400 opacity-60') }} rounded-lg flex items-center justify-center text-white text-xs font-bold transition">
+                        <div class="w-full aspect-square {{ $lot->status === 'available' ? 'bg-green-400 hover:bg-green-500 cursor-pointer' : ($lot->status === 'reserved' ? 'bg-teal-500' : 'bg-red-400 opacity-60') }} rounded-lg flex flex-col items-center justify-center px-1 text-center text-white text-xs font-bold leading-tight transition">
                             {{ $lot->lot_number }}
+                            @if($lotArea)
+                            <span class="mt-0.5 font-medium opacity-90">{{ $lotArea }}</span>
+                            @endif
                         </div>
                         @if($lot->status === 'available')
                         <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 bg-stone-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition z-10 pointer-events-none">
-                            {{ $lot->lot_number }} — Available
+                            {{ $lot->lot_number }} — {{ implode(' · ', array_filter([$lotArea, $lotPrice])) ?: 'Available' }}
                         </div>
                         @auth
                         <form action="{{ route('client.account.reservation.store', $lot) }}" method="POST" class="mt-2">
@@ -287,39 +298,10 @@
             {{-- Inquiry / Reserve CTA --}}
             <div class="bg-white rounded-2xl border border-stone-200 p-5">
                 <h3 class="font-semibold text-stone-800 mb-1">Interested in this property?</h3>
-                <p class="text-xs text-stone-400 mb-4">Send an inquiry or {{ $property->type === 'House and Lot' ? 'request this property' : ($property->type === 'Condominium' ? 'reserve a unit' : 'reserve a lot') }} today.</p>
+                <p class="text-xs text-stone-500 mb-4">Ask a question or schedule a viewing. {{ $property->broker?->name ?? 'The agent' }} will get back to you.</p>
 
+                @include('pages.client.properties._inquiry-form')
                 @auth
-                <form action="{{ route('client.account.inquiries.store', $property->id) }}" method="POST" class="space-y-3">
-                    @csrf
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Full Name</label>
-                        <input type="text" value="{{ auth()->user()->name }}" disabled class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm bg-stone-50">
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Email *</label>
-                        <input type="email" name="email" placeholder="juan@email.com" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('email') ring-2 ring-red-400 @enderror">
-                        @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Phone *</label>
-                        <input type="text" name="phone" placeholder="+63 912 345 6789" required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('phone') ring-2 ring-red-400 @enderror">
-                        @error('phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Facebook <span class="text-stone-400">(optional)</span></label>
-                        <input type="text" name="facebook" maxlength="255" placeholder="Name or profile link" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                        @error('facebook') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Message *</label>
-                        <textarea name="message" rows="3" placeholder="I'm interested in this property..." required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none @error('message') ring-2 ring-red-400 @enderror"></textarea>
-                        @error('message') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl text-sm font-semibold transition">
-                        Send Inquiry
-                    </button>
-                </form>
                 <div class="flex gap-2 mt-3">
                         @php
                             $isFavorited = auth()->check() && auth()->user()->favorites()->where('property_id', $property->id)->exists();
@@ -331,45 +313,7 @@
                             </button>
                         </form>
                 </div>
-                <form action="{{ route('client.account.site-visits.store', $property) }}" method="POST" class="space-y-3 mt-4 pt-4 border-t border-stone-100">
-                    @csrf
-                    <p class="text-sm font-semibold text-stone-700">Request a site visit</p>
-                    <input type="datetime-local" name="scheduled_at" required min="{{ now()->format('Y-m-d\\TH:i') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    <textarea name="notes" rows="2" placeholder="Optional note for the broker" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none"></textarea>
-                    <button type="submit" class="w-full border border-teal-700 text-teal-800 hover:bg-teal-50 py-2.5 rounded-xl text-sm font-semibold transition">Request Site Visit</button>
-                </form>
                 @else
-                <form action="{{ route('client.property.inquire', $property) }}" method="POST" class="space-y-3">
-                    @csrf
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Full Name *</label>
-                        <input type="text" name="name" placeholder="Jane Doe" required value="{{ old('name') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('name') ring-2 ring-red-400 @enderror">
-                        @error('name') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Email *</label>
-                        <input type="email" name="email" placeholder="juan@email.com" required value="{{ old('email') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('email') ring-2 ring-red-400 @enderror">
-                        @error('email') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Phone *</label>
-                        <input type="text" name="phone" placeholder="+63 912 345 6789" required value="{{ old('phone') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 @error('phone') ring-2 ring-red-400 @enderror">
-                        @error('phone') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Facebook <span class="text-stone-400">(optional)</span></label>
-                        <input type="text" name="facebook" maxlength="255" placeholder="Name or profile link" value="{{ old('facebook') }}" class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                        @error('facebook') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs text-stone-500 mb-1 block">Message *</label>
-                        <textarea name="message" rows="3" placeholder="I'm interested in this property..." required class="w-full border border-stone-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none @error('message') ring-2 ring-red-400 @enderror">{{ old('message') }}</textarea>
-                        @error('message') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
-                    </div>
-                    <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-3 rounded-xl text-sm font-semibold transition">
-                        Send Inquiry
-                    </button>
-                </form>
                 <div class="mt-3 text-center">
                     <a href="{{ route('auth.login') }}" class="text-xs text-teal-700 hover:underline">Already have an account? Login</a>
                 </div>
@@ -483,12 +427,16 @@
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+    // The map reads its data from the #property-map element, so no listing text is written into this script.
     document.addEventListener('DOMContentLoaded', function () {
-        @if($property->latitude && $property->longitude)
-        var lat = {{ $property->latitude }};
-        var lng = {{ $property->longitude }};
+        var el = document.getElementById('property-map');
+        if (!el) return;
 
-        var map = L.map('property-map', { center: [lat, lng], zoom: 15, scrollWheelZoom: false });
+        var lat = parseFloat(el.dataset.lat);
+        var lng = parseFloat(el.dataset.lng);
+        if (isNaN(lat) || isNaN(lng)) return;
+
+        var map = L.map(el, { center: [lat, lng], zoom: 15, scrollWheelZoom: false });
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -501,16 +449,20 @@
             iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -40]
         });
 
-        var marker = L.marker([lat, lng], { icon: icon }).addTo(map);
-        marker.bindPopup(`
-            <div style="font-family:Inter,sans-serif;min-width:180px;padding:4px;">
-                <p style="font-weight:700;font-size:14px;color:#1c1917;margin:0 0 4px;">{{ $property->name }}</p>
-                <p style="font-size:12px;color:#78716c;margin:0 0 6px;">{{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? '') }}</p>
-            </div>
-        `).openPopup();
+        // Built with textContent so a name with quotes, backticks or tags shows as plain text.
+        var popup = document.createElement('div');
+        popup.style.cssText = 'font-family:Inter,sans-serif;min-width:180px;padding:4px;';
+        var title = document.createElement('p');
+        title.style.cssText = 'font-weight:700;font-size:14px;color:#1c1917;margin:0 0 4px;';
+        title.textContent = el.dataset.name || '';
+        var place = document.createElement('p');
+        place.style.cssText = 'font-size:12px;color:#78716c;margin:0 0 6px;';
+        place.textContent = el.dataset.place || '';
+        popup.append(title, place);
+
+        L.marker([lat, lng], { icon: icon }).addTo(map).bindPopup(popup).openPopup();
 
         L.circle([lat, lng], { color: '#d97706', fillColor: '#fef3c7', fillOpacity: 0.15, weight: 1.5, radius: 500 }).addTo(map);
-        @endif
     });
 </script>
 @endpush

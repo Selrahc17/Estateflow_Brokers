@@ -20,18 +20,12 @@
             <div class="space-y-3 text-sm">
                 <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Code</span><span class="font-mono text-stone-700 dark:text-stone-200">{{ $reservation->reservation_code }}</span></div>
                 <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Status</span>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-medium
-                        {{ $reservation->status === 'confirmed' ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300' : '' }}
-                        {{ $reservation->status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' : '' }}
-                        {{ $reservation->status === 'cancelled' ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300' : '' }}
-                        {{ $reservation->status === 'completed' ? 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300' : '' }}">
-                        {{ ucfirst($reservation->status) }}
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium {{ ['requested' => 'bg-violet-100 dark:bg-violet-950 text-violet-800 dark:text-violet-300', 'pending' => 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300', 'confirmed' => 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300', 'cancelled' => 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300', 'completed' => 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300'][$reservation->status] ?? 'bg-stone-100 text-stone-700' }}">
+                        {{ $reservation->status_label }}
                     </span>
                 </div>
                 <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Total Price</span><span class="font-semibold text-stone-700 dark:text-stone-200">₱{{ number_format($reservation->total_price, 2) }}</span></div>
-                <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Down Payment</span><span class="text-stone-700 dark:text-stone-200">₱{{ number_format($reservation->down_payment, 2) }}</span></div>
-                <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Terms</span><span class="text-stone-700 dark:text-stone-200">{{ $reservation->payment_terms_months }} months</span></div>
-                <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Schedule</span><span class="text-stone-700 dark:text-stone-200">{{ ucfirst($reservation->payment_schedule) }}</span></div>
+                <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Reservation Fee Paid</span><span class="text-stone-700 dark:text-stone-200">{{ $reservation->reservation_fee !== null ? '₱' . number_format($reservation->reservation_fee, 2) : '—' }}</span></div>
                 <div class="flex justify-between"><span class="text-stone-500 dark:text-stone-400">Reserved</span><span class="text-stone-700 dark:text-stone-200">{{ $reservation->reserved_at?->format('M d, Y') ?? '—' }}</span></div>
             </div>
         </div>
@@ -65,46 +59,16 @@
             <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 p-4">
                 <p class="text-xs text-stone-500 dark:text-stone-400 mb-1">Lot</p>
                 <p class="font-medium text-stone-700 dark:text-stone-200">{{ $reservation->lot?->property?->name ?? '—' }}</p>
-                <p class="text-xs text-stone-500 dark:text-stone-400">Lot {{ $reservation->lot?->lot_number }}</p>
+                <p class="text-xs text-stone-500 dark:text-stone-400">{{ $reservation->lot?->label }}</p>
             </div>
         </div>
 
+        @if($reservation->notes)
         <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 p-5">
-            <h2 class="font-semibold text-stone-800 dark:text-stone-100 mb-4">Payment History</h2>
-            <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="text-left text-stone-500 dark:text-stone-400 border-b border-stone-100 dark:border-stone-800">
-                        <th class="pb-3 font-medium">Code</th>
-                        <th class="pb-3 font-medium">Amount</th>
-                        <th class="pb-3 font-medium">Type</th>
-                        <th class="pb-3 font-medium">Status</th>
-                        <th class="pb-3 font-medium">Date</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-stone-50 dark:divide-stone-800">
-                    @forelse($reservation->payments as $payment)
-                    <tr class="hover:bg-stone-50 dark:hover:bg-stone-800">
-                        <td class="py-3 font-mono text-xs text-stone-600 dark:text-stone-300">{{ $payment->payment_code }}</td>
-                        <td class="py-3 font-semibold text-stone-700 dark:text-stone-200">₱{{ number_format($payment->amount, 2) }}</td>
-                        <td class="py-3 text-stone-500 dark:text-stone-400">{{ ucfirst(str_replace('_', ' ', $payment->payment_type)) }}</td>
-                        <td class="py-3">
-                            <span class="px-2 py-0.5 rounded-full text-xs font-medium
-                                {{ $payment->status === 'verified' ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300' : '' }}
-                                {{ $payment->status === 'pending' ? 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' : '' }}
-                                {{ $payment->status === 'failed' ? 'bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300' : '' }}">
-                                {{ ucfirst($payment->status) }}
-                            </span>
-                        </td>
-                        <td class="py-3 text-stone-500 dark:text-stone-400 text-xs">{{ $payment->created_at->format('M d, Y') }}</td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="5" class="py-6 text-center text-stone-500 dark:text-stone-400">No payments recorded.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-            </div>
+            <h2 class="font-semibold text-stone-800 dark:text-stone-100 mb-2">Notes</h2>
+            <p class="whitespace-pre-line text-sm text-stone-600 dark:text-stone-300">{{ $reservation->notes }}</p>
         </div>
+        @endif
     </div>
 
 </div>

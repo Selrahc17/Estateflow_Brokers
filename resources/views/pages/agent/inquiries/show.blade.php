@@ -34,6 +34,32 @@
         </div>
     </div>
 
+    @if($inquiry->isViewingRequest())
+    {{-- Viewing request --}}
+    <div class="mb-6 flex flex-col gap-4 rounded-xl border border-violet-200 bg-violet-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-start gap-3">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700" aria-hidden="true">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </span>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-violet-800">Viewing request</p>
+                <p class="text-lg font-bold text-stone-800">{{ $inquiry->preferred_viewing_at?->format('l, F j, Y · g:i A') ?? 'No time chosen' }}</p>
+                <p class="text-sm text-stone-600">The buyer's preferred schedule. Confirm it with them, then book the site visit.</p>
+            </div>
+        </div>
+        @if($client)
+        <a href="{{ route('agent.site-visits.create', array_filter(['client_id' => $client->id, 'property_id' => $inquiry->property_id, 'inquiry_id' => $inquiry->id, 'scheduled_at' => $inquiry->preferred_viewing_at?->format('Y-m-d\TH:i')])) }}"
+           class="shrink-0 rounded-lg bg-violet-700 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-violet-800">Schedule Site Visit</a>
+        @else
+        <form action="{{ route('agent.inquiries.client', $inquiry) }}" method="POST" class="shrink-0">
+            @csrf
+            <button type="submit" class="w-full rounded-lg bg-violet-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-800">Add as Client to Schedule</button>
+            <p class="mt-1 text-center text-xs text-violet-800">A site visit needs a client record first.</p>
+        </form>
+        @endif
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Left: Inquiry & Message --}}
         <div class="lg:col-span-2 space-y-6">

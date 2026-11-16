@@ -83,7 +83,7 @@
                     <div class="flex items-start justify-between">
                         <div>
                             <p class="font-semibold text-stone-800 text-sm">{{ $res->lot?->property?->name ?? '—' }}</p>
-                            <p class="text-xs text-stone-400 mt-0.5">Lot {{ $res->lot?->lot_number }} · {{ $res->reservation_code }}</p>
+                            <p class="text-xs text-stone-400 mt-0.5">{{ $res->lot?->label }} · {{ $res->reservation_code }}</p>
                         </div>
                         <span class="px-2 py-0.5 rounded-full text-xs font-medium
                             {{ $res->status==='confirmed' ? 'bg-green-100 text-green-700' : '' }}

@@ -215,4 +215,22 @@ class PropertySellingDetailsTest extends TestCase
         $this->get(route('client.properties', ['status' => 'RFO']))->assertSee('Harbor Ready Homes')->assertDontSee('Sunrise Pre-selling');
         $this->get(route('client.properties'))->assertSee('Sunrise Pre-selling')->assertSee('Harbor Ready Homes')->assertSee('Plain Listing');
     }
+
+    public function test_house_model_inclusions_are_split_into_a_checklist(): void
+    {
+        $this->assertSame(
+            ['Living area', 'Dining area', 'Kitchen area', 'Toilet & bath', 'Service area'],
+            Property::splitInclusions('Living area, dining area, kitchen area, toilet & bath, and service area.')
+        );
+        $this->assertSame(['Balcony', 'Laundry'], Property::splitInclusions("balcony;\nLaundry, balcony"));
+        $this->assertSame([], Property::splitInclusions(null));
+
+        $property = Property::create(['broker_id' => $this->agent->id, 'name' => 'Conchita Ville', 'slug' => 'conchita', 'type' => 'House and Lot', 'status' => 'available',
+            'house_models' => [['name' => 'DX50', 'lot_area' => 72, 'floor_area' => 50, 'bedrooms' => 2, 'bathrooms' => 2, 'price' => 2855000,
+                'features' => 'Living area, dining area, kitchen area, toilet & bath, and service area']]]);
+
+        $this->get(route('client.property.show', $property->slug))
+            ->assertSeeInOrder(['DX50', '72 m² lot · 50 m² floor · 2 bedrooms · 2 T&amp;B', 'aria-label="Inclusions"', 'Living area', 'Dining area', 'Kitchen area', 'Toilet &amp; bath', 'Service area', '₱2,855,000'], false)
+            ->assertDontSee('toilet &amp; bath, and service area', false);
+    }
 }

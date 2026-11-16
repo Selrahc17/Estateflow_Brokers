@@ -132,6 +132,20 @@ class BackupRestoreTest extends TestCase
         $this->assertDatabaseHas('properties', ['name' => 'Vista Homes']);
     }
 
+    public function test_a_signed_backup_with_no_records_is_refused_so_nothing_is_emptied(): void
+    {
+        $this->listing('Vista Homes');
+
+        // What a backup looked like when the database settings hid every table.
+        $empty = "-- EstateFlow database backup, 2026-11-15 16:56:46\n\nBEGIN;\n\n\nCOMMIT;\n";
+        $empty .= BackupService::SIGNATURE_PREFIX.hash_hmac('sha256', $empty, (string) config('app.key'))."\n";
+
+        $this->import($empty)->assertSessionHasErrors(['backup' => 'This backup has no accounts or records in it, so restoring it would empty the system. Nothing was changed.']);
+
+        $this->assertDatabaseHas('properties', ['name' => 'Vista Homes']);
+        $this->assertDatabaseHas('users', ['id' => $this->admin->id]);
+    }
+
     public function test_a_signed_file_that_fails_to_load_changes_nothing(): void
     {
         $this->listing('Vista Homes');

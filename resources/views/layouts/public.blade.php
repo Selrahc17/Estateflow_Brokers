@@ -442,5 +442,6 @@
             });
         }
     </script>
+    @include('layouts.partials.flash-toast')
 </body>
 </html>

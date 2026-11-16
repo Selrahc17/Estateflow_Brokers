@@ -207,8 +207,8 @@
                     </div>
                     @endforeach
                     <div class="col-span-2 sm:col-span-4">
-                        <label :for="'model-features-' + i" class="mb-1 block text-xs font-medium text-stone-600">Inclusions</label>
-                        <input :id="'model-features-' + i" type="text" :name="`house_models[${i}][features]`" x-model="model.features" maxlength="255" placeholder="e.g. Living, dining, kitchen and service area" class="{{ $input }}">
+                        <label :for="'model-features-' + i" class="mb-1 block text-xs font-medium text-stone-600">Inclusions <span class="font-normal text-stone-500">(separate with commas; each shows as a checklist item)</span></label>
+                        <input :id="'model-features-' + i" type="text" :name="`house_models[${i}][features]`" x-model="model.features" maxlength="255" placeholder="e.g. Living area, dining area, kitchen, toilet & bath, service area" class="{{ $input }}">
                     </div>
                 </div>
             </div>

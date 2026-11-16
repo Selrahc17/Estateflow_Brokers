@@ -33,7 +33,7 @@ class ReservationController extends Controller
 
     public function show(Reservation $reservation): View
     {
-        $reservation->load(['client', 'broker', 'lot.property', 'payments']);
+        $reservation->load(['client', 'broker', 'lot.property']);
         return view('pages.admin.reservations.show', compact('reservation'));
     }
 
@@ -54,16 +54,28 @@ class ReservationController extends Controller
                 return 'A completed sale cannot be changed.';
             }
 
-            if ($reservation->status === 'cancelled' && $lot && $lot->status !== 'available') {
-                return 'This lot has been taken since the reservation was cancelled.';
+            $wasHolding = $reservation->holdsLot();
+            $willHold = in_array($status, Reservation::HOLDING, true);
+
+            // A cancelled reservation or a buyer's request takes the lot only if it is still free.
+            if ($lot && ! $wasHolding && ($willHold || $status === 'completed') && $lot->status !== 'available') {
+                return $reservation->status === 'cancelled'
+                    ? 'This lot has been taken since the reservation was cancelled.'
+                    : "{$lot->lot_number} is already reserved for someone else.";
             }
 
             $reservation->update(['status' => $status]);
-            $lot?->update(['status' => match ($status) {
-                'cancelled' => 'available',
-                'completed' => 'sold',
-                default => 'reserved',
-            }]);
+
+            if ($lot) {
+                if ($status === 'completed') {
+                    $lot->update(['status' => 'sold']);
+                } elseif ($willHold) {
+                    $lot->update(['status' => 'reserved']);
+                } elseif ($status === 'cancelled' && $wasHolding && $lot->status === 'reserved') {
+                    // Only the reservation that held the lot gives it back.
+                    $lot->update(['status' => 'available']);
+                }
+            }
 
             return null;
         });

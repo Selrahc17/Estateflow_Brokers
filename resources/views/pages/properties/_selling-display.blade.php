@@ -112,8 +112,15 @@
             @if($specs)
             <p class="mt-1 text-sm text-stone-600">{{ implode(' · ', $specs) }}</p>
             @endif
-            @if(! empty($model['features']))
-            <p class="mt-1 text-xs text-stone-500">{{ $model['features'] }}</p>
+            @if($inclusions = \App\Models\Property::splitInclusions($model['features'] ?? null))
+            <ul class="mt-3 grid grid-cols-1 gap-x-3 gap-y-1.5 sm:grid-cols-2" aria-label="Inclusions">
+                @foreach($inclusions as $inclusion)
+                <li class="flex items-start gap-1.5 text-xs text-stone-600">
+                    <svg class="mt-px h-3.5 w-3.5 shrink-0 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    {{ $inclusion }}
+                </li>
+                @endforeach
+            </ul>
             @endif
             @if($modelPrice > 0)
             <p class="mt-3 text-lg font-bold text-teal-700">{{ $peso($modelPrice) }}</p>

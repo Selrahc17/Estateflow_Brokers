@@ -17,14 +17,11 @@
         <div class="px-6 py-4 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <p class="font-bold text-stone-800">{{ $res->lot?->property?->name ?? '—' }}</p>
-                <p class="text-sm text-stone-400">Lot {{ $res->lot?->lot_number }} · Code: {{ $res->reservation_code }}</p>
+                <p class="text-sm text-stone-400">{{ $res->lot?->label }} · Code: {{ $res->reservation_code }}</p>
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-semibold self-start sm:self-auto
-                {{ $res->status==='confirmed' ? 'bg-green-100 text-green-700' : '' }}
-                {{ $res->status==='pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                {{ $res->status==='cancelled' ? 'bg-red-100 text-red-600' : '' }}
-                {{ $res->status==='completed' ? 'bg-blue-100 text-blue-700' : '' }}">
-                {{ ucfirst($res->status) }}
+                {{ ['requested' => 'bg-violet-100 text-violet-800', 'pending' => 'bg-yellow-100 text-yellow-700', 'confirmed' => 'bg-green-100 text-green-700', 'cancelled' => 'bg-red-100 text-red-600', 'completed' => 'bg-blue-100 text-blue-700'][$res->status] ?? 'bg-stone-100 text-stone-700' }}">
+                {{ $res->status === 'requested' ? 'Waiting for agent' : $res->status_label }}
             </span>
         </div>
         <div class="p-6">

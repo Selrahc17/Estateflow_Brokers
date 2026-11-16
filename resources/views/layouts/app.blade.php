@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    {{-- Runs before first paint so dark mode pages never flash white. --}}
+    <script>
+        if (localStorage.getItem('darkMode') === 'true') document.documentElement.classList.add('dark');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1A6B79">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,9 +20,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         [x-cloak] { display: none !important; }
+        .dark { color-scheme: dark; }
     </style>
 </head>
-<body class="bg-stone-100 font-sans" x-data="{
+<body class="agent-portal bg-stone-100 dark:bg-stone-950 font-sans" x-data="{
+        darkMode: document.documentElement.classList.contains('dark'),
         isDesktop: window.innerWidth >= 1024,
         sidebarOpen: window.innerWidth >= 1024 && localStorage.getItem('agentSidebar') !== 'collapsed',
         toggleSidebar() {
@@ -123,20 +129,21 @@
     </aside>
 
     {{-- Main Content --}}
-    <div :class="!isDesktop ? 'ml-0' : (sidebarOpen ? 'ml-64' : 'ml-16')" class="transition-all duration-300 min-h-screen flex flex-col">
+    <div :class="!isDesktop ? 'ml-0' : (sidebarOpen ? 'ml-64' : 'ml-16')" class="agent-main transition-all duration-300 min-h-screen flex flex-col">
 
         {{-- Top Header --}}
-        <header class="bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
+        <header class="bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 px-6 py-4 flex items-center justify-between sticky top-0 z-40">
             <div class="flex items-center gap-4">
                 <button @click="toggleSidebar()" aria-label="Toggle navigation menu" class="text-stone-500 hover:text-[var(--color-primary)] transition">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
                 <div>
-                    <h1 class="text-lg font-semibold text-stone-800">@yield('page-title', 'Dashboard')</h1>
-                    <p class="text-xs text-stone-500">@yield('page-subtitle', 'Welcome back!')</p>
+                    <h1 class="text-lg font-semibold text-stone-800 dark:text-white">@yield('page-title', 'Dashboard')</h1>
+                    <p class="text-xs text-stone-500 dark:text-stone-400">@yield('page-subtitle', 'Welcome back!')</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
+                @include('layouts.partials.theme-toggle')
                 @if($unreadCount > 0)
                     <a href="{{ route('agent.notifications.index') }}" class="relative text-stone-500 hover:text-[var(--color-primary)] transition">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -176,7 +183,7 @@
             @yield('content')
         </main>
 
-        <footer class="text-center text-xs text-stone-600 py-4 border-t border-stone-200">
+        <footer class="text-center text-xs text-stone-600 dark:text-stone-400 py-4 border-t border-stone-200 dark:border-stone-800">
             © {{ date('Y') }} EstateFlow. All rights reserved.
         </footer>
     </div>

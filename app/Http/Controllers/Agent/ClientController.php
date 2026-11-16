@@ -18,55 +18,34 @@ class ClientController extends Controller
 {
     public function __construct(private AIService $ai) {}
 
+    /**
+     * Every client this agent has, including ones added by hand that have no
+     * inquiry, visit or reservation yet.
+     */
     public function index(): View
     {
-        $brokerId = auth()->id();
+        $search = trim((string) request('search'));
+        $stage = in_array(request('stage'), ['pending', 'under_review', 'approved', 'rejected'], true) ? request('stage') : null;
+        $stageCounts = Client::where('broker_id', auth()->id())
+            ->selectRaw('qualification_status, count(*) as total')->groupBy('qualification_status')->pluck('total', 'qualification_status');
 
-        $clientIds = collect();
-
-        $clientIds = $clientIds->merge(
-            \App\Models\Inquiry::where('broker_id', $brokerId)
-                ->select('email')
-                ->distinct()
-                ->pluck('email')
-                ->filter()
-                ->map(fn ($email) => Client::where('email', $email)->where('broker_id', $brokerId)->value('id'))
-                ->filter()
-        );
-
-        $clientIds = $clientIds->merge(
-            \App\Models\Reservation::where('broker_id', $brokerId)->pluck('client_id')
-        );
-
-        $clientIds = $clientIds->merge(
-            \App\Models\SiteVisit::where('broker_id', $brokerId)->pluck('client_id')
-        );
-
-        $clientIds = $clientIds->merge(
-            \App\Models\Payment::where('broker_id', $brokerId)->pluck('client_id')
-        );
-
-        $clientIds = $clientIds->merge(
-            \App\Models\Feedback::where('user_id', $brokerId)->pluck('client_id')
-        );
-
-        $clientIds = $clientIds->unique()->filter();
-
-        $clients = Client::whereIn('id', $clientIds)
-            ->where('broker_id', $brokerId)
-            ->when(request('search'), function ($query) {
-                $search = request('search');
-                $query->where(function ($searchQuery) use ($search) {
-                    $searchQuery->where('first_name', 'like', '%'.$search.'%')
-                        ->orWhere('last_name', 'like', '%'.$search.'%')
-                        ->orWhere('email', 'like', '%'.$search.'%');
-                });
+        $clients = Client::where('broker_id', auth()->id())
+            ->when($stage, fn ($query) => $query->where('qualification_status', $stage))
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . mb_strtolower($search) . '%';
+                $query->where(fn ($match) => $match
+                    ->whereRaw('lower(first_name) like ?', [$like])
+                    ->orWhereRaw('lower(last_name) like ?', [$like])
+                    ->orWhereRaw("lower(first_name || ' ' || last_name) like ?", [$like])
+                    ->orWhereRaw('lower(email) like ?', [$like])
+                    ->orWhereRaw('lower(phone) like ?', [$like]));
             })
-            ->withCount('reservations')
+            ->withCount(['reservations', 'siteVisits'])
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('pages.clients.index', compact('clients'));
+        return view('pages.clients.index', compact('clients', 'stage', 'stageCounts', 'search'));
     }
 
     public function show(Client $client): View
@@ -132,15 +111,10 @@ class ClientController extends Controller
             'qualification_status' => 'required|in:pending,under_review,approved,rejected',
         ]);
 
-        if ($data['qualification_status'] === 'approved' && ! $client->siteVisits()->where('status', 'completed')->exists()) {
-            return back()->withErrors([
-                'qualification_status' => 'Complete a site visit before approving this client.',
-            ]);
-        }
-
+        // The status is a label for the agent's own tracking; it no longer blocks anything.
         $client->update($data);
 
-        return back()->with('success', 'Client qualification status updated successfully.');
+        return back()->with('success', 'Client status updated.');
     }
 
     public function aiLeadScore(Request $request): JsonResponse

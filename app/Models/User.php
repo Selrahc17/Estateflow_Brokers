@@ -128,10 +128,16 @@ class User extends Authenticatable
         return $this->hasMany(Reservation::class, 'broker_id');
     }
 
-    /** Buyer payments recorded under this broker or agent. */
+    /** Buyer payments recorded under this broker or agent (no longer used; kept for old data). */
     public function payments()
     {
         return $this->hasMany(Payment::class, 'broker_id');
+    }
+
+    /** Sales in this broker's commission records. */
+    public function teamSales()
+    {
+        return $this->hasMany(Sale::class, 'broker_id');
     }
 
     public function agentDocuments()

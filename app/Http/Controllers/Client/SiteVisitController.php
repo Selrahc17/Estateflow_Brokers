@@ -27,13 +27,7 @@ class SiteVisitController extends Controller
         $client = auth()->user()->clientProfiles()->where('broker_id', $property->broker_id)->first();
         if (!$client) {
             return back()->withErrors([
-                'site_visit' => 'Send an inquiry for this property first. Its agent needs to start reviewing your requirements.',
-            ]);
-        }
-
-        if ($client->qualification_status !== 'under_review') {
-            return back()->withErrors([
-                'site_visit' => 'A site visit can be requested after the agent starts reviewing your requirements.',
+                'site_visit' => 'Send an inquiry for this property first, or use Schedule Viewing on the property page.',
             ]);
         }
 

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Client;
-use App\Models\Payment;
 use App\Models\Property;
 use App\Models\Reservation;
+use App\Models\Sale;
 use App\Models\User;
 use App\Support\Totals;
 use Illuminate\View\View;
@@ -25,7 +25,8 @@ class ReportController extends Controller
                 'reservations as confirmed_res' => fn ($query) => $query->whereIn('status', ['confirmed', 'completed']),
             ])
             // Each broker's totals come with the list, instead of three queries per broker.
-            ->withSum(['payments as total_sales' => fn ($query) => $query->where('status', 'paid')], 'amount')
+            // Sales are the broker's commission records; buyer payments go to the developer.
+            ->withSum('teamSales as total_sales', 'selling_price')
             ->orderByDesc('reservations_count')
             ->get()
             ->each(fn ($broker) => $broker->total_sales = (float) $broker->total_sales);
@@ -36,7 +37,7 @@ class ReportController extends Controller
             'total_clients'      => Client::selectRaw('count(*)'),
             'total_properties'   => Property::selectRaw('count(*)'),
             'total_reservations' => Reservation::selectRaw('count(*)'),
-            'total_sales'        => Payment::where('status', 'paid')->selectRaw('coalesce(sum(amount), 0)'),
+            'total_sales'        => Sale::selectRaw('coalesce(sum(selling_price), 0)'),
         ]);
 
         $reservationsByStatus = Reservation::selectRaw('status, COUNT(*) as count')

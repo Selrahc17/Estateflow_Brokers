@@ -1,5 +1,6 @@
 @extends('layouts.public')
 @section('title', 'Contact Us')
+@section('hide-flash-toast', '1')
 
 @section('content')
 

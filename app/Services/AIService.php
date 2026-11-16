@@ -68,34 +68,6 @@ class AIService
         }
     }
 
-    public function generatePropertyDescription(array $specs): string
-    {
-        if (empty($this->apiKey)) {
-            return '';
-        }
-
-        $details = collect($specs)->filter()->map(fn($v, $k) => "$k: $v")->implode(', ');
-
-        try {
-            $response = Http::withToken($this->apiKey)
-                ->timeout(15)
-                ->post($this->endpoint, [
-                    'model'      => $this->model,
-                    'max_tokens' => 250,
-                    'messages'   => [
-                        ['role' => 'system', 'content' => 'You are a professional real estate copywriter in the Philippines. Write compelling, concise property descriptions in 2-3 sentences.'],
-                        ['role' => 'user',   'content' => "Write a property listing description for: $details"],
-                    ],
-                ]);
-
-            return $response->successful()
-                ? ($response->json('choices.0.message.content') ?? '')
-                : '';
-        } catch (\Throwable $e) {
-            return '';
-        }
-    }
-
     public function scoreLeads(array $leads): array
     {
         // Score leads locally based on activity signals — no API call needed

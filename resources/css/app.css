@@ -53,3 +53,215 @@ body {
 .chat-md code { font-size: 0.9em; }
 .chat-md table { border-collapse: collapse; }
 .chat-md th, .chat-md td { border: 1px solid currentColor; padding: 0.15em 0.4em; }
+
+/* Agent portal dark mode. Generated: maps the light classes agent pages use to
+   dark colours. Unlayered, so it wins over Tailwind's utilities when .dark is on. */
+.dark .agent-main .bg-white,
+.dark .agent-main .bg-white\/95 { background-color: var(--color-stone-900); }
+.dark .agent-main .bg-stone-50,
+.dark .agent-main .bg-stone-50\/70 { background-color: color-mix(in oklab, var(--color-stone-800) 55%, var(--color-stone-900)); }
+.dark .agent-main .bg-stone-100 { background-color: var(--color-stone-800); }
+.dark .agent-main .bg-stone-200 { background-color: var(--color-stone-700); }
+.dark .agent-main .hover\:bg-stone-50:hover,
+.dark .agent-main .hover\:bg-stone-50\/70:hover,
+.dark .agent-main .hover\:bg-stone-100:hover { background-color: var(--color-stone-800); }
+.dark .agent-main .hover\:bg-stone-200:hover { background-color: var(--color-stone-700); }
+.dark .agent-main .text-stone-900 { color: var(--color-stone-50); }
+.dark .agent-main .text-stone-800 { color: var(--color-stone-100); }
+.dark .agent-main .text-stone-700 { color: var(--color-stone-200); }
+.dark .agent-main .text-stone-600 { color: var(--color-stone-300); }
+.dark .agent-main .text-stone-500 { color: var(--color-stone-400); }
+.dark .agent-main .text-stone-400 { color: var(--color-stone-500); }
+.dark .agent-main .text-stone-300 { color: var(--color-stone-600); }
+.dark .agent-main .hover\:text-stone-700:hover,
+.dark .agent-main .hover\:text-stone-800:hover { color: var(--color-stone-100); }
+.dark .agent-main .border-stone-100 { border-color: var(--color-stone-800); }
+.dark .agent-main .border-stone-200 { border-color: var(--color-stone-700); }
+.dark .agent-main .border-stone-300 { border-color: var(--color-stone-600); }
+.dark .agent-main .divide-stone-50 > :not(:last-child) { border-color: var(--color-stone-800); }
+.dark .agent-main .divide-stone-100 > :not(:last-child) { border-color: var(--color-stone-800); }
+.dark .agent-main .divide-stone-200 > :not(:last-child) { border-color: var(--color-stone-800); }
+.dark .agent-main .bg-teal-50,
+.dark .agent-main .bg-teal-50\/30,
+.dark .agent-main .bg-teal-50\/60 { background-color: color-mix(in oklab, var(--color-teal-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-teal-100 { background-color: color-mix(in oklab, var(--color-teal-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-teal-50:hover,
+.dark .agent-main .hover\:bg-teal-100:hover { background-color: color-mix(in oklab, var(--color-teal-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-teal-700,
+.dark .agent-main .text-teal-800,
+.dark .agent-main .text-teal-900,
+.dark .agent-main .text-teal-950 { color: var(--color-teal-300); }
+.dark .agent-main .text-teal-600,
+.dark .agent-main .hover\:text-teal-700:hover,
+.dark .agent-main .hover\:text-teal-800:hover { color: var(--color-teal-400); }
+.dark .agent-main .border-teal-100,
+.dark .agent-main .border-teal-200,
+.dark .agent-main .border-teal-300 { border-color: color-mix(in oklab, var(--color-teal-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-green-50,
+.dark .agent-main .bg-green-50\/30,
+.dark .agent-main .bg-green-50\/60 { background-color: color-mix(in oklab, var(--color-green-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-green-100 { background-color: color-mix(in oklab, var(--color-green-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-green-50:hover,
+.dark .agent-main .hover\:bg-green-100:hover { background-color: color-mix(in oklab, var(--color-green-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-green-700,
+.dark .agent-main .text-green-800,
+.dark .agent-main .text-green-900,
+.dark .agent-main .text-green-950 { color: var(--color-green-300); }
+.dark .agent-main .text-green-600,
+.dark .agent-main .hover\:text-green-700:hover,
+.dark .agent-main .hover\:text-green-800:hover { color: var(--color-green-400); }
+.dark .agent-main .border-green-100,
+.dark .agent-main .border-green-200,
+.dark .agent-main .border-green-300 { border-color: color-mix(in oklab, var(--color-green-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-emerald-50,
+.dark .agent-main .bg-emerald-50\/30,
+.dark .agent-main .bg-emerald-50\/60 { background-color: color-mix(in oklab, var(--color-emerald-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-emerald-100 { background-color: color-mix(in oklab, var(--color-emerald-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-emerald-50:hover,
+.dark .agent-main .hover\:bg-emerald-100:hover { background-color: color-mix(in oklab, var(--color-emerald-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-emerald-700,
+.dark .agent-main .text-emerald-800,
+.dark .agent-main .text-emerald-900,
+.dark .agent-main .text-emerald-950 { color: var(--color-emerald-300); }
+.dark .agent-main .text-emerald-600,
+.dark .agent-main .hover\:text-emerald-700:hover,
+.dark .agent-main .hover\:text-emerald-800:hover { color: var(--color-emerald-400); }
+.dark .agent-main .border-emerald-100,
+.dark .agent-main .border-emerald-200,
+.dark .agent-main .border-emerald-300 { border-color: color-mix(in oklab, var(--color-emerald-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-amber-50,
+.dark .agent-main .bg-amber-50\/30,
+.dark .agent-main .bg-amber-50\/60 { background-color: color-mix(in oklab, var(--color-amber-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-amber-100 { background-color: color-mix(in oklab, var(--color-amber-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-amber-50:hover,
+.dark .agent-main .hover\:bg-amber-100:hover { background-color: color-mix(in oklab, var(--color-amber-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-amber-700,
+.dark .agent-main .text-amber-800,
+.dark .agent-main .text-amber-900,
+.dark .agent-main .text-amber-950 { color: var(--color-amber-300); }
+.dark .agent-main .text-amber-600,
+.dark .agent-main .hover\:text-amber-700:hover,
+.dark .agent-main .hover\:text-amber-800:hover { color: var(--color-amber-400); }
+.dark .agent-main .border-amber-100,
+.dark .agent-main .border-amber-200,
+.dark .agent-main .border-amber-300 { border-color: color-mix(in oklab, var(--color-amber-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-yellow-50,
+.dark .agent-main .bg-yellow-50\/30,
+.dark .agent-main .bg-yellow-50\/60 { background-color: color-mix(in oklab, var(--color-yellow-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-yellow-100 { background-color: color-mix(in oklab, var(--color-yellow-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-yellow-50:hover,
+.dark .agent-main .hover\:bg-yellow-100:hover { background-color: color-mix(in oklab, var(--color-yellow-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-yellow-700,
+.dark .agent-main .text-yellow-800,
+.dark .agent-main .text-yellow-900,
+.dark .agent-main .text-yellow-950 { color: var(--color-yellow-300); }
+.dark .agent-main .text-yellow-600,
+.dark .agent-main .hover\:text-yellow-700:hover,
+.dark .agent-main .hover\:text-yellow-800:hover { color: var(--color-yellow-400); }
+.dark .agent-main .border-yellow-100,
+.dark .agent-main .border-yellow-200,
+.dark .agent-main .border-yellow-300 { border-color: color-mix(in oklab, var(--color-yellow-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-red-50,
+.dark .agent-main .bg-red-50\/30,
+.dark .agent-main .bg-red-50\/60 { background-color: color-mix(in oklab, var(--color-red-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-red-100 { background-color: color-mix(in oklab, var(--color-red-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-red-50:hover,
+.dark .agent-main .hover\:bg-red-100:hover { background-color: color-mix(in oklab, var(--color-red-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-red-700,
+.dark .agent-main .text-red-800,
+.dark .agent-main .text-red-900,
+.dark .agent-main .text-red-950 { color: var(--color-red-300); }
+.dark .agent-main .text-red-600,
+.dark .agent-main .hover\:text-red-700:hover,
+.dark .agent-main .hover\:text-red-800:hover { color: var(--color-red-400); }
+.dark .agent-main .border-red-100,
+.dark .agent-main .border-red-200,
+.dark .agent-main .border-red-300 { border-color: color-mix(in oklab, var(--color-red-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-sky-50,
+.dark .agent-main .bg-sky-50\/30,
+.dark .agent-main .bg-sky-50\/60 { background-color: color-mix(in oklab, var(--color-sky-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-sky-100 { background-color: color-mix(in oklab, var(--color-sky-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-sky-50:hover,
+.dark .agent-main .hover\:bg-sky-100:hover { background-color: color-mix(in oklab, var(--color-sky-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-sky-700,
+.dark .agent-main .text-sky-800,
+.dark .agent-main .text-sky-900,
+.dark .agent-main .text-sky-950 { color: var(--color-sky-300); }
+.dark .agent-main .text-sky-600,
+.dark .agent-main .hover\:text-sky-700:hover,
+.dark .agent-main .hover\:text-sky-800:hover { color: var(--color-sky-400); }
+.dark .agent-main .border-sky-100,
+.dark .agent-main .border-sky-200,
+.dark .agent-main .border-sky-300 { border-color: color-mix(in oklab, var(--color-sky-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-blue-50,
+.dark .agent-main .bg-blue-50\/30,
+.dark .agent-main .bg-blue-50\/60 { background-color: color-mix(in oklab, var(--color-blue-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-blue-100 { background-color: color-mix(in oklab, var(--color-blue-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-blue-50:hover,
+.dark .agent-main .hover\:bg-blue-100:hover { background-color: color-mix(in oklab, var(--color-blue-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-blue-700,
+.dark .agent-main .text-blue-800,
+.dark .agent-main .text-blue-900,
+.dark .agent-main .text-blue-950 { color: var(--color-blue-300); }
+.dark .agent-main .text-blue-600,
+.dark .agent-main .hover\:text-blue-700:hover,
+.dark .agent-main .hover\:text-blue-800:hover { color: var(--color-blue-400); }
+.dark .agent-main .border-blue-100,
+.dark .agent-main .border-blue-200,
+.dark .agent-main .border-blue-300 { border-color: color-mix(in oklab, var(--color-blue-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-violet-50,
+.dark .agent-main .bg-violet-50\/30,
+.dark .agent-main .bg-violet-50\/60 { background-color: color-mix(in oklab, var(--color-violet-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-violet-100 { background-color: color-mix(in oklab, var(--color-violet-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-violet-50:hover,
+.dark .agent-main .hover\:bg-violet-100:hover { background-color: color-mix(in oklab, var(--color-violet-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-violet-700,
+.dark .agent-main .text-violet-800,
+.dark .agent-main .text-violet-900,
+.dark .agent-main .text-violet-950 { color: var(--color-violet-300); }
+.dark .agent-main .text-violet-600,
+.dark .agent-main .hover\:text-violet-700:hover,
+.dark .agent-main .hover\:text-violet-800:hover { color: var(--color-violet-400); }
+.dark .agent-main .border-violet-100,
+.dark .agent-main .border-violet-200,
+.dark .agent-main .border-violet-300 { border-color: color-mix(in oklab, var(--color-violet-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-purple-50,
+.dark .agent-main .bg-purple-50\/30,
+.dark .agent-main .bg-purple-50\/60 { background-color: color-mix(in oklab, var(--color-purple-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-purple-100 { background-color: color-mix(in oklab, var(--color-purple-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-purple-50:hover,
+.dark .agent-main .hover\:bg-purple-100:hover { background-color: color-mix(in oklab, var(--color-purple-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-purple-700,
+.dark .agent-main .text-purple-800,
+.dark .agent-main .text-purple-900,
+.dark .agent-main .text-purple-950 { color: var(--color-purple-300); }
+.dark .agent-main .text-purple-600,
+.dark .agent-main .hover\:text-purple-700:hover,
+.dark .agent-main .hover\:text-purple-800:hover { color: var(--color-purple-400); }
+.dark .agent-main .border-purple-100,
+.dark .agent-main .border-purple-200,
+.dark .agent-main .border-purple-300 { border-color: color-mix(in oklab, var(--color-purple-500) 40%, var(--color-stone-800)); }
+.dark .agent-main .bg-orange-50,
+.dark .agent-main .bg-orange-50\/30,
+.dark .agent-main .bg-orange-50\/60 { background-color: color-mix(in oklab, var(--color-orange-500) 12%, var(--color-stone-900)); }
+.dark .agent-main .bg-orange-100 { background-color: color-mix(in oklab, var(--color-orange-500) 22%, var(--color-stone-900)); }
+.dark .agent-main .hover\:bg-orange-50:hover,
+.dark .agent-main .hover\:bg-orange-100:hover { background-color: color-mix(in oklab, var(--color-orange-500) 28%, var(--color-stone-900)); }
+.dark .agent-main .text-orange-700,
+.dark .agent-main .text-orange-800,
+.dark .agent-main .text-orange-900,
+.dark .agent-main .text-orange-950 { color: var(--color-orange-300); }
+.dark .agent-main .text-orange-600,
+.dark .agent-main .hover\:text-orange-700:hover,
+.dark .agent-main .hover\:text-orange-800:hover { color: var(--color-orange-400); }
+.dark .agent-main .border-orange-100,
+.dark .agent-main .border-orange-200,
+.dark .agent-main .border-orange-300 { border-color: color-mix(in oklab, var(--color-orange-500) 40%, var(--color-stone-800)); }
+.dark .agent-main input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]), .dark .agent-main select, .dark .agent-main textarea { background-color: var(--color-stone-800); color: var(--color-stone-100); border-color: var(--color-stone-700); }
+.dark .agent-main input::placeholder,
+.dark .agent-main textarea::placeholder { color: var(--color-stone-500); }
+.dark .agent-main input:disabled,
+.dark .agent-main select:disabled,
+.dark .agent-main textarea:disabled { color: var(--color-stone-400); }
+.dark .agent-main option,
+.dark .agent-main optgroup { background-color: var(--color-stone-800); color: var(--color-stone-100); }

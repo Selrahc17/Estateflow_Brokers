@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Agent;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inquiry;
 use App\Models\Property;
-use App\Services\AIService;
-use Illuminate\Http\JsonResponse;
+use App\Support\Totals;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -15,19 +15,46 @@ use Illuminate\View\View;
 
 class PropertyController extends Controller
 {
+    /**
+     * The agent's listings with what each one still needs before buyers see a
+     * complete page: a photo, a price, a map pin and payment terms.
+     */
     public function index(): View
     {
-        $properties = Property::where('broker_id', auth()->id())
-            ->when(request('search'), fn($q) => $q->where('name', 'like', '%'.request('search').'%'))
-            ->when(request('status'), fn($q) => $q->where('status', request('status')))
-            ->when(request('type'), fn($q) => $q->where('type', request('type')))
-            ->withCount('lots')
-            ->withCount(['lots as available_lots_count' => fn($q) => $q->where('status', 'available')])
+        $mine = fn () => Property::where('broker_id', auth()->id());
+        $search = trim((string) request('search'));
+        $status = in_array(request('status'), ['available', 'coming_soon', 'sold', 'hidden', 'flagged'], true) ? request('status') : null;
+        $type = in_array(request('type'), Property::TYPES, true) ? request('type') : null;
+
+        $stats = Totals::of([
+            'total' => $mine()->selectRaw('count(*)'),
+            'available' => $mine()->whereIn('status', ['available', 'coming_soon'])->selectRaw('count(*)'),
+            'sold' => $mine()->where('status', 'sold')->selectRaw('count(*)'),
+            'new_inquiries' => Inquiry::where('broker_id', auth()->id())->where('status', 'new')->selectRaw('count(*)'),
+        ]);
+
+        $properties = $mine()
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . mb_strtolower($search) . '%';
+                $query->where(fn ($match) => $match
+                    ->whereRaw('lower(name) like ?', [$like])
+                    ->orWhereRaw('lower(city) like ?', [$like])
+                    ->orWhereRaw('lower(province) like ?', [$like]));
+            })
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($type, fn ($query) => $query->where('type', $type))
+            ->withCount([
+                'lots',
+                'lots as available_lots_count' => fn ($query) => $query->where('status', 'available'),
+                'lots as sold_lots_count' => fn ($query) => $query->where('status', 'sold'),
+                'inquiries',
+            ])
+            ->withMin(['lots as lowest_lot_price' => fn ($query) => $query->where('status', 'available')], 'price')
             ->latest()
-            ->paginate(10)
+            ->paginate(12)
             ->withQueryString();
 
-        return view('pages.properties.index', compact('properties'));
+        return view('pages.properties.index', compact('properties', 'stats', 'search', 'status', 'type'));
     }
 
     /**
@@ -341,25 +368,5 @@ class PropertyController extends Controller
 
             return $baseUrl . '/storage/v1/object/public/' . config('filesystems.disks.supabase.bucket') . '/' . $filename;
         }, $request->file('images'));
-    }
-
-    public function aiDescribe(Request $request): JsonResponse
-    {
-        $specs = $request->validate([
-            'name'          => 'nullable|string',
-            'type'          => 'nullable|string',
-            'city'          => 'nullable|string',
-            'province'      => 'nullable|string',
-            'bedrooms'      => 'nullable|integer',
-            'bathrooms'     => 'nullable|integer',
-            'floor_area'    => 'nullable|numeric',
-            'lot_area'      => 'nullable|numeric',
-            'price'         => 'nullable|numeric',
-        ]);
-
-        $ai = app(AIService::class);
-        $description = $ai->generatePropertyDescription($specs);
-
-        return response()->json(['description' => $description]);
     }
 }

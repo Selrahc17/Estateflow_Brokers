@@ -118,6 +118,12 @@ class BackupService
         }
 
         $statements = substr($body, 0, $begin)."\n".substr($body, $begin + 8, $commit - $begin - 8);
+
+        // A backup without records would only empty the system.
+        if (! str_contains($statements, 'INSERT INTO "users"')) {
+            throw new InvalidBackupException('This backup has no accounts or records in it, so restoring it would empty the system. Nothing was changed.');
+        }
+
         $tables = $this->inLoadOrder($this->tables())->reject(fn (string $table) => $table === 'migrations')->values();
 
         DB::transaction(function () use ($tables, $statements) {
@@ -347,6 +353,12 @@ class BackupService
     {
         $counts = [];
         $tables = $this->inLoadOrder($this->tables());
+
+        // Never save a backup that silently left the data out.
+        if (! $tables->contains('users')) {
+            throw new RuntimeException("Could not find EstateFlow's tables in the database, so no backup was made. Check the database settings in .env.");
+        }
+
         $sqlPath = "{$workDir}/database.sql";
         $sql = fopen($sqlPath, 'w');
         $signature = hash_init('sha256', HASH_HMAC, $this->signingKey());
@@ -515,8 +527,10 @@ class BackupService
         $tables = collect(Schema::getTables());
 
         // Supabase keeps its own auth and storage schemas in the same database.
+        // The search path can be left empty in .env to save a query on every
+        // connect, and EstateFlow's tables are then in "public".
         if (DB::connection()->getDriverName() === 'pgsql') {
-            $tables = $tables->where('schema', config('database.connections.pgsql.search_path', 'public'));
+            $tables = $tables->where('schema', config('database.connections.pgsql.search_path') ?: 'public');
         }
 
         return $tables->pluck('name')

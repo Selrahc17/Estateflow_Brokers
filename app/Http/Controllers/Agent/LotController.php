@@ -12,19 +12,63 @@ use Illuminate\Validation\Rule;
 
 class LotController extends Controller
 {
-    public function index(): View
+    /**
+     * Lots of one project at a time, as a site-plan grid grouped by block or as
+     * a list. Lot numbers sort naturally, so Block 2 comes before Block 15.
+     */
+    public function index(Request $request): View
     {
-        $properties = Property::where('broker_id', auth()->id())->get();
+        $properties = Property::where('broker_id', auth()->id())
+            ->withCount([
+                'lots',
+                'lots as available_count' => fn ($query) => $query->where('status', 'available'),
+                'lots as reserved_count' => fn ($query) => $query->where('status', 'reserved'),
+                'lots as sold_count' => fn ($query) => $query->where('status', 'sold'),
+            ])
+            ->orderByDesc('lots_count')->orderBy('name')
+            ->get();
 
-        $lots = Lot::whereHas('property', fn($q) => $q->where('broker_id', auth()->id()))
-            ->when(request('property_id'), fn($q) => $q->where('property_id', request('property_id')))
-            ->when(request('status'), fn($q) => $q->where('status', request('status')))
-            ->with('property')
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
+        // Opens on the first project with lots, unless one was chosen.
+        $selected = $properties->firstWhere('id', $request->integer('property_id'))
+            ?? ($request->has('property_id') ? null : $properties->firstWhere('lots_count', '>', 0));
+        $view = $request->input('view') === 'list' ? 'list' : 'grid';
+        $status = array_key_exists((string) $request->input('status'), Lot::STATUSES) ? $request->input('status') : null;
+        $search = trim((string) $request->input('q'));
 
-        return view('pages.lots.index', compact('lots', 'properties'));
+        $all = Lot::whereIn('property_id', $selected ? [$selected->id] : $properties->pluck('id'))
+            ->with('property:id,name')
+            ->get()
+            ->sort(fn (Lot $a, Lot $b) => [$a->property_id === $selected?->id ? 0 : $a->property?->name, (int) ($a->block ?? PHP_INT_MAX), $a->block, (int) $a->short_number, $a->lot_number]
+                <=> [$b->property_id === $selected?->id ? 0 : $b->property?->name, (int) ($b->block ?? PHP_INT_MAX), $b->block, (int) $b->short_number, $b->lot_number])
+            ->values();
+
+        $stats = [
+            'total' => $all->count(),
+            'available' => $all->where('status', 'available')->count(),
+            'reserved' => $all->where('status', 'reserved')->count(),
+            'sold' => $all->where('status', 'sold')->count(),
+            'available_value' => $all->where('status', 'available')->sum(fn (Lot $lot) => (float) $lot->price),
+        ];
+
+        $lots = $all
+            ->when($status, fn ($lots) => $lots->where('status', $status))
+            ->when($search !== '', fn ($lots) => $lots->filter(fn (Lot $lot) => str_contains(mb_strtolower($lot->lot_number), mb_strtolower($search))))
+            ->values();
+
+        return view('pages.lots.index', compact('properties', 'selected', 'view', 'status', 'search', 'stats', 'lots'));
+    }
+
+    /** One-tap status change. Sold adds the lot to the broker's commission records. */
+    public function updateStatus(Request $request, Lot $lot): RedirectResponse
+    {
+        $this->ensureOwnership($lot);
+        $status = $request->validate(['status' => ['required', Rule::in(array_keys(Lot::STATUSES))]])['status'];
+
+        $lot->update(['status' => $status]);
+
+        return back()->with('success', $status === 'sold'
+            ? "{$lot->lot_number} is marked as sold and was added to your broker's commission records."
+            : "{$lot->lot_number} is now " . strtolower(Lot::STATUSES[$status]) . '.');
     }
 
     public function create(): View

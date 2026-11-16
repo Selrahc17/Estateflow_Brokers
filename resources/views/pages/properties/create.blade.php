@@ -79,12 +79,8 @@
                 </div>
 
                 <div>
-                    <div class="mb-1 flex items-center justify-between gap-3">
-                        <label for="property-description" class="text-sm font-medium text-stone-700">Description</label>
-                        <button type="button" data-ai-describe class="inline-flex items-center gap-1.5 rounded-lg border border-teal-200 px-2.5 py-1 text-xs font-medium text-teal-800 transition hover:bg-teal-50 disabled:cursor-wait disabled:opacity-60">Generate with AI</button>
-                    </div>
+                    <label for="property-description" class="mb-1 block text-sm font-medium text-stone-700">Description</label>
                     <textarea id="property-description" name="description" rows="4" placeholder="Describe the property, its location, and what makes it stand out." class="{{ $field }}">{{ old('description') }}</textarea>
-                    <p data-ai-status role="status" class="mt-1 text-xs text-stone-600"></p>
                 </div>
             </div>
         </section>
@@ -299,8 +295,6 @@
             </div>
         </div>
     </form>
-
-    @include('pages.properties._ai-describe-script')
 </div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>

@@ -10,20 +10,16 @@
 @endif
 
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-    @php
-        $brokerId = auth()->id();
-        $counts = [
-            'total'     => $reservations->total(),
-            'confirmed' => \App\Models\Reservation::where('broker_id',$brokerId)->where('status','confirmed')->count(),
-            'pending'   => \App\Models\Reservation::where('broker_id',$brokerId)->where('status','pending')->count(),
-            'cancelled' => \App\Models\Reservation::where('broker_id',$brokerId)->where('status','cancelled')->count(),
-        ];
-    @endphp
-    @foreach([['Total',$counts['total'],'stone'],['Confirmed',$counts['confirmed'],'green'],['Pending',$counts['pending'],'yellow'],['Cancelled',$counts['cancelled'],'red']] as $s)
-    <div class="bg-white rounded-xl border border-stone-200 p-4 text-center">
-        <p class="text-2xl font-bold text-{{ $s[2] }}-{{ $s[2]==='stone'?'800':'600' }}">{{ $s[1] }}</p>
-        <p class="text-sm text-stone-500">{{ $s[0] }}</p>
-    </div>
+    @foreach([
+        ['Requests from Buyers', (int) $counts->get('requested', 0), 'text-violet-700', 'requested'],
+        ['Pending', (int) $counts->get('pending', 0), 'text-yellow-600', 'pending'],
+        ['Confirmed', (int) $counts->get('confirmed', 0), 'text-green-600', 'confirmed'],
+        ['Completed', (int) $counts->get('completed', 0), 'text-blue-700', 'completed'],
+    ] as [$label, $count, $color, $key])
+    <a href="{{ route('agent.reservations.index', $status === $key ? [] : ['status' => $key]) }}" class="rounded-xl border bg-white p-4 text-center transition hover:border-teal-300 {{ $status === $key ? 'border-teal-500 ring-2 ring-teal-100' : 'border-stone-200' }}">
+        <p class="text-2xl font-bold {{ $color }}">{{ $count }}</p>
+        <p class="text-sm text-stone-500">{{ $label }}</p>
+    </a>
     @endforeach
 </div>
 
@@ -32,8 +28,8 @@
         <input type="text" name="search" value="{{ request('search') }}" placeholder="Search client or lot..." class="min-w-0 flex-1 sm:flex-none border border-stone-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 w-56">
         <select name="status" class="border border-stone-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400" onchange="this.form.submit()">
             <option value="">All Status</option>
-            @foreach(['pending','confirmed','cancelled','completed'] as $s)
-            <option value="{{ $s }}" {{ request('status')===$s?'selected':'' }}>{{ ucfirst($s) }}</option>
+            @foreach(array_keys(\App\Models\Reservation::STATUSES) as $s)
+            <option value="{{ $s }}" @selected($status === $s)>{{ \App\Models\Reservation::STATUSES[$s] }}</option>
             @endforeach
         </select>
     </form>
@@ -62,15 +58,11 @@
             <tr class="hover:bg-stone-50 transition">
                 <td class="px-5 py-3 font-mono text-xs text-stone-500">{{ $res->reservation_code }}</td>
                 <td class="px-5 py-3 font-medium text-stone-700">{{ $res->client?->full_name ?? '—' }}</td>
-                <td class="px-5 py-3 text-stone-500 text-xs">{{ $res->lot?->property?->name }} / Lot {{ $res->lot?->lot_number }}</td>
+                <td class="px-5 py-3 text-stone-500 text-xs">{{ $res->lot?->property?->name }} / {{ $res->lot?->label }}</td>
                 <td class="px-5 py-3 font-semibold text-stone-700">₱{{ number_format($res->total_price, 2) }}</td>
                 <td class="px-5 py-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium
-                        {{ $res->status==='confirmed' ? 'bg-green-100 text-green-700' : '' }}
-                        {{ $res->status==='pending' ? 'bg-yellow-100 text-yellow-700' : '' }}
-                        {{ $res->status==='cancelled' ? 'bg-red-100 text-red-600' : '' }}
-                        {{ $res->status==='completed' ? 'bg-blue-100 text-blue-700' : '' }}">
-                        {{ ucfirst($res->status) }}
+                    <span class="whitespace-nowrap px-2 py-1 rounded-full text-xs font-medium {{ ['requested' => 'bg-violet-100 text-violet-800', 'pending' => 'bg-yellow-100 text-yellow-700', 'confirmed' => 'bg-green-100 text-green-700', 'cancelled' => 'bg-red-100 text-red-600', 'completed' => 'bg-blue-100 text-blue-700'][$res->status] ?? 'bg-stone-100 text-stone-700' }}">
+                        {{ $res->status_label }}
                     </span>
                 </td>
                 <td class="px-5 py-3 text-stone-400 text-xs">{{ $res->created_at->format('M d, Y') }}</td>

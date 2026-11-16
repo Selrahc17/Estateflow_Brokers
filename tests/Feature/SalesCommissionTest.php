@@ -183,8 +183,12 @@ class SalesCommissionTest extends TestCase
         $page = $this->actingAs($this->agent)->get(route('agent.commission'))->assertOk();
 
         $page->assertSee('Shared Status Homes')->assertSee('Private Status Homes')->assertDontSee('Someone Elses Sale')
-            ->assertSee('Transferred')->assertDontSee('Received')->assertSee('Not shared by your broker')
-            ->assertSee('₱3,600,000.00');
+            // The shared status shows on its sale; the unshared "received" one is neither shown nor counted.
+            ->assertSee('title="Your broker has sent this commission.">Transferred</span>', false)
+            ->assertDontSee('title="This commission has been received.">Received</span>', false)
+            ->assertSee('Not shared yet')
+            ->assertViewHas('stats', fn ($stats) => $stats['sales'] === 2 && $stats['received'] === 0)
+            ->assertSee('₱3,600,000');
         foreach (['72,345', '108,765', '11,111'] as $amount) {
             $page->assertDontSee($amount);
         }
@@ -196,6 +200,24 @@ class SalesCommissionTest extends TestCase
         $this->put(route('broker.commissions.update', $sale), ['status' => 'received'])->assertForbidden();
         $this->get(route('broker.commissions.export'))->assertForbidden();
         $this->assertSame('transferred', $sale->fresh()->status);
+    }
+
+    public function test_my_sales_can_be_viewed_by_year_and_explains_how_sales_get_there(): void
+    {
+        $property = $this->listing();
+        Sale::create(['broker_id' => $this->broker->id, 'agent_id' => $this->agent->id, 'property_id' => $property->id, 'sold_at' => now()->subYear()->startOfYear()->addMonth(), 'selling_price' => 1000000, 'status' => 'received', 'show_status_to_agent' => true]);
+        Sale::create(['broker_id' => $this->broker->id, 'agent_id' => $this->agent->id, 'property_id' => $property->id, 'sold_at' => now()->startOfYear(), 'selling_price' => 3600000, 'status' => 'pending']);
+        $this->actingAs($this->agent);
+
+        $this->get(route('agent.commission'))
+            ->assertSee('How sales get here')
+            ->assertSeeInOrder(['All Sales', '2', 'Total Value Sold', '₱4.6M', 'Sales This Year', '1', 'Commission Received', '1']);
+
+        $this->get(route('agent.commission', ['year' => now()->year - 1]))
+            ->assertSeeInOrder(['Sales in ' . (now()->year - 1), '1', 'Value Sold in ' . (now()->year - 1), '₱1,000,000']);
+
+        $fresh = User::factory()->create(['role' => 'agent', 'is_active' => true, 'is_approved' => true]);
+        $this->actingAs($fresh)->get(route('agent.commission'))->assertSee('No sales yet')->assertSee(route('agent.lots.index'), false);
     }
 
     public function test_the_excel_export_has_every_column_a_photo_and_totals(): void

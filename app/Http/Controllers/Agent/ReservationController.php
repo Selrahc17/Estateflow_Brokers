@@ -15,31 +15,56 @@ use Illuminate\View\View;
 
 class ReservationController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $status = array_key_exists((string) $request->input('status'), Reservation::STATUSES) ? $request->input('status') : null;
+        $search = trim((string) $request->input('search'));
+
+        $counts = Reservation::where('broker_id', auth()->id())
+            ->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+
         $reservations = Reservation::where('broker_id', auth()->id())
             ->with(['client', 'lot.property'])
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . mb_strtolower($search) . '%';
+                $query->where(fn ($match) => $match
+                    ->whereRaw('lower(reservation_code) like ?', [$like])
+                    ->orWhereHas('client', fn ($client) => $client->whereRaw("lower(first_name || ' ' || last_name) like ?", [$like])->orWhereRaw('lower(email) like ?', [$like]))
+                    ->orWhereHas('lot', fn ($lot) => $lot->whereRaw('lower(lot_number) like ?', [$like])
+                        ->orWhereHas('property', fn ($property) => $property->whereRaw('lower(name) like ?', [$like]))));
+            })
+            // Buyer requests waiting for the agent come first.
+            ->orderByRaw("case when status = 'requested' then 0 else 1 end")
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('pages.reservations.index', compact('reservations'));
+        return view('pages.reservations.index', compact('reservations', 'counts', 'status', 'search'));
     }
 
+    /**
+     * Any of the agent's clients can be reserved for; the agent decides.
+     * Available lots are grouped by project and in lot-number order.
+     */
     public function create(): View
     {
-        $clients = Client::where('broker_id', auth()->id())->where('qualification_status', 'approved')->get();
-        $lots = Lot::whereHas('property', fn($q) => $q->where('broker_id', auth()->id()))
+        $clients = Client::where('broker_id', auth()->id())->orderBy('first_name')->orderBy('last_name')->get();
+        $lotsByProject = Lot::whereHas('property', fn ($q) => $q->where('broker_id', auth()->id()))
             ->where('status', 'available')
-            ->with('property')
-            ->get();
+            ->with('property:id,name,price')
+            ->get()
+            ->sort(fn (Lot $a, Lot $b) => [$a->property?->name, (int) ($a->block ?? PHP_INT_MAX), (int) $a->short_number, $a->lot_number]
+                <=> [$b->property?->name, (int) ($b->block ?? PHP_INT_MAX), (int) $b->short_number, $b->lot_number])
+            ->groupBy(fn (Lot $lot) => $lot->property?->name ?? 'Other');
 
-        return view('pages.reservations.create', compact('clients', 'lots'));
+        return view('pages.reservations.create', compact('clients', 'lotsByProject'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'client_id'          => ['required', Rule::exists('clients', 'id')->where('broker_id', auth()->id())],
+            'client_id'          => ['required', Rule::exists('clients', 'id')->where('broker_id', auth()->id())->whereNull('deleted_at')],
             'lot_id'             => [
                 'required',
                 Rule::exists('lots', 'id')->whereIn(
@@ -48,21 +73,10 @@ class ReservationController extends Controller
                 ),
             ],
             'total_price'        => 'required|numeric|min:0',
-            'down_payment'       => 'nullable|numeric|min:0',
-            'payment_schedule'   => 'required|in:monthly,quarterly,annual',
-            'payment_terms_months' => 'required|integer|min:1|max:360',
+            // Financing is the developer's; only the reservation fee is recorded here.
+            'reservation_fee'    => 'nullable|numeric|min:0|lte:total_price',
             'notes'              => 'nullable|string',
         ]);
-
-        $client = Client::whereKey($data['client_id'])
-            ->where('broker_id', auth()->id())
-            ->where('qualification_status', 'approved')
-            ->first();
-        if (!$client) {
-            return back()->withErrors([
-                'client_id' => 'The client must be approved before creating a reservation.',
-            ])->withInput();
-        }
 
         $data['broker_id'] = auth()->id();
         $data['agent_id'] = auth()->id();
@@ -107,25 +121,48 @@ class ReservationController extends Controller
     public function updateStatus(Request $request, Reservation $reservation): RedirectResponse
     {
         $this->ensureOwnership($reservation);
-        $data = $request->validate([
+        $status = $request->validate([
             'status' => 'required|in:pending,confirmed,cancelled,completed',
-        ]);
+        ])['status'];
 
-        $reservation->update($data);
+        $wasHolding = $reservation->holdsLot();
+        $willHold = in_array($status, Reservation::HOLDING, true);
 
-        // Update lot status accordingly
-        if ($reservation->lot) {
-            $lotStatus = match ($data['status']) {
-                'cancelled' => 'available',
-                'completed' => 'sold',
-                default => 'reserved',
-            };
+        $error = DB::transaction(function () use ($reservation, $status, $wasHolding, $willHold) {
+            $lot = $reservation->lot_id ? Lot::whereKey($reservation->lot_id)->lockForUpdate()->first() : null;
 
-            $reservation->lot->update(['status' => $lotStatus]);
+            // A buyer's request takes the lot only now, and only if it is still free.
+            if ($lot && ! $wasHolding && ($willHold || $status === 'completed') && $lot->status !== 'available') {
+                return "{$lot->lot_number} is already " . ($lot->status === 'sold' ? 'sold' : 'reserved for someone else') . '.';
+            }
+
+            $reservation->update(['status' => $status]);
+
+            if ($lot) {
+                if ($status === 'completed') {
+                    $lot->update(['status' => 'sold']);
+                } elseif ($willHold) {
+                    $lot->update(['status' => 'reserved']);
+                } elseif ($status === 'cancelled' && $wasHolding && $lot->status === 'reserved') {
+                    // Only the reservation that held the lot gives it back.
+                    $lot->update(['status' => 'available']);
+                }
+            }
+
+            return null;
+        });
+
+        if ($error) {
+            return back()->withErrors(['status' => $error]);
         }
 
         return redirect()->route('agent.reservations.show', $reservation)
-            ->with('success', 'Reservation status updated successfully.');
+            ->with('success', match ($status) {
+                'confirmed' => 'Reservation confirmed. The lot is now reserved.',
+                'cancelled' => 'Reservation cancelled.',
+                'completed' => 'Reservation completed. The lot is marked as sold.',
+                default => 'Reservation status updated.',
+            });
     }
 
     private function ensureOwnership(Reservation $reservation): void

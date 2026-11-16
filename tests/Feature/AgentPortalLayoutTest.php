@@ -83,20 +83,14 @@ class AgentPortalLayoutTest extends TestCase
 
     public function test_page_scripts_now_reach_the_browser(): void
     {
-        $describeScript = "querySelector('[data-ai-describe]')?.addEventListener";
-
-        $this->get(route('agent.properties.create'))->assertSee($describeScript, false)->assertSee('data-ai-status', false);
-        $this->get(route('agent.properties.edit', $this->property()))->assertSee($describeScript, false)->assertSee('data-ai-status', false);
         $this->get(route('agent.clients.index'))->assertSee(route('agent.ai.leads'), false);
     }
 
-    public function test_ai_description_returns_nothing_when_no_key_is_set(): void
+    public function test_property_forms_have_no_ai_description_button(): void
     {
-        config(['services.openai.key' => null, 'services.ai.key' => null]);
-
-        $this->postJson(route('agent.ai.describe'), ['name' => 'Vista Homes'])
-            ->assertOk()
-            ->assertJson(['description' => '']);
+        $this->get(route('agent.properties.create'))->assertOk()->assertSee('Description')->assertDontSee('Generate with AI')->assertDontSee('data-ai-describe', false);
+        $this->get(route('agent.properties.edit', $this->property()))->assertOk()->assertSee('Description')->assertDontSee('Generate with AI')->assertDontSee('data-ai-describe', false);
+        $this->assertFalse(\Illuminate\Support\Facades\Route::has('agent.ai.describe'));
     }
 
     public function test_lead_scoring_works_for_the_agents_own_client(): void

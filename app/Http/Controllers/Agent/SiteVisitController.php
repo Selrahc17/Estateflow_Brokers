@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Inquiry;
 use App\Models\Property;
 use App\Models\SiteVisit;
+use App\Support\Totals;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -14,15 +15,34 @@ use Illuminate\Validation\Rule;
 
 class SiteVisitController extends Controller
 {
-    public function index(): View
+    /**
+     * Upcoming visits first, soonest at the top, so the agent sees what is next.
+     * "Past" covers visits that already happened, were completed or cancelled.
+     */
+    public function index(Request $request): View
     {
-        $siteVisits = SiteVisit::where('broker_id', auth()->id())
-            ->with(['client', 'property', 'inquiry'])
-            ->when(request('status'), fn($q) => $q->where('status', request('status')))
-            ->latest()
-            ->paginate(15);
+        $mine = fn () => SiteVisit::where('broker_id', auth()->id());
+        $when = in_array($request->input('when'), ['upcoming', 'past', 'all'], true) ? $request->input('when') : 'upcoming';
+        $status = in_array($request->input('status'), ['pending', 'confirmed', 'completed', 'cancelled'], true) ? $request->input('status') : null;
+        $open = ['pending', 'confirmed'];
 
-        return view('pages.site-visits.index', compact('siteVisits'));
+        $stats = Totals::of([
+            'today' => $mine()->whereIn('status', $open)->whereBetween('scheduled_at', [now()->startOfDay(), now()->endOfDay()])->selectRaw('count(*)'),
+            'week' => $mine()->whereIn('status', $open)->whereBetween('scheduled_at', [now(), now()->addDays(7)->endOfDay()])->selectRaw('count(*)'),
+            'unconfirmed' => $mine()->where('status', 'pending')->where('scheduled_at', '>=', now()->startOfDay())->selectRaw('count(*)'),
+            'completed' => $mine()->where('status', 'completed')->where('scheduled_at', '>=', now()->startOfMonth())->selectRaw('count(*)'),
+        ]);
+
+        $siteVisits = $mine()
+            ->with(['client', 'property', 'inquiry'])
+            ->when($when === 'upcoming', fn ($query) => $query->whereIn('status', $open)->where('scheduled_at', '>=', now()->startOfDay())->orderBy('scheduled_at'))
+            ->when($when === 'past', fn ($query) => $query->where(fn ($past) => $past->where('scheduled_at', '<', now()->startOfDay())->orWhereIn('status', ['completed', 'cancelled']))->orderByDesc('scheduled_at'))
+            ->when($when === 'all', fn ($query) => $query->orderByDesc('scheduled_at'))
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('pages.site-visits.index', compact('siteVisits', 'stats', 'when', 'status'));
     }
 
     public function create(): View
@@ -44,15 +64,6 @@ class SiteVisitController extends Controller
             'notes'        => 'nullable|string',
             'status'       => 'required|in:pending,confirmed,completed,cancelled',
         ]);
-
-        $client = Client::whereKey($data['client_id'])
-            ->where('broker_id', auth()->id())
-            ->firstOrFail();
-        if ($client->qualification_status !== 'under_review') {
-            return back()->withErrors([
-                'client_id' => 'The client must be under review before a site visit can be scheduled.',
-            ])->withInput();
-        }
 
         $data['broker_id'] = auth()->id();
 

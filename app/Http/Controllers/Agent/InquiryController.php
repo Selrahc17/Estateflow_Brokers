@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Agent;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\Inquiry;
+use App\Support\Totals;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -13,17 +14,38 @@ use Illuminate\View\View;
 
 class InquiryController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $inquiries = Inquiry::where('broker_id', auth()->id())
+        $mine = fn () => Inquiry::where('broker_id', auth()->id());
+        $status = array_key_exists((string) $request->input('status'), Inquiry::STATUSES) ? $request->input('status') : null;
+        $type = in_array($request->input('type'), ['inquiry', 'viewing'], true) ? $request->input('type') : null;
+        $search = trim((string) $request->input('q'));
+
+        $statusCounts = $mine()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+        $stats = Totals::of([
+            'total' => $mine()->selectRaw('count(*)'),
+            'new' => $mine()->where('status', 'new')->selectRaw('count(*)'),
+            'viewings' => $mine()->where('type', 'viewing')->whereIn('status', ['new', 'contacted'])->selectRaw('count(*)'),
+            'this_month' => $mine()->where('created_at', '>=', now()->startOfMonth())->selectRaw('count(*)'),
+        ]);
+
+        $inquiries = $mine()
             ->with(['user', 'property'])
-            ->when(request('status'), fn($q) => $q->where('status', request('status')))
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->when($type, fn ($query) => $query->where('type', $type))
+            ->when($search !== '', function ($query) use ($search) {
+                $like = '%' . mb_strtolower($search) . '%';
+                $query->where(fn ($match) => $match
+                    ->whereRaw('lower(contact_name) like ?', [$like])
+                    ->orWhereRaw('lower(email) like ?', [$like])
+                    ->orWhereRaw('lower(phone) like ?', [$like])
+                    ->orWhereHas('property', fn ($property) => $property->whereRaw('lower(name) like ?', [$like])));
+            })
             ->latest()
-            ->paginate(12);
+            ->paginate(15)
+            ->withQueryString();
 
-        $statuses = ['new', 'contacted', 'site_visit_scheduled', 'negotiating', 'closed', 'lost'];
-
-        return view('pages.agent.inquiries.index', compact('inquiries', 'statuses'));
+        return view('pages.agent.inquiries.index', compact('inquiries', 'statusCounts', 'stats', 'status', 'type', 'search'));
     }
 
     public function show(Inquiry $inquiry): View
@@ -100,7 +122,7 @@ class InquiryController extends Controller
         abort_if($inquiry->broker_id !== auth()->id(), 403);
 
         $validated = $request->validate([
-            'status' => 'required|in:new,contacted,site_visit_scheduled,negotiating,closed,lost',
+            'status' => ['required', \Illuminate\Validation\Rule::in(array_keys(Inquiry::STATUSES))],
         ]);
 
         $inquiry->update(['status' => $validated['status']]);

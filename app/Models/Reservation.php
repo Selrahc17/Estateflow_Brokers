@@ -10,9 +10,33 @@ class Reservation extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * "Requested" comes from a buyer and does not hold the lot until the agent
+     * confirms it. Pending and confirmed reservations hold the lot.
+     */
+    public const STATUSES = [
+        'requested' => 'Requested by buyer',
+        'pending' => 'Pending',
+        'confirmed' => 'Confirmed',
+        'completed' => 'Completed',
+        'cancelled' => 'Cancelled',
+    ];
+
+    public const HOLDING = ['pending', 'confirmed'];
+
+    public function holdsLot(): bool
+    {
+        return in_array($this->status, self::HOLDING, true);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::STATUSES[$this->status] ?? ucfirst((string) $this->status);
+    }
+
     protected $fillable = [
         'client_id', 'agent_id', 'lot_id', 'broker_id', 'reservation_code',
-        'status', 'total_price', 'down_payment', 'payment_schedule',
+        'status', 'total_price', 'reservation_fee', 'down_payment', 'payment_schedule',
         'payment_terms_months', 'notes', 'reserved_at', 'expires_at',
     ];
 
@@ -20,6 +44,7 @@ class Reservation extends Model
     {
         return [
             'total_price'        => 'decimal:2',
+            'reservation_fee'    => 'decimal:2',
             'down_payment'       => 'decimal:2',
             'payment_terms_months' => 'integer',
             'reserved_at'        => 'datetime',

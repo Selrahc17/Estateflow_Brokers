@@ -267,6 +267,7 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::put('/lots/{lot}', [LotController::class, 'update'])->name('lots.update');
     Route::delete('/lots/{lot}', [LotController::class, 'destroy'])->name('lots.destroy');
     Route::patch('/lots/{lot}/mark-sold', [LotController::class, 'markSold'])->name('lots.mark-sold');
+    Route::patch('/lots/{lot}/status', [LotController::class, 'updateStatus'])->name('lots.status');
     Route::get('/inquiries', [BrokerInquiryController::class, 'index'])->name('inquiries.index');
     Route::get('/inquiries/{inquiry}', [BrokerInquiryController::class, 'show'])->name('inquiries.show');
     Route::patch('/inquiries/{inquiry}/status', [BrokerInquiryController::class, 'updateStatus'])->name('inquiries.status');
@@ -300,6 +301,5 @@ Route::prefix('agent')->name('agent.')->middleware(['auth', 'role:agent', 'audit
     Route::get('/settings', [AgentSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings/profile', [AgentSettingController::class, 'updateProfile'])->name('settings.profile');
     Route::post('/settings/password', [AgentSettingController::class, 'updatePassword'])->name('settings.password');
-    Route::post('/ai/describe', [PropertyController::class, 'aiDescribe'])->name('ai.describe');
     Route::post('/ai/leads', [\App\Http\Controllers\Agent\ClientController::class, 'aiLeadScore'])->name('ai.leads');
 });

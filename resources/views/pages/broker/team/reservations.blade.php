@@ -36,7 +36,7 @@
                     </td>
                     <td class="px-5 py-3 text-stone-600 dark:text-stone-300">
                         <p>{{ $reservation->lot?->property?->name ?? 'Property removed' }}</p>
-                        <p class="text-xs text-stone-500 dark:text-stone-400">Lot {{ $reservation->lot?->lot_number ?? '—' }}</p>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">{{ $reservation->lot?->label ?? '—' }}</p>
                     </td>
                     <td class="px-5 py-3 text-stone-600 dark:text-stone-300">{{ $reservation->broker?->name ?? '—' }}</td>
                     <td class="px-5 py-3 text-stone-600 dark:text-stone-300">₱{{ number_format((float) $reservation->total_price, 0) }}</td>

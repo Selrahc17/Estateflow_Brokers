@@ -186,6 +186,42 @@ class Property extends Model
         return $prices ? min($prices) : null;
     }
 
+    /**
+     * "Living area, dining area, and service area." becomes
+     * ["Living area", "Dining area", "Service area"], for a checklist.
+     *
+     * @return array<int, string>
+     */
+    public static function splitInclusions(?string $text): array
+    {
+        return collect(preg_split('/\s*[,;\n]+\s*/', (string) $text))
+            ->map(fn (string $item) => Str::ucfirst(rtrim(preg_replace('/^(and|&)\s+/i', '', trim($item)), '. ')))
+            ->filter()
+            ->unique(fn (string $item) => Str::lower($item))
+            ->values()
+            ->all();
+    }
+
+    /** The ready-made inquiry text a buyer starts with; they can change it before sending. */
+    public function inquiryMessage(): string
+    {
+        return $this->greeting() . "I'm interested in learning more about this property ({$this->name}). Please contact me with more information.";
+    }
+
+    /** The ready-made text for a viewing request. */
+    public function viewingMessage(): string
+    {
+        return $this->greeting() . "I'm interested in viewing this property ({$this->name}). Please let me know your available viewing times.";
+    }
+
+    /** "Hi Ryan! ", using the listing agent's first name. */
+    private function greeting(): string
+    {
+        $agent = Str::before(trim((string) $this->broker?->name), ' ');
+
+        return 'Hi ' . ($agent !== '' ? $agent : 'there') . '! ';
+    }
+
     /** A short summary of the selling terms, for the AI chat. */
     public function sellingTermsSummary(): ?string
     {

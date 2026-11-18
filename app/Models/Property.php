@@ -271,4 +271,22 @@ class Property extends Model
     {
         return $this->hasMany(SiteVisit::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(PropertyReview::class);
+    }
+
+    /** Reviews shown on the site; hidden ones are left out. */
+    public function visibleReviews()
+    {
+        return $this->hasMany(PropertyReview::class)->whereNull('hidden_at');
+    }
+
+    /** Adds rating_avg and rating_count for listing cards. */
+    public function scopeWithRating($query)
+    {
+        return $query->withAvg('visibleReviews as rating_avg', 'rating')
+            ->withCount('visibleReviews as rating_count');
+    }
 }

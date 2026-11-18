@@ -107,6 +107,15 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                             {{ implode(', ', array_filter([$property->city, $property->province])) ?: ($property->address ?? 'Location TBA') }}
                         </p>
+                        <a href="#reviews" class="mt-2 inline-flex items-center gap-1.5 text-sm text-stone-600 hover:text-teal-700">
+                            @if($reviewStats->total)
+                            @include('pages.client.properties._stars', ['rating' => (float) $reviewStats->average, 'size' => 'h-4 w-4'])
+                            <span class="font-semibold text-stone-800">{{ number_format((float) $reviewStats->average, 1) }}</span>
+                            <span>({{ $reviewStats->total }} {{ Str::plural('review', $reviewStats->total) }})</span>
+                            @else
+                            <span>No reviews yet</span>
+                            @endif
+                        </a>
                     </div>
                     <div class="text-right">
                         <p class="text-xs text-stone-400">Starting at</p>
@@ -290,6 +299,8 @@
             </div>
             @endif
 
+            @include('pages.client.properties._reviews')
+
         </div>
 
         {{-- Right: Inquiry + Broker --}}
@@ -301,10 +312,11 @@
                 <p class="text-xs text-stone-500 mb-4">Ask a question or schedule a viewing. {{ $property->broker?->name ?? 'The agent' }} will get back to you.</p>
 
                 @include('pages.client.properties._inquiry-form')
-                @auth
+                @php $inCompare = in_array($property->id, session('compare', []), true); @endphp
                 <div class="flex gap-2 mt-3">
+                        @auth
                         @php
-                            $isFavorited = auth()->check() && auth()->user()->favorites()->where('property_id', $property->id)->exists();
+                            $isFavorited = auth()->user()->favorites()->where('property_id', $property->id)->exists();
                         @endphp
                         <form action="{{ route('client.account.favorites.toggle', $property->id) }}" method="POST" class="flex-1">
                             @csrf
@@ -312,12 +324,19 @@
                                 {{ $isFavorited ? '❤️ Saved' : '🤍 Save' }}
                             </button>
                         </form>
+                        @endauth
+                        <form action="{{ route('client.compare.toggle', $property) }}" method="POST" class="flex-1">
+                            @csrf
+                            <button type="submit" aria-pressed="{{ $inCompare ? 'true' : 'false' }}" class="w-full border {{ $inCompare ? 'border-teal-700 bg-teal-50 text-teal-700' : 'border-stone-200 text-stone-600 hover:bg-stone-50' }} py-2 rounded-xl text-sm font-medium transition">
+                                {{ $inCompare ? '✓ In compare' : '⇄ Compare' }}
+                            </button>
+                        </form>
                 </div>
-                @else
+                @guest
                 <div class="mt-3 text-center">
                     <a href="{{ route('auth.login') }}" class="text-xs text-teal-700 hover:underline">Already have an account? Login</a>
                 </div>
-                @endauth
+                @endguest
             </div>
 
             {{-- Broker Info --}}

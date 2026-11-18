@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Lot;
 use App\Models\Property;
+use App\Models\PropertyReview;
+use App\Models\PropertyView;
 use App\Services\AIService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -51,7 +53,7 @@ class PropertyController extends Controller
             ->when(request('location'), fn($q) => $q->where(fn($q2) => $q2->where('city', 'like', '%'.request('location').'%')->orWhere('province', 'like', '%'.request('location').'%')->orWhere('address', 'like', '%'.request('location').'%')))
             ->when(request('min_price'), fn($q) => $q->where('price', '>=', request('min_price')))
             ->when(request('max_price'), fn($q) => $q->where('price', '<=', request('max_price')))
-            ->withCount(['lots' => fn($q) => $q->where('status', 'available')])
+            ->withCount(['lots' => fn($q) => $q->where('status', 'available')])->withRating()
             ->when(request('sort'), function($q) {
                 return match(request('sort')) {
                     'price_asc' => $q->orderBy('price', 'asc'),
@@ -79,6 +81,23 @@ class PropertyController extends Controller
 
         $property->increment('view_count');
 
+        $viewer = auth()->user();
+        if ($viewer?->role === 'client') {
+            PropertyView::record($viewer, $property);
+        }
+
+        $reviews = $property->visibleReviews()->with('user:id,name')->latest()->take(20)->get();
+        $reviewStats = $property->visibleReviews()
+            ->selectRaw('count(*) as total, avg(rating) as average')
+            ->first();
+        $ratingBreakdown = $property->visibleReviews()
+            ->selectRaw('rating, count(*) as total')
+            ->groupBy('rating')
+            ->pluck('total', 'rating');
+        $myReview = $viewer?->role === 'client'
+            ? PropertyReview::where('property_id', $property->id)->where('user_id', $viewer->id)->first()
+            : null;
+
         $relatedProperties = Property::where('status', 'available')
             ->where('id', '!=', $property->id)
             ->where(function ($query) use ($property) {
@@ -86,7 +105,7 @@ class PropertyController extends Controller
                     ->orWhere('city', $property->city)
                     ->orWhere('province', $property->province);
             })
-            ->withCount(['lots' => fn($q) => $q->where('status', 'available')])
+            ->withCount(['lots' => fn($q) => $q->where('status', 'available')])->withRating()
             ->latest()
             ->take(4)
             ->get();
@@ -95,7 +114,7 @@ class PropertyController extends Controller
             $additionalProperties = Property::where('status', 'available')
                 ->where('id', '!=', $property->id)
                 ->whereNotIn('id', $relatedProperties->pluck('id'))
-                ->withCount(['lots' => fn($q) => $q->where('status', 'available')])
+                ->withCount(['lots' => fn($q) => $q->where('status', 'available')])->withRating()
                 ->latest()
                 ->take(4 - $relatedProperties->count())
                 ->get();
@@ -103,6 +122,6 @@ class PropertyController extends Controller
             $relatedProperties = $relatedProperties->concat($additionalProperties);
         }
 
-        return view('pages.client.properties.show', compact('property', 'relatedProperties'));
+        return view('pages.client.properties.show', compact('property', 'relatedProperties', 'reviews', 'reviewStats', 'ratingBreakdown', 'myReview'));
     }
 }

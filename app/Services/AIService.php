@@ -85,8 +85,13 @@ class AIService
         })->sortByDesc('score')->values()->all();
     }
 
+    /** Whether the last recommendProperties() call was ranked by the AI provider. */
+    public bool $lastRankedByAi = false;
+
     public function recommendProperties(array $preferences): Collection
     {
+        $this->lastRankedByAi = false;
+
         $properties = Property::where('status', 'available')
             ->withCount(['lots' => fn($query) => $query->where('status', 'available')])
             ->latest()
@@ -125,8 +130,10 @@ class AIService
                 $content = $response->json('choices.0.message.content');
                 $ids = is_string($content) ? json_decode(trim($content), true) : null;
                 if (is_array($ids)) {
-                    $order = collect($ids)->filter('is_int')->values();
+                    // A closure, because filter() passes the key too and is_int() takes one argument.
+                    $order = collect($ids)->filter(fn ($id) => is_int($id))->values();
                     $ranked = $properties->sortBy(fn($property) => $order->search($property->id) === false ? PHP_INT_MAX : $order->search($property->id));
+                    $this->lastRankedByAi = true;
                     return $ranked->values();
                 }
             } catch (\Throwable $e) {
@@ -143,6 +150,48 @@ class AIService
             if (!empty($preferences['bedrooms']) && $property->bedrooms >= $preferences['bedrooms']) $score += 10;
             return $score;
         })->values();
+    }
+
+    /**
+     * A short buyer-friendly comparison of listings. Returns null when AI is
+     * off or fails, so the caller can fall back to a plain summary.
+     *
+     * @param  array<int, array<string, string>>  $facts  One set of labelled facts per listing.
+     */
+    public function compareProperties(array $facts, ?string $needs = null): ?string
+    {
+        if (empty($this->apiKey) || count($facts) < 2) {
+            return null;
+        }
+
+        try {
+            $response = Http::withToken($this->apiKey)
+                ->timeout(20)
+                ->post($this->endpoint, [
+                    'model' => $this->model,
+                    'temperature' => 0.3,
+                    'max_tokens' => 400,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You help home buyers in the Philippines compare property listings. '
+                            .'Use only the facts given; if something is missing, say it is not listed. Prices are in Philippine pesos. '
+                            .'Write 3 to 5 short sentences in plain English, no headings or tables: what sets each listing apart, '
+                            .'which suits which kind of buyer, and, if the buyer shared their needs, which fits them best and why. '
+                            .'Do not invent amenities, distances, or prices, and do not promise anything on the agent\'s behalf.'],
+                        ['role' => 'user', 'content' => json_encode([
+                            'buyer_needs' => filled($needs) ? $needs : 'not given',
+                            'listings' => $facts,
+                        ], JSON_UNESCAPED_UNICODE)],
+                    ],
+                ]);
+
+            $text = $response->successful() ? trim((string) $response->json('choices.0.message.content')) : '';
+
+            return $text !== '' ? $text : null;
+        } catch (\Throwable $e) {
+            Log::warning('AI property comparison failed', ['error' => $e->getMessage()]);
+
+            return null;
+        }
     }
 
     private function fallbackResponse(string $message): string

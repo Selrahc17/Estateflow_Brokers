@@ -1,149 +1,226 @@
 @extends('layouts.admin')
 @section('title', 'Documents')
 @section('page-title', 'Documents')
-@section('page-subtitle', 'Manage broker documents and files')
+@section('page-subtitle', 'Review the documents brokers submit')
 
 @section('content')
+@php
+    $fieldClass = 'rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400';
+    $badge = [
+        'pending' => 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+        'needs_more' => 'bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300',
+        'rejected' => 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300',
+        'verified' => 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300',
+        'missing' => 'bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-400',
+    ];
+    $dot = [
+        'pending' => 'bg-amber-500', 'needs_more' => 'bg-orange-500', 'rejected' => 'bg-red-500',
+        'verified' => 'bg-green-500', 'missing' => 'bg-stone-300 dark:bg-stone-600',
+    ];
+    $tabAccent = [
+        'pending' => 'text-amber-700 dark:text-amber-300', 'needs_more' => 'text-orange-700 dark:text-orange-300',
+        'rejected' => 'text-red-700 dark:text-red-300', 'verified' => 'text-green-700 dark:text-green-300',
+        'all' => 'text-stone-700 dark:text-stone-200',
+    ];
+    $keep = array_filter(['q' => $search, 'type' => $type]);
+@endphp
 
 @if(session('success'))
-<div class="mb-5 rounded-lg border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('success') }}</div>
+<div class="mb-5 rounded-lg border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950 px-4 py-3 text-sm text-green-700 dark:text-green-300" role="status">{{ session('success') }}</div>
 @endif
 
 @if($errors->any())
-<div class="mb-5 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 px-4 py-3 text-sm text-red-700 dark:text-red-300">
-    <ul class="list-disc list-inside space-y-1">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+<div class="mb-5 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950 px-4 py-3 text-sm text-red-700 dark:text-red-300" role="alert">
+    @foreach($errors->all() as $error)<p>{{ $error }}</p>@endforeach
 </div>
 @endif
 
-<div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+{{-- Status tabs with counts --}}
+<nav aria-label="Document status" class="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+    @foreach($tabs as $value => $label)
+    @php $active = $status === $value; @endphp
+    <a href="{{ route('admin.documents', $keep + ['status' => $value]) }}" @if($active) aria-current="page" @endif
+       class="{{ $value === 'all' ? 'col-span-2 sm:col-span-1' : '' }} rounded-xl border px-4 py-3 transition {{ $active ? 'border-teal-600 bg-white ring-2 ring-teal-600/20 dark:bg-stone-900' : 'border-stone-200 bg-white hover:border-stone-300 dark:border-stone-700 dark:bg-stone-900 dark:hover:border-stone-600' }}">
+        <span class="block text-xs font-medium text-stone-500 dark:text-stone-400">{{ $label }}</span>
+        <span class="mt-1 block text-2xl font-bold {{ $tabAccent[$value] }}">{{ $counts[$value] ?? 0 }}</span>
+    </a>
+    @endforeach
+</nav>
 
-    {{-- Upload Form --}}
-    <div class="bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 p-6">
-        <h2 class="font-semibold text-stone-800 dark:text-stone-100 mb-5 flex items-center gap-2">
-            <svg class="w-5 h-5 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-            Upload Broker Document
-        </h2>
-        <form action="{{ route('admin.documents.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-            @csrf
-            <div>
-                <label class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5 block">Broker</label>
-                <select name="broker_id" class="w-full border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    <option value="">Select broker...</option>
-                    @foreach($brokers as $broker)
-                        <option value="{{ $broker->id }}" {{ old('broker_id') == $broker->id ? 'selected' : '' }}>{{ $broker->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5 block">Document Name</label>
-                <input type="text" name="name" value="{{ old('name') }}" placeholder="e.g. PRC License" class="w-full border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-            </div>
-            <div>
-                <label class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5 block">Document Type</label>
-                <select name="type" class="w-full border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400">
-                    <option value="">Select type...</option>
-                    @foreach(['license' => 'License', 'id' => 'Government ID', 'contract' => 'Contract', 'accreditation' => 'Accreditation', 'proof_of_income' => 'Proof of Income', 'photo' => 'Photo', 'other' => 'Other'] as $val => $label)
-                        <option value="{{ $val }}" {{ old('type') === $val ? 'selected' : '' }}>{{ $label }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5 block">File</label>
-                <input type="file" name="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" class="w-full border border-stone-200 dark:border-stone-700 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-teal-50 dark:file:bg-teal-950 file:text-teal-700 dark:file:text-teal-300 hover:file:bg-teal-100 dark:hover:file:bg-teal-900">
-                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">PDF, JPG, PNG, DOC up to 10MB</p>
-            </div>
-            <div>
-                <label class="text-xs font-semibold text-stone-500 dark:text-stone-400 uppercase tracking-widest mb-1.5 block">Notes <span class="text-stone-500 dark:text-stone-400 normal-case">(optional)</span></label>
-                <textarea name="notes" rows="3" placeholder="Additional notes..." class="w-full border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 resize-none">{{ old('notes') }}</textarea>
-            </div>
-            <button type="submit" class="w-full bg-teal-700 hover:bg-teal-800 text-white py-2.5 rounded-lg text-sm font-semibold transition">
-                Upload Document
-            </button>
-        </form>
+{{-- Search and filter --}}
+<form method="GET" class="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_220px_auto]">
+    <input type="hidden" name="status" value="{{ $status }}">
+    <input type="search" name="q" value="{{ $search }}" placeholder="Search broker or agent name or email..." aria-label="Search documents" class="{{ $fieldClass }}">
+    <select name="type" aria-label="Filter by document type" class="{{ $fieldClass }}">
+        <option value="">All document types</option>
+        <optgroup label="Broker compliance">
+            @foreach(\App\Models\Document::BROKER_COMPLIANCE_TYPES as $value => $details)
+            <option value="{{ $value }}" @selected($type === $value)>{{ $details['label'] }}</option>
+            @endforeach
+        </optgroup>
+        <optgroup label="Agent IDs">
+            @foreach(\App\Models\Document::AGENT_ID_TYPES as $value => $label)
+            <option value="{{ $value }}" @selected($type === $value)>{{ $label }}</option>
+            @endforeach
+        </optgroup>
+    </select>
+    <div class="flex gap-2">
+        <button type="submit" class="flex-1 rounded-lg bg-teal-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-teal-800">Filter</button>
+        @if($search !== '' || $type)
+        <a href="{{ route('admin.documents', ['status' => $status]) }}" class="rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-4 py-2 text-center text-sm font-medium text-stone-600 dark:text-stone-300 transition hover:bg-stone-50 dark:hover:bg-stone-800">Clear</a>
+        @endif
     </div>
+</form>
 
-    {{-- Document List --}}
-    <div class="xl:col-span-2 bg-white dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-700 overflow-hidden">
-        <div class="px-5 py-4 border-b border-stone-100 dark:border-stone-800 flex items-center justify-between">
-            <h2 class="font-semibold text-stone-800 dark:text-stone-100">Broker Documents</h2>
-            <span class="text-xs text-stone-500 dark:text-stone-400">{{ $documents->total() }} total</span>
+<p class="mb-4 text-xs text-stone-500 dark:text-stone-400">Brokers upload their own documents from their application page or Settings. Verify each one, or ask for a new copy with a reason the broker can act on.</p>
+
+<div class="space-y-5">
+    @forelse($owners as $owner)
+    @php
+        $checklist = $checklists[$owner->id] ?? null;
+        $verified = $checklist ? collect($checklist)->filter(fn ($item) => $item['document']?->status === 'verified')->count() : 0;
+        $total = $checklist ? count($checklist) : 0;
+    @endphp
+    <section class="overflow-hidden rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900" aria-labelledby="owner-{{ $owner->id }}">
+        {{-- Broker header --}}
+        <div class="flex flex-col gap-3 border-b border-stone-100 dark:border-stone-800 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex min-w-0 items-center gap-3">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-700 text-sm font-semibold text-white" aria-hidden="true">{{ strtoupper(substr($owner->name, 0, 1)) }}</span>
+                <div class="min-w-0">
+                    <h2 id="owner-{{ $owner->id }}" class="truncate font-semibold text-stone-800 dark:text-stone-100">{{ $owner->name }}</h2>
+                    <p class="truncate text-xs text-stone-500 dark:text-stone-400">
+                        {{ $owner->email }}
+                        @if($owner->role === 'broker')
+                        · <span class="{{ $owner->is_approved ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-amber-400' }}">{{ $owner->is_approved ? 'Approved broker' : 'Awaiting approval' }}</span>
+                        @endif
+                    </p>
+                </div>
+            </div>
+            @if($checklist)
+            <div class="flex items-center gap-4 sm:justify-end">
+                <div class="w-40">
+                    <p class="text-xs font-medium text-stone-600 dark:text-stone-300">{{ $verified }} of {{ $total }} verified</p>
+                    <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-stone-100 dark:bg-stone-800" role="progressbar" aria-valuemin="0" aria-valuemax="{{ $total }}" aria-valuenow="{{ $verified }}" aria-label="Compliance documents verified">
+                        <div class="h-full rounded-full bg-green-500" style="width: {{ $total ? round($verified / $total * 100) : 0 }}%"></div>
+                    </div>
+                </div>
+                <a href="{{ route('admin.brokers.show', $owner) }}" class="shrink-0 text-xs font-semibold text-teal-700 hover:underline dark:text-teal-400">Open application</a>
+            </div>
+            @endif
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-stone-50 dark:bg-stone-800/60 border-b border-stone-100 dark:border-stone-800">
-                    <tr class="text-left text-stone-500 dark:text-stone-400">
-                        <th class="px-5 py-3 font-medium">Document</th>
-                        <th class="px-5 py-3 font-medium">Broker</th>
-                        <th class="px-5 py-3 font-medium">Type</th>
-                        <th class="px-5 py-3 font-medium">Size</th>
-                        <th class="px-5 py-3 font-medium">Status</th>
-                        <th class="px-5 py-3 font-medium">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-stone-100 dark:divide-stone-800">
-                    @forelse($documents as $doc)
-                    <tr class="hover:bg-stone-50 dark:hover:bg-stone-800 transition">
-                        <td class="px-5 py-3">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 bg-teal-50 dark:bg-teal-950 rounded-lg flex items-center justify-center shrink-0">
-                                    <svg class="w-4 h-4 text-teal-600 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-stone-700 dark:text-stone-200 text-xs">{{ $doc->name }}</p>
-                                    <p class="text-stone-500 dark:text-stone-400 text-xs">{{ $doc->created_at->format('M d, Y') }}</p>
-                                </div>
+
+        {{-- Compliance checklist --}}
+        @if($checklist)
+        <ul class="flex flex-wrap gap-2 border-b border-stone-100 dark:border-stone-800 bg-stone-50/60 dark:bg-stone-800/30 px-5 py-3" aria-label="Compliance checklist for {{ $owner->name }}">
+            @foreach($checklist as $item)
+            @php $state = $item['document']?->status ?? 'missing'; @endphp
+            <li class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium {{ $badge[$state] ?? $badge['missing'] }}">
+                <span class="h-1.5 w-1.5 rounded-full {{ $dot[$state] ?? $dot['missing'] }}" aria-hidden="true"></span>
+                {{ $item['label'] }}<span class="sr-only">:</span>
+                <span class="font-normal opacity-80">{{ $state === 'missing' ? 'Not uploaded' : (\App\Models\Document::STATUSES[$state] ?? $state) }}</span>
+            </li>
+            @endforeach
+        </ul>
+        @endif
+
+        {{-- Documents --}}
+        <ul class="divide-y divide-stone-100 dark:divide-stone-800">
+            @foreach($documents[$owner->id] ?? [] as $doc)
+            @php $title = $doc->agent ? $doc->typeLabel() : $doc->name; @endphp
+            <li class="px-5 py-4" x-data="{ mode: null }">
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div class="flex min-w-0 items-start gap-3">
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-300" aria-hidden="true">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </span>
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <p class="font-medium text-stone-800 dark:text-stone-100">{{ $title }}</p>
+                                <span class="rounded-full px-2 py-0.5 text-xs font-medium {{ $badge[$doc->status] ?? $badge['missing'] }}">{{ $doc->statusLabel() }}</span>
                             </div>
-                        </td>
-                        <td class="px-5 py-3 text-stone-600 dark:text-stone-300 text-xs">{{ $doc->broker?->name ?? ($doc->client?->full_name ?? '—') }}</td>
-                        <td class="px-5 py-3 text-stone-500 dark:text-stone-400 text-xs capitalize">{{ str_replace('_', ' ', $doc->type) }}</td>
-                        <td class="px-5 py-3 text-stone-500 dark:text-stone-400 text-xs">{{ $doc->file_size ?? '—' }}</td>
-                        <td class="px-5 py-3">
-                            <span class="px-2 py-0.5 rounded-full text-xs font-medium
-                                {{ $doc->status === 'verified'    ? 'bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300'  : '' }}
-                                {{ $doc->status === 'pending'     ? 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300': '' }}
-                                {{ $doc->status === 'rejected'    ? 'bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-300'      : '' }}
-                                {{ $doc->status === 'needs_more'  ? 'bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-300'    : '' }}">
-                                {{ ucfirst(str_replace('_', ' ', $doc->status)) }}
-                            </span>
-                            @if($doc->notes)
-                            <p class="mt-1 max-w-[12rem] text-xs text-stone-500 dark:text-stone-400">{{ $doc->notes }}</p>
+                            <p class="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+                                @if($doc->agent)For agent {{ $doc->agent->name }} · @elseif($doc->typeLabel() !== $doc->name){{ $doc->typeLabel() }} · @endif
+                                Uploaded {{ $doc->created_at->format('M d, Y') }}
+                                @if($doc->readableSize()) · {{ $doc->readableSize() }}@endif
+                                @if($doc->status === 'verified' && $doc->verified_at) · Verified {{ $doc->verified_at->format('M d, Y') }}@endif
+                            </p>
+                            @if($doc->notes && $doc->status !== 'verified')
+                            <p class="mt-2 rounded-lg bg-stone-50 dark:bg-stone-800 px-3 py-2 text-xs text-stone-600 dark:text-stone-300"><span class="font-semibold">Reason sent:</span> {{ $doc->notes }}</p>
                             @endif
-                        </td>
-                        <td class="px-5 py-3">
-                            <div class="flex items-center gap-1.5 flex-wrap">
-                                <a href="{{ route('admin.documents.download', $doc) }}" target="_blank"
-                                   class="text-xs bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-700 px-2 py-1 rounded-lg font-medium transition">
-                                    View
-                                </a>
-                                @if($doc->status === 'pending')
-                                <form action="{{ route('admin.documents.verify', $doc) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="text-xs bg-green-100 dark:bg-green-950 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900 px-2 py-1 rounded-lg font-medium transition">Approve</button>
-                                </form>
-                                <form method="POST" class="flex items-center gap-1.5">
-                                    @csrf
-                                    <input type="text" name="notes" required maxlength="1000" placeholder="Reason" aria-label="Reason for {{ $doc->name }}" class="w-28 border border-stone-200 dark:border-stone-700 dark:bg-stone-800 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-teal-400">
-                                    <button type="submit" formaction="{{ route('admin.documents.reject', $doc) }}" class="text-xs bg-red-100 dark:bg-red-950 text-red-600 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900 px-2 py-1 rounded-lg font-medium transition">Reject</button>
-                                    <button type="submit" formaction="{{ route('admin.documents.request-more', $doc) }}" class="whitespace-nowrap text-xs bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900 px-2 py-1 rounded-lg font-medium transition">Request More</button>
-                                </form>
-                                @endif
-                                <form action="{{ route('admin.documents.destroy', $doc) }}" method="POST" onsubmit="return confirm('Delete this document?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-xs bg-stone-100 dark:bg-stone-800 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 px-2 py-1 rounded-lg font-medium transition">Delete</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr><td colspan="6" class="px-5 py-10 text-center text-stone-500 dark:text-stone-400">No documents uploaded yet.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="p-5">{{ $documents->links() }}</div>
-    </div>
+                            @if(in_array($doc->status, ['rejected', 'needs_more'], true))
+                            <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">Waiting for the broker to upload a new copy.</p>
+                            @endif
+                        </div>
+                    </div>
 
+                    <div class="flex shrink-0 flex-wrap items-center gap-2 lg:justify-end">
+                        <a href="{{ route('admin.documents.download', $doc) }}" target="_blank" rel="noopener"
+                           class="rounded-lg border border-stone-200 dark:border-stone-700 px-3 py-1.5 text-xs font-semibold text-stone-700 dark:text-stone-200 transition hover:bg-stone-50 dark:hover:bg-stone-800">View file</a>
+                        @if($doc->status === 'pending')
+                        <form action="{{ route('admin.documents.verify', $doc) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-green-700">Verify</button>
+                        </form>
+                        <button type="button" @click="mode = mode === 'more' ? null : 'more'" :aria-expanded="mode === 'more'"
+                                class="rounded-lg border border-orange-200 dark:border-orange-900 px-3 py-1.5 text-xs font-semibold text-orange-700 dark:text-orange-300 transition hover:bg-orange-50 dark:hover:bg-orange-950">Request new copy</button>
+                        <button type="button" @click="mode = mode === 'reject' ? null : 'reject'" :aria-expanded="mode === 'reject'"
+                                class="rounded-lg border border-red-200 dark:border-red-900 px-3 py-1.5 text-xs font-semibold text-red-700 dark:text-red-300 transition hover:bg-red-50 dark:hover:bg-red-950">Reject</button>
+                        @endif
+                        <form action="{{ route('admin.documents.destroy', $doc) }}" method="POST" onsubmit="return confirm('Delete {{ addslashes($title) }}? The broker will need to upload it again.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="rounded-lg p-1.5 text-stone-400 transition hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-400" aria-label="Delete {{ $title }}" title="Delete">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                @if($doc->status === 'pending')
+                {{-- Reason panel for "Request new copy" and "Reject" --}}
+                @foreach([
+                    'more' => [route('admin.documents.request-more', $doc), 'What should the broker fix or add?', 'e.g. The photo is blurry. Please upload a clearer copy.', 'Send request', 'bg-orange-600 hover:bg-orange-700'],
+                    'reject' => [route('admin.documents.reject', $doc), 'Why is this document rejected?', 'e.g. The PRC ID has expired.', 'Reject document', 'bg-red-600 hover:bg-red-700'],
+                ] as $panel => [$action, $question, $example, $submitLabel, $submitClass])
+                <form x-show="mode === '{{ $panel }}'" style="display: none" action="{{ $action }}" method="POST"
+                      class="mt-3 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800/50 p-3 lg:ml-12">
+                    @csrf
+                    <label for="reason-{{ $panel }}-{{ $doc->id }}" class="block text-xs font-semibold text-stone-700 dark:text-stone-200">{{ $question }}</label>
+                    <textarea id="reason-{{ $panel }}-{{ $doc->id }}" name="notes" rows="2" required maxlength="1000" placeholder="{{ $example }}"
+                              class="mt-1.5 w-full rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-400"></textarea>
+                    <p class="mt-1 text-xs text-stone-500 dark:text-stone-400">The broker sees this reason in their notifications.</p>
+                    <div class="mt-2 flex gap-2">
+                        <button type="submit" class="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition {{ $submitClass }}">{{ $submitLabel }}</button>
+                        <button type="button" @click="mode = null" class="rounded-lg px-3 py-1.5 text-xs font-semibold text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800">Cancel</button>
+                    </div>
+                </form>
+                @endforeach
+                @endif
+            </li>
+            @endforeach
+        </ul>
+    </section>
+    @empty
+    <div class="rounded-xl border border-dashed border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 px-6 py-14 text-center">
+        <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-green-600 dark:bg-green-950 dark:text-green-400" aria-hidden="true">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        </span>
+        @if($search !== '' || $type)
+        <p class="mt-3 font-semibold text-stone-800 dark:text-stone-100">No documents match your search</p>
+        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">Try another name or document type.</p>
+        @elseif($status === 'pending')
+        <p class="mt-3 font-semibold text-stone-800 dark:text-stone-100">Nothing to review</p>
+        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">New uploads from brokers will appear here.</p>
+        @else
+        <p class="mt-3 font-semibold text-stone-800 dark:text-stone-100">No documents here</p>
+        <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">Documents with this status will appear here.</p>
+        @endif
+    </div>
+    @endforelse
 </div>
+
+@if($owners->hasPages())
+<div class="mt-5">{{ $owners->links() }}</div>
+@endif
 
 @endsection

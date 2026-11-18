@@ -49,10 +49,8 @@ class AgentController extends Controller
             ->withQueryString();
 
         $agentCount = $team->count();
-        $agentLimit = config('brokerage.max_agents_per_broker');
-        $atLimit = $agentCount >= $agentLimit;
 
-        return view('pages.broker.agents.index', compact('agents', 'summary', 'status', 'agentCount', 'agentLimit', 'atLimit'));
+        return view('pages.broker.agents.index', compact('agents', 'summary', 'status', 'agentCount'));
     }
 
     public function store(Request $request, AgentInvitationService $invitations): RedirectResponse
@@ -62,12 +60,6 @@ class AgentController extends Controller
             'email' => ['required', 'email', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:20'],
         ], ['email.unique' => 'An account with this email already exists.']);
-
-        $limit = config('brokerage.max_agents_per_broker');
-
-        if (auth()->user()->agents()->count() >= $limit) {
-            return back()->withInput()->withErrors(['email' => "You have reached the limit of {$limit} agents per broker."]);
-        }
 
         // Together, so a failed invitation cannot leave an account with no link.
         [$agent, $link] = DB::transaction(function () use ($data, $invitations) {

@@ -69,4 +69,19 @@ class AIProviderTest extends TestCase
 
         $this->assertNotSame('', $reply);
     }
+
+    public function test_find_your_match_follows_the_ai_ranking(): void
+    {
+        $agent = \App\Models\User::factory()->create(['role' => 'agent']);
+        $first = \App\Models\Property::create(['broker_id' => $agent->id, 'name' => 'First', 'slug' => 'first', 'type' => 'House and Lot', 'status' => 'available']);
+        $second = \App\Models\Property::create(['broker_id' => $agent->id, 'name' => 'Second', 'slug' => 'second', 'type' => 'House and Lot', 'status' => 'available']);
+        $this->useProvider('test-key');
+        Http::fake(['api.groq.com/*' => Http::response(['choices' => [['message' => ['content' => json_encode([$second->id, $first->id])]]]])]);
+
+        $ai = app(AIService::class);
+        $ranked = $ai->recommendProperties(['type' => 'House and Lot']);
+
+        $this->assertTrue($ai->lastRankedByAi);
+        $this->assertSame(['Second', 'First'], $ranked->pluck('name')->all());
+    }
 }

@@ -32,7 +32,7 @@
 </div>
 
 <div class="max-w-6xl mx-auto px-6 py-8">
-    @php($reviewing = $profiles->whereNotNull('broker_id'))
+    @php $reviewing = $profiles->whereNotNull('broker_id'); @endphp
     @if($reviewing->isNotEmpty())
     <h2 class="font-semibold text-stone-800 mb-4">Your Status with Each Agent</h2>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 mb-8">
@@ -53,11 +53,68 @@
     </div>
     @endif
 
+    {{-- Recommended for you --}}
+    @php
+        $recMode = $recommendations['mode'];
+        $prefs = $recommendations['preferences'];
+        $prefChips = array_filter([
+            $prefs['type'] ?? null,
+            isset($prefs['city']) || isset($prefs['province']) ? implode(', ', array_filter([$prefs['city'] ?? null, $prefs['province'] ?? null])) : null,
+            isset($prefs['max_price']) ? 'Up to ₱' . number_format($prefs['max_price'] / 1000000, 1) . 'M' : null,
+            isset($prefs['bedrooms']) ? $prefs['bedrooms'] . '+ ' . Str::plural('bedroom', $prefs['bedrooms']) : null,
+        ]);
+        $activity = collect($recommendations['activity'])->map(fn ($count, $label) => "{$count} {$label}")->implode(', ');
+    @endphp
+    <section class="mb-8" aria-labelledby="recommended-heading">
+        <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <h2 id="recommended-heading" class="font-semibold text-stone-800">{{ $recMode === 'personal' ? 'Recommended for you' : 'Popular right now' }}</h2>
+                @if($recMode === 'personal')
+                <p class="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-stone-500">
+                    @if($recommendations['ai'])<span class="rounded-full bg-violet-100 px-2 py-0.5 font-semibold text-violet-800">AI picks</span>@endif
+                    Based on your activity{{ $activity ? ': ' . $activity : '' }}.
+                </p>
+                @if($prefChips)
+                <ul class="mt-2 flex flex-wrap gap-1.5" aria-label="What we matched on">
+                    @foreach($prefChips as $chip)
+                    <li class="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-800">{{ $chip }}</li>
+                    @endforeach
+                </ul>
+                @endif
+                @else
+                <p class="mt-0.5 text-xs text-stone-500">The listings other buyers save and ask about the most.</p>
+                @endif
+            </div>
+            <a href="{{ route('client.recommendations') }}" class="text-xs font-semibold text-teal-700 hover:underline">Tell us what you want →</a>
+        </div>
+
+        @if($recMode === 'popular')
+        <div class="mb-4 flex flex-col gap-3 rounded-2xl border border-teal-100 bg-teal-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-sm text-stone-700">Save or view a few properties and we'll suggest ones that match what you like. Or tell us what you're looking for now.</p>
+            <div class="flex shrink-0 gap-2">
+                <a href="{{ route('client.recommendations') }}" class="rounded-xl bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800">Find Your Match</a>
+                <a href="{{ route('client.properties') }}" class="rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-semibold text-stone-700 transition hover:bg-stone-50">Browse</a>
+            </div>
+        </div>
+        @endif
+
+        @if($recommendations['properties']->isNotEmpty())
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach($recommendations['properties'] as $recommended)
+                @include('pages.client.properties._card', ['property' => $recommended])
+            @endforeach
+        </div>
+        @else
+        <p class="rounded-2xl border border-stone-200 bg-white px-5 py-8 text-center text-sm text-stone-500">No listings to suggest right now. Please check back soon.</p>
+        @endif
+    </section>
+
     <h2 class="font-semibold text-stone-800 mb-4">Quick Access</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         @foreach([
             ['My Reservation','client.account.reservation','M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'],
                 ['Find Your Match','client.recommendations','M9 3v2m6-2v2M4 9h16M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z'],
+                ['Compare','client.compare','M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4'],
             ['Feedback','client.account.feedback','M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z'],
         ] as $nav)
         <a href="{{ route($nav[1]) }}" class="bg-white rounded-2xl border border-stone-200 p-5 flex flex-col items-center gap-3 hover:shadow-md hover:border-teal-200 transition group text-center">

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AppNotification;
 use App\Models\Lot;
 use App\Models\Reservation;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,28 +14,60 @@ use Illuminate\View\View;
 
 class ReservationController extends Controller
 {
-    public function index(): View
+    /**
+     * What an admin can do from each status, with what happens to the lot.
+     * A completed sale is final, so it offers nothing.
+     */
+    public const ACTIONS = [
+        'requested' => ['confirmed', 'cancelled'],
+        'pending' => ['confirmed', 'completed', 'cancelled'],
+        'confirmed' => ['completed', 'cancelled'],
+        'cancelled' => ['pending'],
+        'completed' => [],
+    ];
+
+    public function index(Request $request): View
     {
-        $reservations = Reservation::with(['client', 'broker', 'lot.property'])
-            ->when(request('status'), fn($q) => $q->where('status', request('status')))
-            ->when(request('search'), function ($q) {
-                $search = '%'.request('search').'%';
-                $q->where(fn ($query) => $query->where('reservation_code', 'like', $search)
-                    ->orWhereHas('client', fn ($client) => $client->where('first_name', 'like', $search)
-                        ->orWhere('last_name', 'like', $search)
-                        ->orWhere('email', 'like', $search)));
-            })
+        $tabs = ['all' => 'All'] + Reservation::STATUSES;
+        $status = array_key_exists((string) $request->input('status'), $tabs) ? $request->input('status') : 'all';
+        $search = trim((string) $request->input('search'));
+        $brokers = User::where('role', 'broker')->orderBy('name')->get(['id', 'name']);
+        $brokerId = $brokers->contains('id', (int) $request->input('broker')) ? (int) $request->input('broker') : null;
+
+        $scope = fn () => Reservation::query()
+            ->when($brokerId, fn ($query) => $query->whereHas('broker', fn ($handler) => $handler
+                ->where('broker_id', $brokerId)->orWhere('users.id', $brokerId)))
+            ->when($search !== '', function ($query) use ($search) {
+                $like = "%{$search}%";
+                $query->where(fn ($match) => $match->where('reservation_code', 'like', $like)
+                    ->orWhereHas('client', fn ($client) => $client->where('first_name', 'like', $like)
+                        ->orWhere('last_name', 'like', $like)
+                        ->orWhere('email', 'like', $like))
+                    ->orWhereHas('lot.property', fn ($property) => $property->where('name', 'like', $like))
+                    ->orWhereHas('broker', fn ($agent) => $agent->where('name', 'like', $like)));
+            });
+
+        $counts = $scope()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+        $counts['all'] = $counts->sum();
+
+        $reservations = $scope()
+            ->with(['client', 'broker.broker', 'lot.property'])
+            ->when($status !== 'all', fn ($query) => $query->where('status', $status))
             ->latest()
             ->paginate(15)
             ->withQueryString();
 
-        return view('pages.admin.reservations.index', compact('reservations'));
+        return view('pages.admin.reservations.index', compact('reservations', 'tabs', 'status', 'counts', 'search', 'brokers', 'brokerId'));
     }
 
     public function show(Reservation $reservation): View
     {
-        $reservation->load(['client', 'broker', 'lot.property']);
-        return view('pages.admin.reservations.show', compact('reservation'));
+        $reservation->load(['client', 'broker.broker', 'lot.property']);
+
+        return view('pages.admin.reservations.show', [
+            'reservation' => $reservation,
+            'actions' => self::ACTIONS[$reservation->status] ?? [],
+        ]);
     }
 
     public function updateStatus(Request $request, Reservation $reservation): RedirectResponse
@@ -86,7 +119,14 @@ class ReservationController extends Controller
 
         $this->notifyParties($reservation, $status);
 
-        return back()->with('success', 'Reservation updated.');
+        $code = $reservation->reservation_code;
+
+        return back()->with('success', match ($status) {
+            'confirmed' => "Reservation {$code} confirmed. The lot is now reserved.",
+            'completed' => "Reservation {$code} completed. The lot is marked as sold.",
+            'cancelled' => "Reservation {$code} cancelled.",
+            default => "Reservation {$code} is pending again.",
+        });
     }
 
     private function notifyParties(Reservation $reservation, string $status): void

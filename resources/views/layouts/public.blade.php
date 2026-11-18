@@ -443,5 +443,6 @@
         }
     </script>
     @include('layouts.partials.flash-toast')
+    @include('layouts.partials.compare-bar')
 </body>
 </html>

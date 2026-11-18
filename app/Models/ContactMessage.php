@@ -9,6 +9,25 @@ class ContactMessage extends Model
 {
     use HasFactory;
 
+    /** Subjects offered on the public contact form. */
+    public const SUBJECTS = [
+        'Property Inquiry',
+        'Reservation Question',
+        'Document Submission',
+        'General Inquiry',
+        'Complaint / Feedback',
+    ];
+
+    public const STATUSES = [
+        'new' => 'New',
+        'handled' => 'Handled',
+    ];
+
+    public function fullName(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
+
     protected $fillable = [
         'first_name',
         'last_name',

@@ -45,6 +45,9 @@ use App\Http\Controllers\Agent\SiteVisitController;
 use App\Http\Controllers\Client\ChatController as ClientChatController;
 use App\Http\Controllers\Client\DashboardController as ClientDashboardController;
 use App\Http\Controllers\Client\FavoriteController as ClientFavoriteController;
+use App\Http\Controllers\Client\PropertyReviewController as ClientPropertyReviewController;
+use App\Http\Controllers\Client\CompareController as ClientCompareController;
+use App\Http\Controllers\Admin\PropertyReviewController as AdminPropertyReviewController;
 use App\Http\Controllers\Client\FeedbackController as ClientFeedbackController;
 use App\Http\Controllers\Client\InquiryController as ClientInquiryController;
 use App\Http\Controllers\Client\NotificationController as ClientNotificationController;
@@ -82,6 +85,10 @@ Route::middleware('role.redirect')->group(function () {
 Route::get('/', [ClientPropertyController::class, 'index'])->name('home');
 Route::get('/properties', [ClientPropertyController::class, 'index'])->name('client.properties');
 Route::get('/recommendations', [ClientPropertyController::class, 'recommendations'])->name('client.recommendations');
+Route::get('/compare', [ClientCompareController::class, 'index'])->name('client.compare');
+Route::post('/compare/summary', [ClientCompareController::class, 'summary'])->middleware('throttle:10,1')->name('client.compare.summary');
+Route::post('/compare/{property}', [ClientCompareController::class, 'toggle'])->name('client.compare.toggle');
+Route::delete('/compare', [ClientCompareController::class, 'clear'])->name('client.compare.clear');
 Route::get('/properties/{slug}', [ClientPropertyController::class, 'show'])->name('client.property.show');
 Route::post('/properties/{property}/inquire', [ClientInquiryController::class, 'store'])->middleware('throttle:public-forms')->name('client.property.inquire');
 Route::view('/about', 'pages.client.about.index')->name('client.about');
@@ -116,6 +123,8 @@ Route::prefix('my')->name('client.account.')->middleware(['auth', 'role:client',
     Route::post('/favorites/{property}', [ClientFavoriteController::class, 'store'])->name('favorites.store');
     Route::delete('/favorites/{property}', [ClientFavoriteController::class, 'destroy'])->name('favorites.destroy');
     Route::post('/favorites/{property}/toggle', [ClientFavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::post('/reviews/{property}', [ClientPropertyReviewController::class, 'store'])->middleware('throttle:public-forms')->name('reviews.store');
+    Route::delete('/reviews/{property}', [ClientPropertyReviewController::class, 'destroy'])->name('reviews.destroy');
     Route::get('/inquiries', [ClientInquiryController::class, 'index'])->name('inquiries');
     Route::post('/inquiries/{property}', [ClientInquiryController::class, 'store'])->name('inquiries.store');
     Route::get('/inquiries/{inquiry}', [ClientInquiryController::class, 'show'])->name('inquiries.show');
@@ -146,7 +155,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'audit
     Route::get('/reservations/{reservation}', [AdminReservationController::class, 'show'])->name('reservations.show');
     Route::patch('/reservations/{reservation}/status', [AdminReservationController::class, 'updateStatus'])->name('reservations.status');
     Route::get('/documents', [AdminDocumentController::class, 'index'])->name('documents');
-    Route::post('/documents', [AdminDocumentController::class, 'store'])->name('documents.store');
     Route::get('/documents/{document}/download', [AdminDocumentController::class, 'download'])->name('documents.download');
     Route::post('/documents/{document}/verify', [AdminDocumentController::class, 'verify'])->name('documents.verify');
     Route::post('/documents/{document}/reject', [AdminDocumentController::class, 'reject'])->name('documents.reject');
@@ -156,6 +164,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin', 'audit
     Route::post('/feedback/{feedback}/resolve', [AdminFeedbackController::class, 'resolve'])->name('feedback.resolve');
     Route::get('/contact-messages', [AdminContactMessageController::class, 'index'])->name('contact-messages');
     Route::post('/contact-messages/{contactMessage}/handle', [AdminContactMessageController::class, 'handle'])->name('contact-messages.handle');
+    Route::post('/contact-messages/{contactMessage}/reopen', [AdminContactMessageController::class, 'reopen'])->name('contact-messages.reopen');
+    Route::get('/reviews', [AdminPropertyReviewController::class, 'index'])->name('reviews');
+    Route::patch('/reviews/{review}/hide', [AdminPropertyReviewController::class, 'hide'])->name('reviews.hide');
+    Route::patch('/reviews/{review}/restore', [AdminPropertyReviewController::class, 'restore'])->name('reviews.restore');
     Route::get('/audit', [AdminAuditController::class, 'index'])->name('audit');
     Route::get('/backups', [AdminBackupController::class, 'index'])->name('backups');
     Route::post('/backups', [AdminBackupController::class, 'store'])->name('backups.store');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ContactMessage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ContactController extends Controller
 {
@@ -15,7 +16,7 @@ class ContactController extends Controller
             'last_name' => 'required|string|max:100',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:30',
-            'subject' => 'required|in:Property Inquiry,Reservation Question,Document Submission,General Inquiry,Complaint / Feedback',
+            'subject' => ['required', Rule::in(ContactMessage::SUBJECTS)],
             'message' => 'required|string|max:5000',
         ]);
 

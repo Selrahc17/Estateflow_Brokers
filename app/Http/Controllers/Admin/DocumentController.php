@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AppNotification;
 use App\Models\Document;
 use App\Models\User;
+use App\Services\BrokerComplianceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,43 +14,65 @@ use Illuminate\View\View;
 
 class DocumentController extends Controller
 {
-    public function index(): View
+    /** Status tabs, in the order an admin works through them. */
+    public const TABS = Document::STATUSES + ['all' => 'All'];
+
+    /**
+     * A review queue of broker and agent documents, grouped by broker.
+     * Brokers upload their own files; admins only review them.
+     */
+    public function index(Request $request, BrokerComplianceService $compliance): View
     {
-        // Broker and agent documents only. Buyer requirements are handled by the
-        // developer's coordinator, so older buyer uploads stay stored but hidden.
-        $documents = Document::whereNull('client_id')->with('broker', 'uploader')->latest()->paginate(15);
-        $brokers = User::where('role', 'broker')->orderBy('name')->get();
-        return view('pages.admin.documents.index', compact('documents', 'brokers'));
-    }
+        $status = array_key_exists((string) $request->input('status'), self::TABS) ? $request->input('status') : 'pending';
+        $types = Document::typeLabels();
+        $type = array_key_exists((string) $request->input('type'), $types) ? $request->input('type') : null;
+        $search = trim((string) $request->input('q'));
 
-    public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'broker_id' => 'required|exists:users,id',
-            'name'      => 'required|string|max:255',
-            'type'      => 'required|string|max:30',
-            'file'      => 'required|file|max:10240',
-            'notes'     => 'nullable|string|max:1000',
+        // Buyer requirements are handled by the developer's coordinator, so older
+        // buyer uploads stay stored but are not shown here.
+        $scope = fn () => Document::whereNull('client_id')
+            ->whereNotNull('broker_id')
+            ->when($type, fn ($query) => $query->where('type', $type))
+            ->when($search !== '', fn ($query) => $query->where(fn ($match) => $match
+                ->whereHas('broker', fn ($user) => $user->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                ->orWhereHas('agent', fn ($user) => $user->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))));
+
+        $counts = $scope()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+        $counts['all'] = $counts->sum();
+
+        $filtered = $scope()->when($status !== 'all', fn ($query) => $query->where('status', $status));
+
+        $owners = User::whereIn('id', (clone $filtered)->select('broker_id')->toBase())
+            ->orderBy('name')
+            ->paginate(8)
+            ->withQueryString();
+
+        $complianceOrder = array_flip(array_keys(Document::BROKER_COMPLIANCE_TYPES));
+        $documents = (clone $filtered)
+            ->whereIn('broker_id', $owners->pluck('id'))
+            ->with('agent:id,name')
+            ->get()
+            ->sortBy(fn (Document $document) => [
+                $document->agent_id ? 1 : 0,
+                $complianceOrder[$document->type] ?? 99,
+                $document->created_at?->timestamp ?? 0,
+            ])
+            ->groupBy('broker_id');
+
+        $checklists = $owners->filter(fn (User $owner) => $owner->role === 'broker')
+            ->mapWithKeys(fn (User $broker) => [$broker->id => $compliance->checklist($broker)]);
+
+        return view('pages.admin.documents.index', [
+            'tabs' => self::TABS,
+            'status' => $status,
+            'counts' => $counts,
+            'types' => $types,
+            'type' => $type,
+            'search' => $search,
+            'owners' => $owners,
+            'documents' => $documents,
+            'checklists' => $checklists,
         ]);
-
-        $file = $request->file('file');
-        $filename = 'broker-documents/' . uniqid() . '.' . $file->getClientOriginalExtension();
-        \Illuminate\Support\Facades\Storage::disk('supabase')->put($filename, file_get_contents($file->getRealPath()), 'public');
-        $path = env('SUPABASE_URL') . '/storage/v1/object/public/properties/' . $filename;
-        $size = round($file->getSize() / 1024) . ' KB';
-
-        Document::create([
-            'broker_id'   => $request->broker_id,
-            'uploaded_by' => auth()->id(),
-            'name'        => $request->name,
-            'type'        => $request->type,
-            'file_path'   => $path,
-            'file_size'   => $size,
-            'notes'       => $request->notes,
-            'status'      => 'verified',
-        ]);
-
-        return back()->with('success', 'Document uploaded successfully.');
     }
 
     public function download(Document $document)
@@ -74,7 +97,7 @@ class DocumentController extends Controller
         $document->update(['status' => 'verified', 'verified_at' => now(), 'notes' => null]);
         $this->notifyOwner($document, "{$document->name} was verified.");
 
-        return back()->with('success', 'Document verified.');
+        return back()->with('success', "{$document->name} verified.");
     }
 
     public function reject(Request $request, Document $document): RedirectResponse
@@ -83,7 +106,7 @@ class DocumentController extends Controller
         $document->update(['status' => 'rejected', 'notes' => $notes, 'verified_at' => null]);
         $this->notifyOwner($document, "{$document->name} was rejected: {$notes}");
 
-        return back()->with('success', 'Document rejected.');
+        return back()->with('success', "{$document->name} rejected. The broker has been told why.");
     }
 
     public function requestMore(Request $request, Document $document): RedirectResponse
@@ -92,7 +115,7 @@ class DocumentController extends Controller
         $document->update(['status' => 'needs_more', 'notes' => $notes, 'verified_at' => null]);
         $this->notifyOwner($document, "More is needed for {$document->name}: {$notes}");
 
-        return back()->with('success', 'Requested additional documents.');
+        return back()->with('success', "Asked the broker for a new copy of {$document->name}.");
     }
 
     private function reason(Request $request): string
@@ -120,6 +143,7 @@ class DocumentController extends Controller
     public function destroy(Document $document): RedirectResponse
     {
         $document->delete();
-        return back()->with('success', 'Document deleted.');
+
+        return back()->with('success', "{$document->name} deleted.");
     }
 }

@@ -6,7 +6,6 @@
 @section('content')
 @inject('compliance', 'App\Services\BrokerComplianceService')
 @php
-    $usedPercent = $agentLimit > 0 ? min(100, round($agentCount / $agentLimit * 100)) : 100;
     $inputClass = 'w-full rounded-lg border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-800 px-3 py-2.5 text-sm text-stone-800 dark:text-stone-100 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-teal-400';
     $labelClass = 'mb-1.5 block text-sm font-medium text-stone-600 dark:text-stone-300';
     $menuItemClass = 'block w-full px-4 py-2 text-left text-sm transition hover:bg-stone-50 dark:hover:bg-stone-700';
@@ -19,7 +18,7 @@
 @endphp
 
 {{-- The dialog sits further down the page, so it only exists after the first tick. --}}
-<div x-data @if($errors->any() && ! $atLimit) x-init="$nextTick(() => $refs.invite.showModal())" @endif>
+<div x-data @if($errors->any()) x-init="$nextTick(() => $refs.invite.showModal())" @endif>
 
     @if(session('success'))
     <div class="mb-5 rounded-lg border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950 px-4 py-3 text-sm text-green-700 dark:text-green-300">{{ session('success') }}</div>
@@ -49,25 +48,13 @@
     </div>
     @endif
 
-    {{-- Team capacity --}}
+    {{-- Team size --}}
     <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div class="w-full sm:max-w-xs">
-            <div class="mb-1.5 flex items-baseline justify-between gap-3">
-                <p class="text-sm font-semibold text-stone-800 dark:text-stone-100">{{ $agentCount }} of {{ $agentLimit }} agents</p>
-                <p class="text-xs text-stone-600 dark:text-stone-400">{{ max(0, $agentLimit - $agentCount) }} {{ Str::plural('slot', max(0, $agentLimit - $agentCount)) }} left</p>
-            </div>
-            <div class="h-1.5 overflow-hidden rounded-full bg-stone-200 dark:bg-stone-700" role="progressbar" aria-label="Team capacity" aria-valuenow="{{ $agentCount }}" aria-valuemin="0" aria-valuemax="{{ $agentLimit }}">
-                <div class="h-full rounded-full {{ $atLimit ? 'bg-amber-500' : 'bg-teal-600 dark:bg-teal-400' }}" style="width: {{ $usedPercent }}%"></div>
-            </div>
-        </div>
-        @if($atLimit)
-        <p class="rounded-lg border border-amber-200 dark:border-amber-900 bg-amber-50 dark:bg-amber-950 px-3 py-2 text-sm text-amber-800 dark:text-amber-300">You have reached the limit of {{ $agentLimit }} agents per broker.</p>
-        @else
+        <p class="text-sm font-semibold text-stone-800 dark:text-stone-100">{{ $agentCount }} {{ Str::plural('agent', $agentCount) }} on your team</p>
         <button type="button" @click="$refs.invite.showModal()" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-teal-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-800">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Invite Agent
         </button>
-        @endif
     </div>
 
     {{-- Status filters --}}
@@ -222,7 +209,6 @@
     </div>
 
     {{-- Invite dialog --}}
-    @unless($atLimit)
     <dialog x-ref="invite" aria-labelledby="invite-heading" @click="if ($event.target === $el) $el.close()"
         class="m-auto w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white dark:bg-stone-900 p-0 text-stone-800 dark:text-stone-100 shadow-xl backdrop:bg-black/50">
         <form action="{{ route('broker.agents.store') }}" method="POST" class="space-y-4 p-6">
@@ -259,7 +245,6 @@
             </div>
         </form>
     </dialog>
-    @endunless
 
 </div>
 

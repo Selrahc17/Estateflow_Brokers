@@ -242,18 +242,22 @@ class BrokerPortalTest extends TestCase
         $this->post(route('broker.agents.invitation', $agent))->assertNotFound();
     }
 
-    public function test_agent_limit_blocks_new_invitations(): void
+    public function test_there_is_no_limit_on_how_many_agents_a_broker_invites(): void
     {
-        config(['brokerage.max_agents_per_broker' => 2]);
-        $this->makeAgent();
-        $this->makeAgent();
+        for ($i = 0; $i < 20; $i++) {
+            $this->makeAgent();
+        }
 
         $this->from(route('broker.agents.index'))
-            ->post(route('broker.agents.store'), ['name' => 'One Too Many', 'email' => 'extra@example.com'])
-            ->assertSessionHasErrors(['email' => 'You have reached the limit of 2 agents per broker.']);
+            ->post(route('broker.agents.store'), ['name' => 'Twenty First', 'email' => 'extra@example.com'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('invite_link');
 
-        $this->assertDatabaseMissing('users', ['email' => 'extra@example.com']);
-        $this->get(route('broker.agents.index'))->assertSee('2 of 2 agents')->assertDontSee('Send Invitation');
+        $this->assertDatabaseHas('users', ['email' => 'extra@example.com', 'role' => 'agent']);
+        $this->get(route('broker.agents.index'))
+            ->assertSee('21 agents on your team')
+            ->assertSee('Send Invitation')
+            ->assertDontSee('limit of');
     }
 
     public function test_agent_status_filters_match_their_counts(): void
@@ -300,19 +304,6 @@ class BrokerPortalTest extends TestCase
             ->assertSee('$refs.invite.showModal()', false);
 
         $this->get(route('broker.agents.index'))->assertDontSee('$refs.invite.showModal())', false);
-    }
-
-    public function test_limit_error_does_not_try_to_open_a_missing_dialog(): void
-    {
-        config(['brokerage.max_agents_per_broker' => 1]);
-        $this->makeAgent();
-
-        $this->from(route('broker.agents.index'))
-            ->followingRedirects()
-            ->post(route('broker.agents.store'), ['name' => 'Extra', 'email' => 'extra@example.com'])
-            ->assertSee('You have reached the limit of 1 agents per broker.')
-            ->assertDontSee('x-ref="invite"', false)
-            ->assertDontSee('$nextTick', false);
     }
 
     public function test_team_pages_show_only_this_brokers_agents(): void
